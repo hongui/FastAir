@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/material_blue_grey_50"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/toolbar"/>
+
+    <LinearLayout
+        android:id="@+id/fragment_chat_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorGrid"
+        android:orientation="horizontal"
+        android:padding="@dimen/dp8">
+
+        <EditText
+            android:id="@+id/chatInput"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/dp4"
+            android:layout_weight="1"
+            android:background="@drawable/selector_chat_input_bg"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/chatSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginLeft="@dimen/dp4"
+            android:background="@drawable/selector_chat_send_bg"
+            android:enabled="false"
+            android:text="发送"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chatContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/fragment_chat_edit"
+        android:layout_below="@+id/toolbar" />
+</RelativeLayout>

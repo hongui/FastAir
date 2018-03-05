@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_operation_open"
+        android:title="打开"/>
+
+    <item
+        android:id="@+id/menu_operation_detail"
+        android:title="详情"/>
+
+    <item
+        android:id="@+id/menu_operation_delete"
+        android:title="删除"/>
+</menu>

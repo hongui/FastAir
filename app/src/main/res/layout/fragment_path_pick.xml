@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/toolbar"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/pathPickTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:tabTextAppearance="@style/TabTextAppearance"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabTextColor="@android:color/white"
+        app:tabBackground="@color/colorPrimary"
+        app:tabMode="scrollable"
+        app:tabIndicatorHeight="@dimen/dp2"
+        app:tabSelectedTextColor="@color/colorAccent"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/pathPickContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
