@@ -1,0 +1,74 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:local="zh-cn">
+    <string name="app_name">快传</string>
+    <string name="app_description">体验飞起来的速度</string>
+    <string name="scan_tips">正在扫描周围设备，请稍等...</string>
+    <string name="tips_scan_failed">扫描完毕，未发现周围设备，请确认后再试</string>
+    <string name="tips_init_failed">初始化失败了，待会儿再试吧</string>
+    <string name="tips_error">出错了</string>
+    <string name="tips_disabled_wifi_p2p">当前设备的Wifi Direct开关未开启，或设备不支持，请确认后再试</string>
+    <string name="tips_ok">好的</string>
+    <string name="base.chooseOperator">选择操作</string>
+    <string name="base.findDevice">设备查找</string>
+    <string name="base.transferRecord">传输记录</string>
+    <string name="base.receive">接收</string>
+    <string name="base.again">再来一发</string>
+    <string name="base.chat">聊天</string>
+    <string name="base.exit">退出</string>
+    <string name="discoverDevice">发现设备</string>
+    <string name="discover.tips">系统正在查找周围设备，请稍等...</string>
+    <string name="action.copy">复制内容</string>
+    <string name="toast.alreadyCopy">内容已成功复制到剪切板</string>
+    <string name="toast.sendIllegal">空格或者空行不能发送</string>
+    <string name="toast.sendFaild">消息发送失败</string>
+    <string name="toast.removeFalid">移除组发生了错误</string>
+    <string name="toast.connectSuccess">连接成功,正在跳转，请稍等...</string>
+    <string name="toast.failedOpen">找不到合适的程序处理文件，文件打开失败</string>
+    <string name="toast.failedFinder">查找出错</string>
+    <string name="toggle_open">设置</string>
+    <string name="toggle_close">@string/app_name</string>
+    <string name="aes">升序</string>
+    <string name="des">降序</string>
+    <string name="swap">交换</string>
+    <string name="selectAll">全选</string>
+    <string name="unSelectAll">取消全选</string>
+    <string name="sort">排序</string>
+    <string name="delete">删除</string>
+    <string name="sortByName">按名称</string>
+    <string name="sortBySize">按大小</string>
+    <string name="sortByTime">按时间</string>
+    <string name="warm">警告</string>
+    <string name="giveUp">放弃</string>
+    <string name="send">发送</string>
+    <string name="category_picture">图片</string>
+    <string name="category_other">其它</string>
+    <string name="category_application">应用</string>
+    <string name="category_zip">压缩包</string>
+    <string name="category_txt">文本</string>
+    <string name="category_pdf">PDF</string>
+    <string name="category_powerpoint">PowerPoint</string>
+    <string name="category_excel">Excel</string>
+    <string name="category_word">Word</string>
+    <string name="category_music">音乐</string>
+    <string name="category_video">视频</string>
+    <string name="history">传输历史</string>
+    <string name="setting">设置</string>
+
+    <!--dialog-->
+    <string name="deleteTips">该操作将会删除目前所选的全部文件，删除后不可恢复</string>
+    <string name="disconverBackInfo">正在搜索周围设备，确定停止搜索并返回</string>
+    <string name="stop">停止</string>
+
+    <string name="viewTips">应用需要读取媒体文件，用于查看和发送</string>
+    <string name="goTurnOn">去开启</string>
+
+    <string name="disconverStateTips">当前Wi-Fi处于关闭状态或设备不支持Wi-Fi直连</string>
+
+    <string name="ok">确定</string>
+    <string name="wramTips">温馨提示</string>
+    <string name="chatOverInfo">确定要结束聊天，并且断开与对方的连接吗</string>
+    <string name="disconnect">断开</string>
+    <string name="justkid">手滑了</string>
+    <string name="chooseDownloadPath">选择文件接收路径</string>
+
+    <string name="fabbehivior">com.mob.lee.fastair.view.TranslationBehavior</string>
+</resources>

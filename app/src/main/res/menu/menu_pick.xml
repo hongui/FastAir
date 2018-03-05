@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_setting"
+        android:icon="@drawable/ic_action_more"
+        android:title="@string/setting"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/menu_content_swap"
+                android:icon="@drawable/ic_action_swap"
+                android:title="@string/aes"
+                app:showAsAction="always" />
+            <item
+                android:id="@+id/menu_content_all"
+                android:icon="@drawable/ic_action_select"
+                android:title="@string/selectAll"
+                app:showAsAction="always" />
+
+            <item
+                android:id="@+id/menu_content_sort"
+                android:icon="@drawable/ic_action_sort"
+                android:title="@string/sort"
+                app:showAsAction="always">
+                <menu>
+                    <group>
+                        <item
+                            android:id="@+id/menu_content_sort_byname"
+                            android:title="@string/sortByName" />
+
+                        <item
+                            android:id="@+id/menu_content_sort_bysize"
+                            android:title="@string/sortBySize" />
+
+                        <item
+                            android:id="@+id/menu_content_sort_bytime"
+                            android:title="@string/sortByTime" />
+                    </group>
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/menu_content_delete"
+                android:icon="@drawable/ic_action_delete"
+                android:title="@string/delete"
+                app:showAsAction="always" />
+        </menu>
+    </item>
+</menu>

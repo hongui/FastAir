@@ -1,0 +1,46 @@
+def versions=[:]
+versions.support='26.1.0'
+versions.kotlin='1.2.20'
+versions.constaint='1.0.2'
+versions.lifecycle='1.0.0'
+versions.room='1.0.0'
+versions.okio='1.13.0'
+versions.coroutines='0.21'
+
+ext.buildTool='27.0.1'
+
+def appVersion=[:]
+appVersion.code=5
+appVersion.name='1.3.0'
+ext.appVersion=appVersion
+
+def sdk=[:]
+sdk.mins=16
+sdk.target=25
+sdk.compile=26
+ext.sdk=sdk
+
+def support=[:]
+support.compat="com.android.support:appcompat-v7:$versions.support"
+support.recyclerview="com.android.support:recyclerview-v7:$versions.support"
+support.design="com.android.support:design:$versions.support"
+support.cardview="com.android.support:cardview-v7:$versions.support"
+support.constaint="com.android.support.constraint:constraint-layout:$versions.constaint"
+ext.support=support
+
+def kotlin=[:]
+kotlin.kdk="org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+kotlin.compiler="org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+kotlin.reflect="org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
+kotlin.coroutines="org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
+ext.coreKotlin=kotlin
+
+def room=[:]
+room.runtime="android.arch.persistence.room:runtime:$versions.room"
+room.compiler="android.arch.persistence.room:compiler:$versions.room"
+ext.room=room
+
+ext.lifecycle="android.arch.lifecycle:extensions:$versions.lifecycle"
+ext.okio="com.squareup.okio:okio:$versions.okio"
+
+ext.androidPlugin='com.android.tools.build:gradle:3.0.1'

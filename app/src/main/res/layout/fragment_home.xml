@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical">
+
+    <include
+        layout="@layout/toolbar"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/homeReceive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|end"
+        android:layout_marginEnd="@dimen/dp16"
+        android:layout_marginRight="@dimen/dp16"
+        android:layout_marginTop="@dimen/dp28"
+        android:clickable="true"
+        android:src="@drawable/ic_action_download"/>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/homeDrawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dp56">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/homeContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/homeNavgation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/menu_navigation"/>
+
+    </android.support.v4.widget.DrawerLayout>
+</FrameLayout>
