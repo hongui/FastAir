@@ -1,17 +1,11 @@
 package com.mob.lee.fastair
 
-import android.arch.persistence.room.Room
 import android.content.ClipData
 import android.content.ContentUris
-import android.net.Uri
 import android.os.Bundle
 import com.mob.lee.fastair.base.AppActivity
-import com.mob.lee.fastair.db.AppDatabase
-import com.mob.lee.fastair.fragment.DiscoverFragment
 import com.mob.lee.fastair.fragment.HomeFragment
 import com.mob.lee.fastair.model.Record
-import com.mob.lee.fastair.model.Message
-import com.mob.lee.fastair.model.STATE_ORIGIN
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.utils.database
 import java.io.File

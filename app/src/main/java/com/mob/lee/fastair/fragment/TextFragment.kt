@@ -5,10 +5,10 @@ import com.mob.lee.fastair.base.AppFragment
 import android.text.Spanned
 import android.graphics.Typeface
 import android.text.style.StyleSpan
-import android.support.v4.content.ContextCompat
 import android.text.style.ForegroundColorSpan
 import android.text.SpannableStringBuilder
 import android.text.style.RelativeSizeSpan
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.fragment_text.*
 
 
@@ -72,7 +72,7 @@ class TextFragment : AppFragment() {
         start = span.length
         span.append("\t6. 注意，v1.0版本与v1.1版本之间的聊天功能无效，请升级至v1.1;\n")
         span.append("\t7. 传输结束后，出现点击无效的情况，请退出程序即可恢复，无需杀死程序。\n")
-        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.color_red)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.color_red)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         return span
     }
 
@@ -101,14 +101,14 @@ class TextFragment : AppFragment() {
     }
 
     private fun setTitle(span: SpannableStringBuilder, start: Int) {
-        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimaryText)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.colorPrimaryText)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         span.setSpan(StyleSpan(Typeface.BOLD), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         span.setSpan(RelativeSizeSpan(1.2f), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         span.append("\n")
     }
 
     private fun setContact(span: SpannableStringBuilder, start: Int) {
-        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimaryText)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.colorPrimaryText)), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         span.setSpan(StyleSpan(Typeface.BOLD), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 }

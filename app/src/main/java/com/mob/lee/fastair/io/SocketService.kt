@@ -1,7 +1,7 @@
 package com.mob.lee.fastair.io
 
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
@@ -11,107 +11,102 @@ import java.nio.channels.SocketChannel
 /**
  * Created by Andy on 2017/11/29.
  */
-class SocketService(var keepAlive:Boolean=false) {
-    val readers = ArrayList<(bytes: ProtocolBytes) -> Unit>()
-    private val writers = ArrayList<SendTask>()
+class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
+    private val readers = HashSet<Reader>()
+    private val writers = Channel<Writer>()
     private var isOpen: Boolean = false
+    private var channel: SocketChannel? = null
 
+    /*建立连接，host为空作为客户端，否则作为服务器*/
     fun open(port: Int, host: String? = null) = runBlocking {
         if (isOpen) {
             return@runBlocking
         }
         isOpen = true
         try {
-            val channel = if (null != host) {
-                val channel = SocketChannel.open()
-                channel.connect(InetSocketAddress(host, port))
-                channel
+            if (null != host) {
+                channel = SocketChannel.open()
+                channel?.connect(InetSocketAddress(host, port))
             } else {
                 val server = ServerSocketChannel.open()
                 server.socket().bind(InetSocketAddress(port))
-                server.accept()
+                channel = server.accept()
             }
-            handleRead(channel)
-            handleWrite(channel)
-        }catch (e:Exception){
+            handleRead()
+            handleWrite()
+        } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            channel?.let {
+                it.close()
+            }
         }
     }
 
-    fun read(reader: (bytes: ProtocolBytes) -> Unit) {
+    /*添加收到数据的监听*/
+    fun read(reader: Reader) {
         readers.add(reader)
     }
 
-    fun write(task: SendTask) {
-        writers.add(task)
+    /*添加写入数据的监听*/
+    fun write(writer: Writer) = scope.launch {
+        writers.send(writer)
     }
 
+    /*关闭连接*/
     fun close() {
-        isOpen=false
-        keepAlive=false
+        isOpen = false
+        keepAlive = false
+        writers.close()
     }
 
-    private fun handleRead(channel: SocketChannel) {
-        launch {
-            while (isOpen||keepAlive) {
-                try {
-                    val head= readFix(5,channel)
-                    val type = head.get()
-                    val length = head.int
-                    val bytes= readFix(length,channel)
-                    for (reader in readers) {
-                        reader(ProtocolBytes.wrap(bytes.array(), type))
+    /*读取数据*/
+    suspend private fun handleRead() = withContext(Dispatchers.Default) {
+        while (isOpen || keepAlive) {
+            try {
+                val head = readFix(5)
+                val type = head.get()
+                val length = head.int
+                val bytes = readFix(length)
+                for (reader in readers) {
+                    reader(ProtocolByte.wrap(bytes.array(), ProtocolType.wrap(type)))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                for (reader in readers) {
+                    reader.onError(e.message)
+                }
+            }
+        }
+        channel?.socket()?.shutdownInput()
+    }
+
+    /*发送数据*/
+    suspend private fun handleWrite() {
+        while (isOpen || keepAlive) {
+            if (writers.isClosedForSend) {
+                break
+            }
+            try {
+                val data = writers.receive()
+                for (d in data) {
+                    val bytes = d.bytes
+                    while (bytes.hasRemaining()) {
+                        channel?.write(bytes)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            channel.socket().shutdownInput()
         }
+        channel?.socket()?.shutdownOutput()
     }
 
-    private fun handleWrite(channel: SocketChannel) {
-        launch {
-            while (isOpen||keepAlive) {
-                if (writers.isEmpty()){
-                    continue
-                }
-                val bytes = writers.elementAt(0)
-                try {
-                    val tasks = bytes.exe()
-                    for (task in tasks) {
-                        channel.write(task.bytes)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    writers.removeAt(0)
-                }
-            }
-            channel.socket().shutdownOutput()
-        }
-    }
-
-    private fun readFix(size:Int, channel: SocketChannel):ByteBuffer{
-        val buffer=ByteBuffer.allocate(size)
-        var tempSize=-1
-        while (-1==tempSize){
-            buffer.clear()
-            tempSize=channel.read(buffer)
-        }
-        while (tempSize<size){
-            buffer.limit(size)
-            buffer.position(tempSize)
-            val tempBuffer=ByteBuffer.allocate(size-tempSize)
-            var innerSize=-1
-            while (-1==innerSize){
-                tempBuffer.clear()
-                innerSize=channel.read(tempBuffer)
-            }
-            tempSize+=innerSize
-            for(i in 0 until innerSize){
-                buffer.put(tempBuffer.get(i))
-            }
+    /*读取特定长度的字节，可能会阻塞*/
+    private fun readFix(targetSize: Int): ByteBuffer {
+        val buffer = ByteBuffer.allocate(targetSize)
+        while (buffer.hasRemaining()) {
+            channel?.read(buffer)
         }
         buffer.flip()
         return buffer

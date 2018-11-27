@@ -1,17 +1,17 @@
 package com.mob.lee.fastair.fragment
 
 import android.os.Environment
-import android.support.design.widget.TabLayout
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import kotlinx.android.synthetic.main.fragment_path_pick.*
-import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import java.io.File
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TabHost
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.ViewHolder
 import com.mob.lee.fastair.model.formatDate
@@ -37,7 +37,7 @@ class PathPickFragment:AppFragment(){
         setHasOptionsMenu(true)
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            mCurrentPath = File(context.readDownloadPath())
+            mCurrentPath = File(context?.readDownloadPath())
             mAdapter=PathPickAdapter()
             pathPickContent.setLayoutManager(LinearLayoutManager(context))
             pathPickContent.setAdapter(mAdapter)
@@ -72,10 +72,10 @@ class PathPickFragment:AppFragment(){
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.getItemId() == R.id.menu_ok) {
             if (null == mCurrentPath) {
-                mCurrentPath = File(context.readDownloadPath())
+                mCurrentPath = File(context?.readDownloadPath())
             }
             mCurrentPath?.let {
-                context.writeDownloadPath(it.getAbsolutePath())
+                context?.writeDownloadPath(it.getAbsolutePath())
                 toast("路径修改成功，新文件将保存在${it.getAbsolutePath()}")
                 mParent?.onBackPressed()
                 return true
@@ -86,7 +86,7 @@ class PathPickFragment:AppFragment(){
 
     private fun updateContent(newFile: File?,position:Int=pathPickTab.tabCount) {
         mCurrentPath = newFile
-        val paths = context.getPaths(mCurrentPath)
+        val paths = context?.getPaths(mCurrentPath)?: emptyList()
         mAdapter.clearAll()
         mAdapter.addAll(paths)
         if(position==pathPickTab.tabCount) {

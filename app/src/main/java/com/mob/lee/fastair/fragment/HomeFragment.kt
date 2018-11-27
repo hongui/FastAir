@@ -9,12 +9,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.design.widget.NavigationView
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.HomeAdapter
 import com.mob.lee.fastair.base.AppFragment
@@ -61,7 +61,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.connected) {
-                    P2PManager.disconnect(context)
+                    P2PManager.disconnect(context!!)
                     val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
                     item.title = "连接设备"
                 } else {

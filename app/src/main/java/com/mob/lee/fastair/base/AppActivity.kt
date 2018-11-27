@@ -1,7 +1,7 @@
 package com.mob.lee.fastair.base
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import kotlin.reflect.KClass
 
 /**
@@ -51,7 +51,7 @@ open class AppActivity : AppCompatActivity() {
             fragment = constructor.call()
         }
         if (null != fragment.arguments) {
-            fragment.arguments.putAll(bundle)
+            fragment.arguments?.putAll(bundle)
         } else {
             fragment.arguments = bundle
         }

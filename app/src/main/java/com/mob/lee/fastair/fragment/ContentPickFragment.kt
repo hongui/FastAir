@@ -2,7 +2,6 @@ package com.mob.lee.fastair.fragment
 
 import android.Manifest
 import android.animation.ObjectAnimator
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,14 +9,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.content.ContextCompat
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.ContentPickAdapter
 import com.mob.lee.fastair.base.AppFragment
@@ -46,7 +46,7 @@ class ContentPickFragment : AppFragment() {
 
     override fun setting() {
         setHasOptionsMenu(true)
-        val fileCategory = FileCategory(arguments.getInt("fileCategory"))
+        val fileCategory = FileCategory(arguments?.getInt("fileCategory")?:0)
         toolbar(fileCategory.title)
 
         val adapter = ContentPickAdapter()
@@ -56,18 +56,18 @@ class ContentPickFragment : AppFragment() {
         pickSend.setOnClickListener {
             val records = mFileViewModel.checkedrecords()
             if (records.isEmpty()) {
-                context.errorToast("请先选择发送文件")
+                context?.errorToast("请先选择发送文件")
                 return@setOnClickListener
             }
             val bundle = Bundle()
             bundle.putBoolean(IS_SEND, true)
             mParent?.fragment(DiscoverFragment::class, bundle = bundle)
             thread {
-                context.database().recordDao().insert(records)
+                context?.database()?.recordDao()?.insert(records)
             }
         }
 
-        mFileViewModel = ViewModelProviders.of(activity).get(FileViewModel::class.java)
+        mFileViewModel = ViewModelProviders.of(activity!!).get(FileViewModel::class.java)
         mFileViewModel.mRecords.observe({ lifecycle }) {
             it?.let {
                 adapter.addAll(it)
@@ -147,7 +147,7 @@ class ContentPickFragment : AppFragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (PERMISSION_CODE == requestCode && !grantResults.isEmpty()) {
             if (PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                mFileViewModel.load(context, arguments.getInt("fileCategory"))
+                mFileViewModel.load(context!!, arguments?.getInt("fileCategory")?:0)
             } else if (shouldShowRequestPermissionRationale(permissions[0])) {
                 showDialog(getString(R.string.viewTips),
                         { dialog, which ->
@@ -166,16 +166,16 @@ class ContentPickFragment : AppFragment() {
     }
 
     fun permisionCheck() {
-        val fileCategory = arguments.getInt("fileCategory")
+        val fileCategory = arguments?.getInt("fileCategory")?:0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val permission = ContextCompat.checkSelfPermission(mParent as Context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permission == PackageManager.PERMISSION_GRANTED) {
-                mFileViewModel.load(context, fileCategory)
+                mFileViewModel.load(context!!, fileCategory)
             } else {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
             }
         } else {
-            mFileViewModel.load(context, fileCategory)
+            mFileViewModel.load(context!!, fileCategory)
         }
     }
 
@@ -222,7 +222,7 @@ class ContentPickFragment : AppFragment() {
             val file=File(it.path)
             val success = file.delete()
             if (success) {
-                updateStorage(context, it)
+                updateStorage(context!!, it)
                 count++
                 adapter.remove(it)
             }

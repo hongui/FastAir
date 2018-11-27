@@ -2,8 +2,11 @@ package com.mob.lee.fastair.adapter
 
 import android.widget.ImageView
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.io.state.ProcessState
+import com.mob.lee.fastair.io.state.SUCCESS
+import com.mob.lee.fastair.io.state.StartState
+import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.model.Record
-import com.mob.lee.fastair.model.STATE_SUCCESS
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.display
 import com.mob.lee.fastair.view.CircleProgress
@@ -13,8 +16,7 @@ import com.mob.lee.fastair.view.CircleProgress
  */
 class HistoryAdapter : Adapter<Record>() {
     var mCurrentIndex: Int = -1
-    var mCurrentProgress: Int = 0
-    var mCurrentState: Int = 0
+    lateinit var mCurrentState: State
 
     override fun layout(): Int = R.layout.item_history
 
@@ -24,24 +26,25 @@ class HistoryAdapter : Adapter<Record>() {
 
         holder?.text(R.id.item_history_title, data.name)
         holder?.text(R.id.item_history_date, data.date.formatDate("MM/dd/yy HH:mm"))
-        if (mCurrentIndex == position) {
-            progress?.progress(mCurrentProgress.toFloat())
-            if (0 != mCurrentState) {
-                progress?.updateState(mCurrentState)
+        if (mCurrentState is ProcessState) {
+            val state = mCurrentState as ProcessState
+            progress?.progress(state.percentage())
+            progress?.updateState(CircleProgress.PROGRESS)
+        } else {
+            val state = when (data.state) {
+                SUCCESS -> CircleProgress.SUCCESS
+                else -> CircleProgress.FAILED
             }
+            progress?.updateState(state)
         }
-        if (STATE_SUCCESS == data.state) {
-            progress?.updateState(CircleProgress.SUCCESS)
-        }
+
         preview?.let {
-            display(it.context,data.path,it)
+            display(it.context, data.path, it)
         }
     }
 
     fun setCurrent(record: Record) {
-        mCurrentState=0
-        mCurrentProgress=0
-
+        mCurrentState = StartState()
         mCurrentIndex = indexOfCurrent(record)
         if (0 > mCurrentIndex) {
             mCurrentIndex = datas.size
@@ -50,12 +53,7 @@ class HistoryAdapter : Adapter<Record>() {
         notifyItemChanged(mCurrentIndex)
     }
 
-    fun setProgress(progress: Int) {
-        mCurrentProgress = progress
-        notifyItemChanged(mCurrentIndex)
-    }
-
-    fun setComplete(state: Int) {
+    fun updateState(state: State) {
         mCurrentState = state
         notifyItemChanged(mCurrentIndex)
     }

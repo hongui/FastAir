@@ -2,11 +2,10 @@ package com.mob.lee.fastair.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.mob.lee.fastair.R
 import java.util.*
 

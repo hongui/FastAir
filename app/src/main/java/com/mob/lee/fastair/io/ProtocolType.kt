@@ -4,17 +4,42 @@ package com.mob.lee.fastair.io
  * Created by Andy on 2018/1/16.
  */
 enum class ProtocolType(val type:Byte){
-    B('B'.toByte()),
-    S('S'.toByte()),
-    L('L'.toByte()),
-    N('N'.toByte());
+    /*字节*/
+    B(ProtocolType.CB),
+    /*短整型*/
+    S(ProtocolType.CS),
+    /*整形*/
+    I(ProtocolType.CI),
+    /*长整形*/
+    L(ProtocolType.CL),
+    /*浮点*/
+    F(ProtocolType.CF),
+    /*浮点*/
+    D(ProtocolType.CD),
+    /*字符串*/
+    C(ProtocolType.CC),
+    /*分割符用*/
+    E(ProtocolType.CE);
 
     companion object {
-        fun isValid(type:Byte):Boolean{
-            return when(type){
-                B.type,S.type,L.type,N.type->true
-                else->false
-            }
+        const val CB:Byte=0x01 shl 0
+        const val CS:Byte=0x01 shl 1
+        const val CI:Byte=0x01 shl 2
+        const val CL:Byte=0x01 shl 3
+        const val CF:Byte=0x01 shl 4
+        const val CD:Byte=0x01 shl 5
+        const val CC:Byte=0x01 shl 6
+        const val CE:Byte=0x0
+
+        fun wrap(value:Byte):ProtocolType=when(value){
+            CB->B
+            CS->S
+            CI->I
+            CL->L
+            CF->F
+            CD->D
+            CC->C
+            else->E
         }
     }
 }
