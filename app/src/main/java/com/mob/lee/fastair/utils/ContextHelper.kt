@@ -1,6 +1,5 @@
 package com.mob.lee.fastair.utils
 
-import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -10,11 +9,11 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.widget.Toast
+import androidx.room.Room
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.db.AppDatabase
 import com.mob.lee.fastair.model.Record
 import java.io.File
-import java.io.FileFilter
 import java.util.*
 
 /**

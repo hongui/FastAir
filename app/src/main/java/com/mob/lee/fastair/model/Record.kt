@@ -1,8 +1,8 @@
 package com.mob.lee.fastair.model
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.File
 
 /**
@@ -17,6 +17,6 @@ data class Record(@PrimaryKey var id: Long, @ColumnInfo var size: Long, @ColumnI
             if (-1 == index) {
                 return path
             }
-            return path.substring(index+1)
+            return path.substring(index + 1)
         }
 }

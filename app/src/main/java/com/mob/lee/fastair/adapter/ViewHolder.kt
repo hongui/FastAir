@@ -1,16 +1,16 @@
 package com.mob.lee.fastair.adapter
 
-import android.support.v7.widget.AppCompatTextView
-import android.support.v7.widget.RecyclerView
 import android.util.SparseArray
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Created by Andy on 2017/6/7.
  */
-class ViewHolder(view:View?):RecyclerView.ViewHolder(view){
+class ViewHolder(view:View): RecyclerView.ViewHolder(view){
 
     val mViews:SparseArray<View> =SparseArray()
 

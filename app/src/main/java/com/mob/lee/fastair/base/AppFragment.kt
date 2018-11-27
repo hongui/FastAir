@@ -3,22 +3,25 @@ package com.mob.lee.fastair.base
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import com.mob.lee.fastair.R
 
 /**
  * Created by Andy on 2017/6/1.
  */
 
-abstract class AppFragment :Fragment(){
+abstract class AppFragment : Fragment(){
 
     var mParent:AppActivity?=null
+    val mScope:AndroidScope by lazy {
+        AndroidScope()
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -26,13 +29,23 @@ abstract class AppFragment :Fragment(){
             mParent=it as AppActivity
         }
     }
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(layout(),container,false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setting()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mScope.create()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mScope.destory()
     }
 
     abstract fun layout():Int
@@ -55,7 +68,7 @@ abstract class AppFragment :Fragment(){
     }
 
     fun showDialog(content: CharSequence,positiveListener: (dialog:DialogInterface,which:Int)->Unit,positive: CharSequence=getString(R.string.ok),title: CharSequence=getString(R.string.wramTips),negative: CharSequence=getString(R.string.justkid),negativeListener: ((dialog:DialogInterface,which:Int)->Unit)?=null){
-        AlertDialog.Builder(context)
+        AlertDialog.Builder(context!!)
                 .setTitle(title)
                 .setMessage(content)
                 .setPositiveButton(positive,positiveListener)

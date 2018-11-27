@@ -1,8 +1,8 @@
 package com.mob.lee.fastair.imageloader
 
 import android.graphics.*
-import android.support.annotation.ColorInt
 import android.text.TextPaint
+import androidx.annotation.ColorInt
 import java.util.*
 import java.util.regex.Pattern
 

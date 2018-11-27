@@ -1,11 +1,10 @@
 package com.mob.lee.fastair.io
 
-import kotlinx.coroutines.experimental.channels.ReceiveChannel
-import kotlinx.coroutines.experimental.channels.SendChannel
+import kotlinx.coroutines.channels.ReceiveChannel
 
 /**
  * Created by Andy on 2018/1/5.
  */
 interface SendTask{
-    fun exe():ReceiveChannel<ProtocolBytes>
+    fun exe(): ReceiveChannel<ProtocolByte>
 }

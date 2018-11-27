@@ -1,9 +1,9 @@
 package com.mob.lee.fastair.adapter
 
 import android.graphics.Color
-import android.support.v4.content.ContextCompat
 import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.STATE_CHECK

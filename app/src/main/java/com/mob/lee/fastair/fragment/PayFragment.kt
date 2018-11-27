@@ -15,8 +15,8 @@ class PayFragment:AppFragment(){
     override fun setting() {
         toolbar("谢谢客官打赏")
 
-        display(context,R.drawable.alipay,payAlipay)
-        display(context,R.drawable.wechat,payWechat)
+        display(context!!,R.drawable.alipay,payAlipay)
+        display(context!!,R.drawable.wechat,payWechat)
     }
 
 }

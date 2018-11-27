@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.fragment
 
+import kotlinx.coroutines.launch
 import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Bundle
@@ -15,7 +16,9 @@ import com.mob.lee.fastair.p2p.Subscriber
 import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.successToast
 import kotlinx.android.synthetic.main.fragment_discover.*
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Andy on 2017/8/11.
@@ -30,7 +33,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
         }
         showDialog(getString(R.string.disconverStateTips), { dialog, which ->
             val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
-            context.startActivity(intent)
+            context?.startActivity(intent)
         }, getString(R.string.goTurnOn))
     }
 
@@ -48,8 +51,8 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
             name?.text = device.deviceName
             view?.setOnClickListener {
                 stopDiscover=true
-                context.successToast("正在建立连接，请稍后...")
-                P2PManager.connect(context, device)
+                context?.successToast("正在建立连接，请稍后...")
+                P2PManager.connect(context!!, device)
             }
             discoverView.addView(view)
         }
@@ -57,16 +60,16 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
 
     override fun connect(connected: Boolean) {
         if (connected) {
-            if(arguments.getBoolean("isJustConnect")){
-                context.successToast("连接成功,可以收发信息了")
+            if(arguments?.getBoolean("isJustConnect")?:false){
+                context?.successToast("连接成功,可以收发信息了")
                 backIt=true
                 mParent?.onBackPressed()
                 return
             }
-            context.successToast("连接成功,正在跳转，请稍等...")
+            context?.successToast("连接成功,正在跳转，请稍等...")
             P2PManager.connectInfo({ info ->
                 P2PManager.stop(mParent!!)
-                val isChat = arguments.getBoolean(IS_CHAT, false)
+                val isChat = arguments?.getBoolean(IS_CHAT, false)?:false
                 val bundle = Bundle()
                 bundle.putString(ADDRESS, info.groupOwnerAddress.hostAddress)
                 bundle.putBoolean(IS_HOST, info.isGroupOwner)
@@ -76,7 +79,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
                 } else {
                     mParent?.fragment(HistoryFragment::class, bundle,addToIt = false)
                 }
-                launch {
+                mScope.launch {
                     val recordDao = mParent?.database()?.recordDao()
                     val records = recordDao?.checkedRecords()
                     records?.let {
@@ -101,12 +104,12 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
     override fun onResume() {
         super.onResume()
 
-        P2PManager.register(context)
+        P2PManager.register(context!!)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.stop(context)
+        P2PManager.stop(context!!)
         P2PManager.remove(this)
     }
 
@@ -114,7 +117,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
         if(!backIt) {
             showDialog(getString(R.string.disconverBackInfo), { dialog, which ->
                 backIt = true
-                P2PManager.stop(context)
+                P2PManager.stop(context!!)
                 P2PManager.remove(this)
                 mParent?.onBackPressed()
             }, getString(R.string.stop))

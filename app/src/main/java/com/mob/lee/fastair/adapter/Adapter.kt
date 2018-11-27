@@ -1,9 +1,9 @@
 package com.mob.lee.fastair.adapter
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 
 /**
@@ -11,7 +11,7 @@ import com.mob.lee.fastair.R
  */
 abstract class Adapter<D> : RecyclerView.Adapter<ViewHolder>() {
     var hasEmpty: Boolean = true
-    var context: Context? = null
+    lateinit var context: Context
     val datas = ArrayList<D>()
 
     abstract fun layout(): Int
@@ -20,15 +20,15 @@ abstract class Adapter<D> : RecyclerView.Adapter<ViewHolder>() {
 
     override fun getItemViewType(position: Int)=if(hasEmpty)0 else 1
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        context = parent?.context
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        context = parent.context
         if (0==viewType) {
-            return ViewHolder(LayoutInflater.from(context)?.inflate(R.layout.empty, parent, false))
+            return ViewHolder(LayoutInflater.from(context).inflate(R.layout.empty, parent, false))
         }
-        return ViewHolder(LayoutInflater.from(context)?.inflate(layout(), parent, false))
+        return ViewHolder(LayoutInflater.from(context).inflate(layout(), parent, false))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (datas.isEmpty() || position >= datas.size) {
             return
         }

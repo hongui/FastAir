@@ -3,12 +3,12 @@ package com.mob.lee.fastair.adapter
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.model.Message
 
@@ -30,20 +30,20 @@ class MessageAdapter : RecyclerView.Adapter<ViewHolder>() {
         return R.layout.item_chat_date
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = mMessages[position]
-        holder?.itemView?.setOnLongClickListener { v ->
+        holder.itemView.setOnLongClickListener { v ->
             popupMenu(v, message.content)
             true
         }
         when (message.type) {
-            Message.OTHER -> holder?.text(R.id.item_chat_receive_content, message.content)
+            Message.OTHER -> holder.text(R.id.item_chat_receive_content, message.content)
 
-            Message.SELF -> holder?.text(R.id.item_chat_send_content, message.content)
+            Message.SELF -> holder.text(R.id.item_chat_send_content, message.content)
         }
     }
 

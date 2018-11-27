@@ -1,6 +1,6 @@
 package com.mob.lee.fastair.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import com.mob.lee.fastair.model.*
 
 /**

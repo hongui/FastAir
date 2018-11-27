@@ -1,10 +1,10 @@
 package com.mob.lee.fastair.viewmodel
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.mob.lee.fastair.model.APPLICATION
 import com.mob.lee.fastair.model.EXCEL
 import com.mob.lee.fastair.model.MUSIC
