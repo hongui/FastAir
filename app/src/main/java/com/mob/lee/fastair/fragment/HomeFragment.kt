@@ -11,14 +11,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.adapter.HomeAdapter
+import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.model.category
 import com.mob.lee.fastair.p2p.P2PManager
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -29,21 +26,17 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     val PERMISSION_CODE = 12
     val INTENT_CODE = 123
 
-    override fun layout(): Int = R.layout.fragment_home
+    override fun layout() : Int = R.layout.fragment_home
 
     override fun setting() {
-        homeContent?.setLayoutManager(GridLayoutManager(mParent, 3))
-        homeContent?.adapter = HomeAdapter().addAll(category())
+        homeContent?.adapter = PageAdapter(mParent !!, childFragmentManager)
+        homeTabs.setupWithViewPager(homeContent)
 
-        val toolbar = view?.findViewById<Toolbar>(R.id.toolbar)
-        val toggle = ActionBarDrawerToggle(mParent as Activity, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
+        val toggle = ActionBarDrawerToggle(mParent !!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
         toolbar?.title = getString(R.string.app_description)
         toggle.syncState()
-        homeDrawer?.addDrawerListener(toggle)
 
-        homeReceive?.setOnClickListener {
-            mParent?.fragment(DiscoverFragment::class)
-        }
+        homeDrawer?.addDrawerListener(toggle)
         homeNavgation?.setNavigationItemSelectedListener(this)
     }
 
@@ -56,12 +49,13 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             item.title = "连接设备"
         }
     }
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        var data: Bundle? = null
+
+    override fun onNavigationItemSelected(item : MenuItem) : Boolean {
+        var data : Bundle? = null
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.connected) {
-                    P2PManager.disconnect(context!!)
+                    P2PManager.disconnect(context !!)
                     val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
                     item.title = "连接设备"
                 } else {
@@ -95,7 +89,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (INTENT_CODE == requestCode) {
             permisionCheck()
@@ -118,9 +112,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         startActivityForResult(intent, INTENT_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode : Int, permissions : Array<out String>, grantResults : IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (PERMISSION_CODE == requestCode && !grantResults.isEmpty()) {
+        if (PERMISSION_CODE == requestCode && ! grantResults.isEmpty()) {
             if (shouldShowRequestPermissionRationale(permissions[0])) {
                 showDialog(getString(R.string.viewTips),
                         { dialog, which ->

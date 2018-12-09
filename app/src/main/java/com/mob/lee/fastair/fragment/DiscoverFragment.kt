@@ -24,10 +24,10 @@ import kotlin.coroutines.CoroutineContext
  * Created by Andy on 2017/8/11.
  */
 class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
-    var stopDiscover=false
-    var backIt=false
+    var stopDiscover = false
+    var backIt = false
 
-    override fun wifiState(enable: Boolean) {
+    override fun wifiState(enable : Boolean) {
         if (enable) {
             return
         }
@@ -37,8 +37,8 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
         }, getString(R.string.goTurnOn))
     }
 
-    override fun peers(devices: List<WifiP2pDevice>) {
-        if(null==discoverView){
+    override fun peers(devices : List<WifiP2pDevice>) {
+        if (null == discoverView) {
             return
         }
         if (stopDiscover) {
@@ -50,50 +50,49 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
             val name = view?.findViewById<TextView>(R.id.item_scan_name)
             name?.text = device.deviceName
             view?.setOnClickListener {
-                stopDiscover=true
+                stopDiscover = true
                 context?.successToast("正在建立连接，请稍后...")
-                P2PManager.connect(context!!, device)
+                P2PManager.connect(context !!, device)
             }
             discoverView.addView(view)
         }
     }
 
-    override fun connect(connected: Boolean) {
+    override fun connect(connected : Boolean) {
         if (connected) {
-            if(arguments?.getBoolean("isJustConnect")?:false){
+            if (arguments?.getBoolean("isJustConnect") ?: false) {
                 context?.successToast("连接成功,可以收发信息了")
-                backIt=true
+                backIt = true
                 mParent?.onBackPressed()
                 return
             }
             context?.successToast("连接成功,正在跳转，请稍等...")
             P2PManager.connectInfo({ info ->
-                P2PManager.stop(mParent!!)
-                val isChat = arguments?.getBoolean(IS_CHAT, false)?:false
+                P2PManager.stop(mParent !!)
+                val isChat = arguments?.getBoolean(IS_CHAT, false) ?: false
                 val bundle = Bundle()
                 bundle.putString(ADDRESS, info.groupOwnerAddress.hostAddress)
                 bundle.putBoolean(IS_HOST, info.isGroupOwner)
                 bundle.putAll(arguments)
                 if (isChat) {
-                    mParent?.fragment(ChatFragment::class, bundle,addToIt = false)
+                    mParent?.fragment(ChatFragment::class, bundle, addToIt = false)
                 } else {
-                    mParent?.fragment(HistoryFragment::class, bundle,addToIt = false)
+                    mParent?.fragment(HistoryFragment::class, bundle, addToIt = false)
                 }
-                mScope.launch {
-                    val recordDao = mParent?.database()?.recordDao()
-                    val records = recordDao?.checkedRecords()
+                mParent?.database(mScope, { dao ->
+                    val records = dao.checkedRecords()
                     records?.let {
-                        records.forEach {
+                        it.forEach {
                             it.state = STATE_WAIT
                         }
-                        recordDao.updates(records)
+                        dao.updates(it)
                     }
-                }
+                })
             })
         }
     }
 
-    override fun layout(): Int = R.layout.fragment_discover
+    override fun layout() : Int = R.layout.fragment_discover
 
     override fun setting() {
         toolbar(R.string.discoverDevice, true)
@@ -104,20 +103,20 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
     override fun onResume() {
         super.onResume()
 
-        P2PManager.register(context!!)
+        P2PManager.discover(context !!)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.stop(context!!)
+        P2PManager.stop(context !!)
         P2PManager.remove(this)
     }
 
-    override fun onPressed(): Boolean {
-        if(!backIt) {
+    override fun onPressed() : Boolean {
+        if (! backIt) {
             showDialog(getString(R.string.disconverBackInfo), { dialog, which ->
                 backIt = true
-                P2PManager.stop(context!!)
+                P2PManager.stop(context !!)
                 P2PManager.remove(this)
                 mParent?.onBackPressed()
             }, getString(R.string.stop))

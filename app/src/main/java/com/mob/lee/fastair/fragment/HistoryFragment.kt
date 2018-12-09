@@ -25,10 +25,10 @@ import kotlinx.coroutines.launch
  */
 class HistoryFragment : AppFragment() {
     private val TAG = "HistoryFragment"
-    private var mConntect: ServiceConnection? = null
-    private lateinit var mAdapter: HistoryAdapter
+    private var mConntect : ServiceConnection? = null
+    private lateinit var mAdapter : HistoryAdapter
 
-    override fun layout(): Int = R.layout.fragment_history
+    override fun layout() : Int = R.layout.fragment_history
 
     override fun setting() {
         toolbar(R.string.history)
@@ -42,29 +42,26 @@ class HistoryFragment : AppFragment() {
     override fun onResume() {
         super.onResume()
         if (arguments?.getBoolean("isHistory") ?: false) {
-            mScope.launch {
-                val channel = Channel<List<Record>?>()
-                mScope.async {
-                    val records = mParent?.database()?.recordDao()?.completedRecords()
-                    channel.send(records)
-                }
-                val records = channel.receive()
-                records?.let {
-                    mAdapter.addAll(it)
-                }
-            }
-
+            /*val channel = Channel<List<Record>?>()
+            mParent?.database(mScope, { dao ->
+                val records = dao.completedRecords()
+                channel.send(records)
+            })
+            val records = channel.receive()
+            records?.let {
+                mAdapter.addAll(it)
+            }*/
 
         } else {
             val intent = Intent(mParent, FileService::class.java)
             intent.putExtras(arguments)
 
             mConntect = object : ServiceConnection {
-                override fun onServiceDisconnected(name: ComponentName?) {
+                override fun onServiceDisconnected(name : ComponentName?) {
 
                 }
 
-                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                override fun onServiceConnected(name : ComponentName?, service : IBinder?) {
                     val binder = service as BinderImpl?
                     val fileService = binder?.mService as FileService?
                     fileService?.mFileChangeListener = {

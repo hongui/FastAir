@@ -83,6 +83,7 @@ abstract class Adapter<D> : RecyclerView.Adapter<ViewHolder>() {
             notifyItemRangeRemoved(0,datas.size)
             datas.clear()
         }
+        handleEmpty(false)
     }
 
     fun handleEmpty(isEmpty:Boolean=true){

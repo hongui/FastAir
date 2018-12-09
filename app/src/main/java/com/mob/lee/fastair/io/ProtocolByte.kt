@@ -32,8 +32,9 @@ data class ProtocolByte(val bytes:ByteBuffer, val type: ProtocolType){
         }
 
         fun empty():ProtocolByte{
-            val buffer=ByteBuffer.allocate(TYPE_LENGTH)
+            val buffer=ByteBuffer.allocate(HEAD_LENGTH)
             buffer.put(ProtocolType.CE)
+            buffer.putInt(0)
             buffer.flip()
             return ProtocolByte(buffer,ProtocolType.L)
         }

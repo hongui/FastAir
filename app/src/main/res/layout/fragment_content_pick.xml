@@ -1,40 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.mob.lee.fastair.view.ContentMenuRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pickContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/AppTheme.AppBarOverlay" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.mob.lee.fastair.view.ContentMenuRecyclerView
-        android:id="@+id/pickContent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/pickSend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/dp24"
-        android:layout_marginRight="@dimen/dp24"
-        android:clickable="true"
-        android:src="@drawable/ic_action_send"
-        app:layout_anchor="@id/pickContent"
-        app:layout_anchorGravity="bottom|right"
-        app:layout_behavior="@string/fabbehivior" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    android:layout_height="match_parent" />

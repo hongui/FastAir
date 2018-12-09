@@ -30,7 +30,7 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
                 length = data.getLong()
             }
 
-            ProtocolType.S -> {
+            ProtocolType.C -> {
                 val name = data.getString()
                 try {
                     val f = context?.createFile(name)

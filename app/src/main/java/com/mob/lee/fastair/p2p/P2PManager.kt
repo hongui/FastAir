@@ -41,7 +41,9 @@ object P2PManager {
                 connected=false
             }
         })
+    }
 
+    fun discover(context : Context){
         manager!!.discoverPeers(channel, ActionListener(context))
     }
 

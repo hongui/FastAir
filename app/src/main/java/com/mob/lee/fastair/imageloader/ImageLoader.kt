@@ -4,8 +4,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
@@ -89,10 +93,22 @@ object ImageLoader {
             applicationInfo.sourceDir = path
             applicationInfo.publicSourceDir = path
             val drawable = applicationInfo?.loadIcon(manager)
-            if (null == drawable) {
-                return decodeOther(path, width, height)
-            } else {
-                return (drawable as BitmapDrawable).bitmap
+            return when(drawable){
+
+                is BitmapDrawable->drawable.bitmap
+
+                is AdaptiveIconDrawable->{
+                    val foreground=drawable.foreground
+                    val background=drawable.background
+                    val layerDrawable=LayerDrawable(arrayOf(background,foreground))
+                    val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    layerDrawable.setBounds(0,0,bitmap.width,bitmap.height)
+                    layerDrawable.draw(canvas)
+                    bitmap
+                }
+
+                else->decodeOther(path, width, height)
             }
         }
         return decodeOther(path, width, height)
