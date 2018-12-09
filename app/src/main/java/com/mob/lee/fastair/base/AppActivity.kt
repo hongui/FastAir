@@ -9,10 +9,19 @@ import kotlin.reflect.KClass
  */
 open class AppActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    val mScope:AndroidScope by lazy {
+        AndroidScope()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mScope.create()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mScope.destory()
+    }
     override fun onBackPressed() {
         if (handle()) {
             return

@@ -14,9 +14,9 @@ import kotlin.concurrent.thread
 /**
  * Created by Andy on 2017/6/2.
  */
-class ContainerActivity : AppActivity(){
+class ContainerActivity : AppActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         val data = supportParentActivityIntent?.clipData
         if (null != data) {
@@ -31,14 +31,14 @@ class ContainerActivity : AppActivity(){
         P2PManager.removeService(this)
     }
 
-    fun parseClipData(clipData: ClipData) {
+    fun parseClipData(clipData : ClipData) {
         val records = ArrayList<Record>()
         val itemCount = clipData.itemCount
         for (i in 0 until itemCount) {
             val item = clipData.getItemAt(i)
             val uri = item.uri
             if (null != uri && "file".equals(uri.scheme)) {
-                val file=File(uri.path)
+                val file = File(uri.path)
                 val record = Record(
                         ContentUris.parseId(uri),
                         file.length(),
@@ -47,8 +47,8 @@ class ContainerActivity : AppActivity(){
                 records.add(record)
             }
         }
-        thread {
-            database().recordDao().insert(records)
-        }
+        database(mScope, { dao ->
+            dao.insert(records)
+        })
     }
 }

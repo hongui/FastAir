@@ -18,9 +18,9 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
     private var channel: SocketChannel? = null
 
     /*建立连接，host为空作为客户端，否则作为服务器*/
-    fun open(port: Int, host: String? = null) = runBlocking {
+    fun open(port: Int, host: String? = null) = scope.launch(Dispatchers.IO) {
         if (isOpen) {
-            return@runBlocking
+            return@launch
         }
         isOpen = true
         try {
@@ -36,7 +36,6 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
             handleWrite()
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
             channel?.let {
                 it.close()
             }
@@ -61,7 +60,7 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
     }
 
     /*读取数据*/
-    suspend private fun handleRead() = withContext(Dispatchers.Default) {
+    private fun handleRead() = scope.launch(Dispatchers.IO) {
         while (isOpen || keepAlive) {
             try {
                 val head = readFix(5)
@@ -74,7 +73,7 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
             } catch (e: Exception) {
                 e.printStackTrace()
                 for (reader in readers) {
-                    reader.onError(e.message)
+                    reader?.onError(e.message)
                 }
             }
         }
@@ -82,11 +81,8 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
     }
 
     /*发送数据*/
-    suspend private fun handleWrite() {
+    private fun handleWrite()=scope.launch(Dispatchers.IO) {
         while (isOpen || keepAlive) {
-            if (writers.isClosedForSend) {
-                break
-            }
             try {
                 val data = writers.receive()
                 for (d in data) {

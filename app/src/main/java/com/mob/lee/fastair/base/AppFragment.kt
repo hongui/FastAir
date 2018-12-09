@@ -29,18 +29,15 @@ abstract class AppFragment : Fragment(){
             mParent=it as AppActivity
         }
     }
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(layout(),container,false)
+
+    override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
+        return inflater?.inflate(layout(), container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setting()
-    }
-
-    override fun onStart() {
-        super.onStart()
         mScope.create()
+        setting()
     }
 
     override fun onDestroy() {
