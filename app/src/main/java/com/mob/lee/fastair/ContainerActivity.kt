@@ -9,7 +9,6 @@ import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.utils.database
 import java.io.File
-import kotlin.concurrent.thread
 
 /**
  * Created by Andy on 2017/6/2.
