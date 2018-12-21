@@ -1,15 +1,23 @@
 package com.mob.lee.fastair.adapter
 
-/**
- * Created by andyt on 2017/6/7.
- */
-abstract class DataHolder<D>{
-    var mDatas=ArrayList<D>()
-    abstract fun layout():Int
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
-    open fun handleIt(position:Int)=true
+interface DataHolder<D>{
+    val layout:Int
+    var startPosition:Int
+    val datas:MutableList<D>?
 
-    open fun size()=mDatas.size
+    fun targetView(parent: ViewGroup?): View?{
+        return LayoutInflater.from(parent?.context)?.inflate(layout,parent,false)
+    }
 
-    open fun bind(position:Int,viewHolder:ViewHolder){}
+    fun canHandleIt(position:Int):Boolean=startPosition<=position && position<startPosition+size()
+
+    fun size():Int
+
+    fun bind(position:Int,viewHolder:ViewHolder)
+
+    fun change(pos:Int,data: Any?):Int=0
 }

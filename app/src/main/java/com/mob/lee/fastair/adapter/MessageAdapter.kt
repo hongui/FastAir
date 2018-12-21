@@ -31,7 +31,7 @@ class MessageAdapter : RecyclerView.Adapter<ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false))
+        return ViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false),0)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

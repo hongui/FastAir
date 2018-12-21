@@ -14,13 +14,15 @@ import com.mob.lee.fastair.view.CircleProgress
 /**
  * Created by Andy on 2017/9/19.
  */
-class HistoryAdapter : Adapter<Record>() {
+class HistoryAdapter : MultiDataHolder<Record>(R.layout.item_history) {
     var mCurrentIndex: Int = -1
     lateinit var mCurrentState: State
 
-    override fun layout(): Int = R.layout.item_history
+    override fun bind(position: Int, holder: ViewHolder) {
+        val originPos=position-startPosition
+        val data=datas.getOrNull(originPos)
+        data?:return
 
-    override fun bind(data: Record, holder: ViewHolder?, position: Int) {
         val preview = holder?.view<ImageView>(R.id.item_history_preview)
         val progress = holder?.view<CircleProgress>(R.id.item_history_progress)
 
@@ -48,14 +50,15 @@ class HistoryAdapter : Adapter<Record>() {
         mCurrentIndex = indexOfCurrent(record)
         if (0 > mCurrentIndex) {
             mCurrentIndex = datas.size
-            add(record)
+            //insert(record)
+            return
         }
-        notifyItemChanged(mCurrentIndex)
+        //update(record)
     }
 
     fun updateState(state: State) {
         mCurrentState = state
-        notifyItemChanged(mCurrentIndex)
+        //update(mCurrentIndex)
     }
 
     fun indexOfCurrent(current: Record): Int {
