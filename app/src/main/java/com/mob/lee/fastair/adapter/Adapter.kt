@@ -7,7 +7,7 @@ import kotlin.math.abs
 /**
  * Created by Andy on 2017/8/8.
  */
-class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<ViewHolder>() {
+class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<ViewHolder>() {
     val datas = ArrayList<DataHolder<out Any>>()
 
     init {
@@ -16,7 +16,7 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position : Int) : Int {
         for ((index, d) in datas.withIndex()) {
             if (d.canHandleIt(position)) {
                 return index
@@ -25,17 +25,17 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         return 0
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent : ViewGroup, viewType : Int) : ViewHolder {
         val view = datas[viewType].targetView(parent)
         view ?: throw NullPointerException("DataType:$viewType has null View!")
         return ViewHolder(view, viewType)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder : ViewHolder, position : Int) {
         datas[holder.dataType].bind(position, holder)
     }
 
-    override fun getItemCount(): Int {
+    override fun getItemCount() : Int {
         var total = 0
         for (d in datas) {
             total += d.size()
@@ -43,7 +43,7 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         return total
     }
 
-    fun add(data: DataHolder<out Any>, position: Int = datas.size) {
+    fun add(data : DataHolder<out Any>, position : Int = datas.size) {
         if (position < 0 || position > datas.size) {
             return
         }
@@ -52,7 +52,22 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         notifyItemRangeInserted(position, data.size())
     }
 
-    fun change(any: Any?) {
+    fun remove(data : DataHolder<out Any>? = null, position : Int = datas.indexOf(data)) {
+        if (position >= 0) {
+            val holder = datas.removeAt(position)
+            notifyItemRangeRemoved(holder.startPosition, holder.size())
+        }
+    }
+
+    fun remove(layout:Int){
+        for ((i,d) in datas.withIndex()){
+            if(d.layout==layout){
+                remove(position = i)
+            }
+        }
+    }
+
+    fun change(any : Any?) {
         var pos = 0
         var updateCount = 0
         for (d in datas) {
@@ -67,15 +82,15 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         }
     }
 
-    fun handleFlag(flag: Int, pos: Int) {
+    fun handleFlag(flag : Int, pos : Int) {
         when {
             flag > 0 -> notifyItemInserted(pos)
-            flag == -1 -> notifyItemRemoved(pos)
-            flag < -1 -> notifyItemChanged(pos)
+            flag == - 1 -> notifyItemRemoved(pos)
+            flag < - 1 -> notifyItemChanged(pos)
         }
     }
 
-    fun clearAndAdd(list: List<Any>) {
+    fun clearAndAdd(list : List<Any>) {
         clearAll()
         for (l in list) {
             change(l)

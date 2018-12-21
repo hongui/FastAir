@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.ContentPickAdapter
+import com.mob.lee.fastair.adapter.SimgleDataHolder
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.utils.updateStorage
@@ -53,23 +54,29 @@ class ContentPickFragment : AppFragment() {
     override fun setting() {
         setHasOptionsMenu(true)
 
-        val adapter = Adapter(ContentPickAdapter())
+        val adapter = Adapter(ContentPickAdapter(),SimgleDataHolder(layout = R.layout.loading))
 
         pickContent.layoutManager = LinearLayoutManager(context)
         pickContent.adapter = adapter
 
         mFileViewModel = ViewModelProviders.of(activity !!).get(FileViewModel::class.java)
         mFileViewModel.record.observe({ lifecycle }) {
+            adapter.remove(R.layout.loading)
             it?.let {
+                adapter.remove(R.layout.empty)
                 adapter.change(it)
+            }?:let {
+                if(0==adapter.itemCount) {
+                    adapter.add(SimgleDataHolder(layout = R.layout.empty))
+                }
             }
         }
 
-        /*mFileViewModel.needUpdate.observe({ lifecycle }) {
+        mFileViewModel.needUpdate.observe({ lifecycle }) {
             if(it) {
-                //adapter.clearAll()
+                adapter.clearAll()
             }
-        }*/
+        }
 
         view?.viewTreeObserver?.addOnGlobalLayoutListener(object :ViewTreeObserver.OnGlobalLayoutListener{
             override fun onGlobalLayout() {
@@ -102,6 +109,7 @@ class ContentPickFragment : AppFragment() {
     }
 
     override fun onOptionsItemSelected(item : MenuItem?) : Boolean {
+        val pos=arguments?.getInt("pos")?:0
         when (item?.itemId) {
             R.id.menu_content_delete -> {
                 val records = mFileViewModel.checkedrecords()
@@ -114,7 +122,7 @@ class ContentPickFragment : AppFragment() {
                 }, getString(R.string.delete), negative = getString(R.string.giveUp))
             }
             R.id.menu_content_swap -> {
-                reverse()
+                mFileViewModel.reverse(mScope,pos)
                 mFileViewModel.mIsDes = ! mFileViewModel.mIsDes
                 if (mFileViewModel.mIsDes) {
                     item.title = getString(R.string.des)
@@ -123,16 +131,16 @@ class ContentPickFragment : AppFragment() {
                 }
             }
             R.id.menu_content_sort_byname -> {
-                sortByName()
+                mFileViewModel.sortBy(mScope,pos,{it.name})
             }
             R.id.menu_content_sort_bysize -> {
-                sortBySize()
+                mFileViewModel.sortBy(mScope,pos,{it.size})
             }
             R.id.menu_content_sort_bytime -> {
-                sortByDate()
+                mFileViewModel.sortBy(mScope,pos,{it.date})
             }
             R.id.menu_content_all -> {
-                selectAll()
+                //selectAll()
                 if (mFileViewModel.mCheckAll) {
                     item.title = getString(R.string.selectAll)
                 } else {
@@ -188,35 +196,6 @@ class ContentPickFragment : AppFragment() {
         val uri = Uri.fromParts("package", (mParent as Context).packageName, null)
         intent.data = uri
         startActivityForResult(intent, INTENT_CODE)
-    }
-
-    fun reverse() {
-        val adapter = pickContent.adapter as ContentPickAdapter
-        val list = adapter.datas.reversed()
-        //adapter.(list)
-    }
-
-    fun sortBySize() {
-        val adapter = pickContent.adapter as ContentPickAdapter
-        val list = adapter.datas.sortedBy { it.size }
-        //mDataHolder.clearAndAdd(list)
-    }
-
-    fun sortByName() {
-        val adapter = pickContent.adapter as ContentPickAdapter
-        val list = adapter.datas.sortedBy { it.name.toLowerCase() }
-        //mDataHolder.clearAndAdd(list)
-    }
-
-    fun sortByDate() {
-        val adapter = pickContent.adapter as ContentPickAdapter
-        val list = adapter.datas.sortedBy { it.date }
-       // mDataHolder.clearAndAdd(list)
-    }
-
-    fun selectAll() {
-        val adapter = pickContent.adapter as ContentPickAdapter
-        //mDataHolder.selectOrUnSelectAll(mFileViewModel.mCheckAll)
     }
 
     fun deleteFiles(data : List<Record>) {
