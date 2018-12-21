@@ -22,6 +22,7 @@ import com.mob.lee.fastair.model.WORD
 import com.mob.lee.fastair.model.ZIP
 import com.mob.lee.fastair.repository.RecordRep
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.consumeEachIndexed
 import kotlinx.coroutines.launch
@@ -37,10 +38,10 @@ class FileViewModel : ViewModel() {
     var mCheckAll = false
     var mIsDes = true
 
-    fun load(scope : AndroidScope, context : Context, position:Int) {
+    fun register(scope : AndroidScope,channel : Channel<Record?>?){
+        channel?:return
         needUpdate.value=true
         scope.launch(Dispatchers.Main) {
-            val channel = RecordRep.load(scope,context, position)
             channel.consumeEachIndexed {
                 if(0==it.index){
                     needUpdate.value=false
@@ -51,7 +52,17 @@ class FileViewModel : ViewModel() {
                 needUpdate.value=false
             }
         }
+    }
+    fun load(scope : AndroidScope, context : Context, position:Int) {
+        register(scope,RecordRep.load(context, position))
+    }
 
+    fun sortBy(scope : AndroidScope,position : Int,selector: (Record)->Comparable<*>,isAes:Boolean=false){
+        register(scope,RecordRep.sortBy(position,selector,isAes))
+    }
+
+    fun reverse(scope : AndroidScope,position : Int){
+        register(scope,RecordRep.reverse(position))
     }
 
     fun checkedrecords() : List<Record> {
