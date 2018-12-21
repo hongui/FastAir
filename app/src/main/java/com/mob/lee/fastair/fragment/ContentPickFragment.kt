@@ -15,16 +15,13 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.core.content.ContextCompat
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.ContentPickAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.model.IS_SEND
 import com.mob.lee.fastair.model.Record
-import com.mob.lee.fastair.utils.database
-import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.updateStorage
 import com.mob.lee.fastair.viewmodel.FileViewModel
 import kotlinx.android.synthetic.main.fragment_content_pick.*
@@ -38,6 +35,7 @@ class ContentPickFragment : AppFragment() {
     val INTENT_CODE = 123
 
     lateinit var mFileViewModel : FileViewModel
+    lateinit var mAdapter:Adapter
 
     companion object {
         fun nav(pos : Int) : AppFragment {
@@ -55,22 +53,23 @@ class ContentPickFragment : AppFragment() {
     override fun setting() {
         setHasOptionsMenu(true)
 
-        val adapter = ContentPickAdapter()
+        val adapter = Adapter(ContentPickAdapter())
+
         pickContent.layoutManager = LinearLayoutManager(context)
         pickContent.adapter = adapter
 
         mFileViewModel = ViewModelProviders.of(activity !!).get(FileViewModel::class.java)
         mFileViewModel.record.observe({ lifecycle }) {
             it?.let {
-                adapter.add(it)
+                adapter.change(it)
             }
         }
 
-        mFileViewModel.needUpdate.observe({ lifecycle }) {
+        /*mFileViewModel.needUpdate.observe({ lifecycle }) {
             if(it) {
-                adapter.clearAll()
+                //adapter.clearAll()
             }
-        }
+        }*/
 
         view?.viewTreeObserver?.addOnGlobalLayoutListener(object :ViewTreeObserver.OnGlobalLayoutListener{
             override fun onGlobalLayout() {
@@ -194,30 +193,30 @@ class ContentPickFragment : AppFragment() {
     fun reverse() {
         val adapter = pickContent.adapter as ContentPickAdapter
         val list = adapter.datas.reversed()
-        adapter.clearAndAdd(list)
+        //adapter.(list)
     }
 
     fun sortBySize() {
         val adapter = pickContent.adapter as ContentPickAdapter
         val list = adapter.datas.sortedBy { it.size }
-        adapter.clearAndAdd(list)
+        //mDataHolder.clearAndAdd(list)
     }
 
     fun sortByName() {
         val adapter = pickContent.adapter as ContentPickAdapter
         val list = adapter.datas.sortedBy { it.name.toLowerCase() }
-        adapter.clearAndAdd(list)
+        //mDataHolder.clearAndAdd(list)
     }
 
     fun sortByDate() {
         val adapter = pickContent.adapter as ContentPickAdapter
         val list = adapter.datas.sortedBy { it.date }
-        adapter.clearAndAdd(list)
+       // mDataHolder.clearAndAdd(list)
     }
 
     fun selectAll() {
         val adapter = pickContent.adapter as ContentPickAdapter
-        adapter.selectOrUnSelectAll(mFileViewModel.mCheckAll)
+        //mDataHolder.selectOrUnSelectAll(mFileViewModel.mCheckAll)
     }
 
     fun deleteFiles(data : List<Record>) {
@@ -229,7 +228,7 @@ class ContentPickFragment : AppFragment() {
             if (success) {
                 updateStorage(context !!, it)
                 count ++
-                adapter.remove(it)
+                //mDataHolder.delete(it)
             }
             success
         }

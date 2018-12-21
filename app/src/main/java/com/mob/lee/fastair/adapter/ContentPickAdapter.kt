@@ -15,11 +15,11 @@ import com.mob.lee.fastair.utils.display
 /**
  * Created by Andy on 2017/6/20.
  */
-class ContentPickAdapter() : Adapter<Record>() {
+class ContentPickAdapter : MultiDataHolder<Record>(R.layout.item_file) {
 
-    override fun layout(): Int = R.layout.item_file
-
-    override fun bind(record: Record, holder: ViewHolder?, position: Int) {
+    override fun bind(position: Int, holder: ViewHolder) {
+        val record=datas.getOrNull(position-startPosition)
+        record?:return
         holder?.text(R.id.item_file_name, record.name)
         holder?.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(holder.itemView.context))
         val iconView = holder?.view<ImageView>(R.id.item_file_icon)
@@ -35,12 +35,12 @@ class ContentPickAdapter() : Adapter<Record>() {
             } else {
                 record.state = STATE_CHECK
             }
-            notifyItemChanged(position)
+            //update(position)
         }
         holder?.check(R.id.item_file_selector, STATE_CHECK== record.state)
         val isChecked=holder?.view<CheckBox>(R.id.item_file_selector)?.isChecked?:false
         val color=if(isChecked){
-            ContextCompat.getColor(context,R.color.material_grey_300)
+            ContextCompat.getColor(holder.itemView.context,R.color.material_grey_300)
         }else{
             Color.WHITE
         }
@@ -55,6 +55,6 @@ class ContentPickAdapter() : Adapter<Record>() {
                 it.state = STATE_CHECK
             }
         }
-        notifyItemRangeChanged(0, datas.size)
+        //adapter?.notifyItemRangeChanged(startPosition, startPosition+datas.size)
     }
 }

@@ -1,96 +1,93 @@
 package com.mob.lee.fastair.adapter
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.mob.lee.fastair.R
+import kotlin.math.abs
 
 /**
  * Created by Andy on 2017/8/8.
  */
-abstract class Adapter<D> : RecyclerView.Adapter<ViewHolder>() {
-    var hasEmpty: Boolean = true
-    lateinit var context: Context
-    val datas = ArrayList<D>()
+class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<ViewHolder>() {
+    val datas = ArrayList<DataHolder<out Any>>()
 
-    abstract fun layout(): Int
+    init {
+        for (d in dataHolder) {
+            add(d)
+        }
+    }
 
-    abstract fun bind(data: D, holder: ViewHolder?, position: Int)
-
-    override fun getItemViewType(position: Int)=if(hasEmpty)0 else 1
+    override fun getItemViewType(position: Int): Int {
+        for ((index, d) in datas.withIndex()) {
+            if (d.canHandleIt(position)) {
+                return index
+            }
+        }
+        return 0
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        context = parent.context
-        if (0==viewType) {
-            return ViewHolder(LayoutInflater.from(context).inflate(R.layout.empty, parent, false))
-        }
-        return ViewHolder(LayoutInflater.from(context).inflate(layout(), parent, false))
+        val view = datas[viewType].targetView(parent)
+        view ?: throw NullPointerException("DataType:$viewType has null View!")
+        return ViewHolder(view, viewType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (datas.isEmpty() || position >= datas.size) {
+        datas[holder.dataType].bind(position, holder)
+    }
+
+    override fun getItemCount(): Int {
+        var total = 0
+        for (d in datas) {
+            total += d.size()
+        }
+        return total
+    }
+
+    fun add(data: DataHolder<out Any>, position: Int = datas.size) {
+        if (position < 0 || position > datas.size) {
             return
         }
-        bind(datas[position], holder, position)
-    }
-
-    override fun getItemCount(): Int = if (hasEmpty) 1 else datas.size
-
-    fun addAll(newData: List<D>): Adapter<D> {
-        handleEmpty(newData.isEmpty())
-        val size = datas.size
-        datas.addAll(newData)
-        notifyItemRangeInserted(size, newData.size)
-        return this
-    }
-
-    fun add(data: D, position: Int = datas.size): Adapter<D> {
-        handleEmpty(false)
+        data.startPosition = itemCount
         datas.add(position, data)
-        notifyItemInserted(position)
-        return this
+        notifyItemRangeInserted(position, data.size())
     }
 
-    fun remove(position: Int) {
-        if (0 > position || position >= datas.size) {
-            return
-        }
-        datas.removeAt(position)
-        notifyItemRemoved(position)
-    }
-
-    fun remove(data: D){
-        val index=datas.indexOf(data)
-        if (0 > index || index >= datas.size) {
-            return
-        }
-        datas.removeAt(index)
-        notifyItemRemoved(index)
-    }
-
-    fun clearAndAdd(newData: List<D>) {
-        if(datas.isNotEmpty()) {
-            notifyItemRangeRemoved(0, datas.size)
-            datas.clear()
-        }
-        datas.addAll(newData)
-        notifyItemRangeInserted(0, datas.size)
-    }
-
-    fun clearAll(){
-        if(datas.isNotEmpty()){
-            notifyItemRangeRemoved(0,datas.size)
-            datas.clear()
-        }
-        handleEmpty(false)
-    }
-
-    fun handleEmpty(isEmpty:Boolean=true){
-        if (hasEmpty&&!isEmpty) {
-            hasEmpty = false
-            notifyDataSetChanged()
+    fun change(any: Any?) {
+        var pos = 0
+        var updateCount = 0
+        for (d in datas) {
+            val flag = d.change(pos - updateCount, any)
+            //判断之后才更新起点
+            d.startPosition = pos
+            handleFlag(flag, pos)
+            pos += d.size()
+            if (1 == abs(flag)) {
+                updateCount += 1
+            }
         }
     }
 
+    fun handleFlag(flag: Int, pos: Int) {
+        when {
+            flag > 0 -> notifyItemInserted(pos)
+            flag == -1 -> notifyItemRemoved(pos)
+            flag < -1 -> notifyItemChanged(pos)
+        }
+    }
+
+    fun clearAndAdd(list: List<Any>) {
+        clearAll()
+        for (l in list) {
+            change(l)
+        }
+    }
+
+    fun clearAll() {
+        var pos = 0
+        for (d in datas) {
+            pos += d.datas?.size ?: 0
+            d.datas?.clear()
+        }
+        notifyItemRangeRemoved(0, pos)
+    }
 }

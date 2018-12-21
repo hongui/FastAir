@@ -13,6 +13,7 @@ import android.widget.TabHost
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.adapter.Adapter
+import com.mob.lee.fastair.adapter.MultiDataHolder
 import com.mob.lee.fastair.adapter.ViewHolder
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.display
@@ -27,8 +28,6 @@ import com.mob.lee.fastair.utils.writeDownloadPath
 class PathPickFragment:AppFragment(){
 
     private var mCurrentPath: File? = null
-    private lateinit var mAdapter:PathPickAdapter
-
 
     override fun layout()= R.layout.fragment_path_pick
 
@@ -38,9 +37,19 @@ class PathPickFragment:AppFragment(){
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             mCurrentPath = File(context?.readDownloadPath())
-            mAdapter=PathPickAdapter()
             pathPickContent.setLayoutManager(LinearLayoutManager(context))
-            pathPickContent.setAdapter(mAdapter)
+            pathPickContent.setAdapter(Adapter(MultiDataHolder<File>(R.layout.item_path,{position, data, viewHolder ->
+                data?:return@MultiDataHolder
+                val icon=viewHolder.view<ImageView>(R.id.item_path_icon)
+                icon?.let {
+                    display(icon.context, data.path,it)
+                }
+                viewHolder.text(R.id.item_path_name,data.name)
+                viewHolder.text(R.id.item_path_extra,data.lastModified().formatDate())
+                viewHolder.itemView.setOnClickListener {
+                    updateContent(data)
+                }
+            })))
             updateContent(null)
             pathPickTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -87,8 +96,8 @@ class PathPickFragment:AppFragment(){
     private fun updateContent(newFile: File?,position:Int=pathPickTab.tabCount) {
         mCurrentPath = newFile
         val paths = context?.getPaths(mCurrentPath)?: emptyList()
-        mAdapter.clearAll()
-        mAdapter.addAll(paths)
+        val adapter=pathPickContent.adapter as Adapter
+        adapter.clearAndAdd(paths)
         if(position==pathPickTab.tabCount) {
             pathPickTab.addTab(pathPickTab.newTab().setText(mCurrentPath?.getName() ?: "主目录").setContentDescription(mCurrentPath?.getAbsolutePath()?:Environment.getExternalStorageDirectory().absolutePath))
         }else{
@@ -97,22 +106,5 @@ class PathPickFragment:AppFragment(){
             }
         }
         pathPickTab.setScrollPosition(pathPickTab.tabCount-1, 0F, true)
-    }
-
-    inner class PathPickAdapter: Adapter<File>(){
-
-        override fun layout()= R.layout.item_path
-
-        override fun bind(data: File, holder: ViewHolder?, position: Int) {
-            val icon=holder?.view<ImageView>(R.id.item_path_icon)
-            icon?.let {
-                display(icon.context, data.path,it)
-            }
-            holder?.text(R.id.item_path_name,data.name)
-            holder?.text(R.id.item_path_extra,data.lastModified().formatDate())
-            holder?.itemView?.setOnClickListener {
-                updateContent(data)
-            }
-        }
     }
 }

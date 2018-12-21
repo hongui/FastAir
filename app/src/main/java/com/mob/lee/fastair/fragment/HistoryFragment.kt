@@ -8,6 +8,7 @@ import android.os.IBinder
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.HistoryAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.io.state.StartState
@@ -36,7 +37,7 @@ class HistoryFragment : AppFragment() {
         val recyclerView = view?.findViewById<RecyclerView>(R.id.fragment_history)
         mAdapter = HistoryAdapter()
         recyclerView?.layoutManager = LinearLayoutManager(context)
-        recyclerView?.adapter = mAdapter
+        recyclerView?.adapter = Adapter(HistoryAdapter())
     }
 
     override fun onResume() {

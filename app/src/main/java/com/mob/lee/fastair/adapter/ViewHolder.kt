@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * Created by Andy on 2017/6/7.
  */
-class ViewHolder(view:View): RecyclerView.ViewHolder(view){
+class ViewHolder(view:View,val dataType:Int): RecyclerView.ViewHolder(view){
 
     val mViews:SparseArray<View> =SparseArray()
 
