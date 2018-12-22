@@ -1,7 +1,6 @@
 package com.mob.lee.fastair.fragment
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,11 +11,14 @@ import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.viewmodel.FileViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
 /**
@@ -38,6 +40,15 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         homeDrawer?.addDrawerListener(toggle)
         homeNavgation?.setNavigationItemSelectedListener(this)
+
+        homeContent.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+            override fun onPageSelected(position : Int) {
+                val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
+                viewmodel.position = position
+                permisionCheck()
+            }
+        })
+        permisionCheck()
     }
 
     override fun onResume() {
@@ -101,8 +112,15 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             val permission = ContextCompat.checkSelfPermission(mParent as Context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permission == PackageManager.PERMISSION_DENIED) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
+            } else {
+                load()
             }
         }
+    }
+
+    fun load() {
+        val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
+        viewmodel.load(mScope, context !!)
     }
 
     fun openSetting() {

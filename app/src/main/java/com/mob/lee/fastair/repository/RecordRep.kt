@@ -20,20 +20,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.util.Comparator
 
 object RecordRep {
     val records = SparseArray<List<Record>>()
     var total = 0
 
-    fun load(context : Context?, position : Int) : Channel<Record?> {
+    fun load(context : Context?, position : Int) : Channel<Record> {
         val list = records.get(position)
 
         //有缓存，不查库
         if (list?.isNotEmpty() ?: false) {
             return send(list)
         }
-        val channel = Channel<Record?>()
+        val channel = Channel<Record>()
         val category = categories()[position]
 
         //暂时使用全局的Job，不然数据可能会不全
@@ -65,28 +64,22 @@ object RecordRep {
                     total += temp.size
                 }
             }
-            channel.send(null)
             channel.close()
         }
         return channel
     }
 
-    fun sortBy(position : Int, selector : (Record) -> Comparable<*>, isAes : Boolean) : Channel<Record?>? {
+    fun sortBy(position : Int, selector : (Record) -> Comparable<*>) : Channel<Record>? {
         return operator(position, {
-            val operator = if (isAes) {
-                compareBy(selector)
-            } else {
-                compareByDescending(selector)
-            }
-            it.sortedWith(operator)
+            it.sortedWith(compareByDescending(selector))
         })
     }
 
-    fun reverse(position : Int) : Channel<Record?>? {
+    fun reverse(position : Int) : Channel<Record>? {
         return operator(position, { it.reversed() })
     }
 
-    fun operator(position : Int, op : (List<Record>) -> List<Record>) : Channel<Record?>? {
+    fun operator(position : Int, op : (List<Record>) -> List<Record>) : Channel<Record>? {
         val datas = records.get(position)
         datas?.let {
             val target = op(it)
@@ -96,17 +89,16 @@ object RecordRep {
         return null
     }
 
-    fun send(datas : List<Record?>?) : Channel<Record?> {
-        val channel = Channel<Record?>()
+    fun send(datas : List<Record?>?) : Channel<Record> {
+        val channel = Channel<Record>()
         GlobalScope.launch(Dispatchers.IO) {
             datas?.let {
                 for (d in it) {
-                    channel.send(d)
+                    d?.let {
+                        channel.send(it)
+                    }
                 }
-            } ?: let {
-                channel.send(null)
             }
-            channel.send(null)
             channel.close()
         }
         return channel
