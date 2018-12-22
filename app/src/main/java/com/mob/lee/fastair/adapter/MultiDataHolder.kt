@@ -22,11 +22,10 @@ open class MultiDataHolder<D>(override val layout: Int, val bindAction: ((positi
                     //完全相等，删除
                     if (d == data) {
                         datas.removeAt(i)
-                        return -1
                     } else {
                         datas[i] = data
-                        return -2
                     }
+                    return i
                 }
             }
         }
@@ -35,7 +34,7 @@ open class MultiDataHolder<D>(override val layout: Int, val bindAction: ((positi
             val real = data as? D
             real?.let {
                 datas.add(it)
-                return 1
+                return datas.size
             }
         }
         return super.change(pos, data)

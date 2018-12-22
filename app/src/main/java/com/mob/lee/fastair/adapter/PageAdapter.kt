@@ -11,7 +11,7 @@ class PageAdapter(val activity : AppActivity,fm:FragmentManager):FragmentStatePa
     val pagers= RecordRep.categories()
 
     override fun getItem(position : Int) : Fragment {
-       return ContentPickFragment.nav(position)
+       return ContentPickFragment()
     }
 
     override fun getCount() =pagers.size
