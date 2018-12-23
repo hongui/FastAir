@@ -16,17 +16,23 @@ open class MultiDataHolder<D>(override val layout: Int, val bindAction: ((positi
 
     override fun change(pos: Int, data: Any?): Int {
         if (startPosition == pos && null != data) {
+            var remove=-1
             for ((i, d) in datas.withIndex()) {
                 //引用一样，说明要更新或者删除
                 if (d === data) {
                     //完全相等，删除
                     if (d == data) {
-                        datas.removeAt(i)
+                        remove=i
+                        break
                     } else {
                         datas[i] = data
+                        return i
                     }
-                    return i
                 }
+            }
+            if(-1!=remove){
+                datas.removeAt(remove)
+                return remove
             }
         }
         //没找到，加进去吧

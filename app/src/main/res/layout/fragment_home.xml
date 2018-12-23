@@ -45,4 +45,87 @@
             app:menu="@menu/menu_navigation" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/toolOperation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginRight="@dimen/dp16"
+        android:layout_marginBottom="@dimen/dp32"
+        app:layout_behavior="@string/dropbehavior" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolMenus"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp56"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"
+        app:layout_behavior="@string/dropbehavior">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolSwap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_action_swap"
+            android:text="@string/aes"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/toolAll"
+            style="@style/ToolItem"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_action_all"
+            android:text="@string/selectAll"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/toolSwap"
+            app:layout_constraintRight_toLeftOf="@+id/toolguideLeft"
+            style="@style/ToolItem"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/toolguideLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.45"
+            app:layout_constraintLeft_toRightOf="@id/toolAll"
+            app:layout_constraintRight_toLeftOf="@+id/toolguideRight"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/toolguideRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.55"
+            app:layout_constraintLeft_toRightOf="@id/toolguideLeft"
+            app:layout_constraintRight_toLeftOf="@+id/toolSort"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_action_sort"
+            android:text="@string/sort"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/toolguideRight"
+            app:layout_constraintRight_toLeftOf="@+id/toolDelete"
+            style="@style/ToolItem"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_action_delete"
+            android:text="@string/delete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/toolSort"
+            app:layout_constraintRight_toRightOf="parent"
+            style="@style/ToolItem"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

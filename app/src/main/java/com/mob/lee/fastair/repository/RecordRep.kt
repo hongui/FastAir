@@ -12,17 +12,22 @@ import com.mob.lee.fastair.model.OtherCategory
 import com.mob.lee.fastair.model.PDFCategory
 import com.mob.lee.fastair.model.PowerPointCategory
 import com.mob.lee.fastair.model.Record
+import com.mob.lee.fastair.model.STATE_CHECK
+import com.mob.lee.fastair.model.STATE_ORIGIN
 import com.mob.lee.fastair.model.TextCategory
 import com.mob.lee.fastair.model.VideoCategory
 import com.mob.lee.fastair.model.WordCategory
 import com.mob.lee.fastair.model.ZipCategory
+import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.io.File
 
 object RecordRep {
     val records = SparseArray<List<Record>>()
+    val states = SparseArray<Boolean>()
     var total = 0
 
     fun load(context : Context?, position : Int) : Channel<Record> {
@@ -79,6 +84,51 @@ object RecordRep {
         return operator(position, { it.reversed() })
     }
 
+    fun states(position : Int, state : Int, start : Int, count : Int) : Channel<Record>? {
+        return operator(position, {
+            var temp = 0
+            it.forEachIndexed { index, record ->
+                if (0 == index - start - temp && (temp < count || - 1 == count)) {
+                    record.state = state
+                    temp += 1
+                }
+            }
+            if (temp == it.size && state == STATE_CHECK) {
+                states.put(position, true)
+            }
+            it
+        })
+    }
+
+    fun toggleState(position : Int) : Channel<Record>? {
+        val isChecked = states.get(position, false)
+        val state = if (isChecked) {
+            states.remove(position)
+            STATE_ORIGIN
+        } else {
+            STATE_CHECK
+        }
+        return states(position, state, 0, - 1)
+    }
+
+    fun delete(context : Context, position : Int) :Channel<Record>?{
+        return operator(position, {
+            val datas = it.toMutableList()
+            val iter = datas.iterator()
+            while (iter.hasNext()) {
+                val data = iter.next()
+                if (STATE_CHECK==data.state) {
+                    val file = File(data.path)
+                    if (file.delete()) {
+                        iter.remove()
+                        updateStorage(context, data)
+                    }
+                }
+            }
+            datas
+        })
+    }
+
     fun operator(position : Int, op : (List<Record>) -> List<Record>) : Channel<Record>? {
         val datas = records.get(position)
         datas?.let {
@@ -88,6 +138,7 @@ object RecordRep {
         }
         return null
     }
+
 
     fun send(datas : List<Record?>?) : Channel<Record> {
         val channel = Channel<Record>()

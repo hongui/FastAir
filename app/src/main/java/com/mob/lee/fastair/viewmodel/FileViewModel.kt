@@ -38,6 +38,7 @@ class FileViewModel : ViewModel() {
         mCurrentChannel=channel
         scope.launch(Dispatchers.Main) {
             var size = 0
+            state.value= STATE_PRE
             channel.consumeEachIndexed {
                 if (0 == it.index) {
                     state.value = STATE_START
@@ -66,6 +67,18 @@ class FileViewModel : ViewModel() {
 
     fun reverse(scope : AndroidScope) {
         register(scope, RecordRep.reverse(position))
+    }
+
+    fun updateState(scope : AndroidScope,state:Int,start:Int,count:Int=1){
+        register(scope, RecordRep.states(position,state,start, count))
+    }
+
+    fun toggleState(scope : AndroidScope){
+        register(scope, RecordRep.toggleState(position))
+    }
+
+    fun delete(context : Context,scope : AndroidScope){
+        register(scope, RecordRep.delete(context,position))
     }
 
     fun checkedrecords() : List<Record> {
