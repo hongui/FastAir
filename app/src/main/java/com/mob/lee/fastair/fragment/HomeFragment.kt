@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
@@ -41,13 +42,39 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         homeDrawer?.addDrawerListener(toggle)
         homeNavgation?.setNavigationItemSelectedListener(this)
 
+        val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
         homeContent.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
             override fun onPageSelected(position : Int) {
-                val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
                 viewmodel.position = position
                 permisionCheck()
             }
         })
+
+        toolOperation.setImageDrawable(ContextCompat.getDrawable(context !!, R.drawable.ic_action_receive))
+        toolSwap.setOnClickListener {
+            viewmodel.reverse(mScope)
+        }
+        toolAll.setOnClickListener {
+            viewmodel.toggleState(mScope)
+        }
+        toolSort.setOnClickListener {
+            val menus = PopupMenu(context !!, toolSort)
+            menus.inflate(R.menu.menu_sort)
+            menus.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_content_sort_byname -> viewmodel.sortBy(mScope, { it.name })
+                    R.id.menu_content_sort_bysize -> viewmodel.sortBy(mScope, { it.size })
+                    R.id.menu_content_sort_bytime -> viewmodel.sortBy(mScope, { it.date })
+                }
+                true
+            }
+            menus.show()
+        }
+        toolDelete.setOnClickListener {
+            showDialog(getString(R.string.deleteTips),positive = getString(R.string.delete),positiveListener = {dialog, which ->
+                viewmodel.delete(mParent!!,mScope)
+            })
+        }
         permisionCheck()
     }
 

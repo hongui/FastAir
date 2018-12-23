@@ -17,34 +17,38 @@ class TranslationBehavior : CoordinatorLayout.Behavior<View> {
 
     var mAnimating = false
     var mMargin:CoordinatorLayout.LayoutParams?=null
+    var mTotalOffset=0
+
+    constructor():super()
 
     constructor(context: Context, attr: AttributeSet) : super(context, attr)
-
-    /*开始滑动*/
 
     override fun onStartNestedScroll(coordinatorLayout: CoordinatorLayout, child: View, directTargetChild: View, target: View, axes: Int, type: Int): Boolean {
         return 0!=(ViewCompat.SCROLL_AXIS_VERTICAL and axes)
     }
 
-    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: View, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
-        if(null==mMargin){
-            mMargin=child.layoutParams as CoordinatorLayout.LayoutParams
+    override fun onNestedPreScroll(coordinatorLayout : CoordinatorLayout, child : View, target : View, dx : Int, dy : Int, consumed : IntArray, type : Int) {
+        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        if(mAnimating){
+            return
         }
-        if (0F == child.translationY && !mAnimating && (0 < dyUnconsumed && 0 == dyConsumed/*划到底部并且继续划*/ || 0 == dyUnconsumed && 0 < dyConsumed/*往下滑未到底*/)) {
-            anim(child, 0F, mMargin!!.bottomMargin+child.height.toFloat())
-        } else if ((mMargin!!.bottomMargin+child.height).toFloat() == child.translationY && !mAnimating && (0 > dyUnconsumed && 0 == dyConsumed || 0 == dyUnconsumed && 0 > dyConsumed)) {
-            anim(child, mMargin!!.bottomMargin+child.height.toFloat(), 0F)
+        val layoutparams=child.layoutParams as? CoordinatorLayout.LayoutParams
+        val total=child.height+(layoutparams?.bottomMargin?:0).toFloat()
+        if(dy>0&&child.translationY!=total){
+            //往下滑，并且还没到底
+            anim(child,0F,total)
+        }else if(dy<0 &&0<child.translationY){
+            //往上滑，并且还没恢复到原始位置
+            anim(child,total,0F)
         }
     }
 
     fun anim(view: View,start:Float,end:Float) {
+        mAnimating = true
         val animator = ObjectAnimator.ofFloat(view, "translationY",start,end)
+        animator.duration=250
         animator.setInterpolator(FastOutSlowInInterpolator())
         animator.addListener(object : AnimatorListenerAdapter() {
-
-            override fun onAnimationStart(animation: Animator?) {
-                mAnimating = true
-            }
 
             override fun onAnimationEnd(animation: Animator?) {
                 mAnimating = false

@@ -35,4 +35,10 @@
     <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="ToolItem">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/sp10</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>
