@@ -8,6 +8,7 @@ import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.RecordRep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.consumeEachIndexed
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
@@ -18,6 +19,7 @@ import kotlin.properties.Delegates
 class FileViewModel : ViewModel() {
     val record = MutableLiveData<Record>()
     val state = MutableLiveData<Int>()
+    val update = MutableLiveData<Record>()
     var mCheckAll = false
     var mIsDes = true
     var position : Int by Delegates.observable(0, { property, oldValue, newValue ->
@@ -57,6 +59,15 @@ class FileViewModel : ViewModel() {
         }
     }
 
+    fun update(scope : AndroidScope, channel : Channel<Record>?){
+        channel?:return
+        scope.launch (Dispatchers.Main){
+            channel.consumeEach {
+                update.value=it
+            }
+        }
+    }
+
     fun load(scope : AndroidScope, context : Context) {
         register(scope, RecordRep.load(context, position))
     }
@@ -70,7 +81,7 @@ class FileViewModel : ViewModel() {
     }
 
     fun updateState(scope : AndroidScope,state:Int,start:Int,count:Int=1){
-        register(scope, RecordRep.states(position,state,start, count))
+        update(scope, RecordRep.states(position,state,start, count))
     }
 
     fun toggleState(scope : AndroidScope){
@@ -78,7 +89,7 @@ class FileViewModel : ViewModel() {
     }
 
     fun delete(context : Context,scope : AndroidScope){
-        register(scope, RecordRep.delete(context,position))
+        update(scope, RecordRep.delete(context,position))
     }
 
     fun checkedrecords() : List<Record> {

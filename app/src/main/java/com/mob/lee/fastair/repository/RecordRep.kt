@@ -30,7 +30,7 @@ object RecordRep {
     val states = SparseArray<Boolean>()
     var total = 0
 
-    fun load(context : Context?, position : Int) : Channel<Record> {
+    fun load(context: Context?, position: Int): Channel<Record> {
         val list = records.get(position)
 
         //有缓存，不查库
@@ -74,33 +74,30 @@ object RecordRep {
         return channel
     }
 
-    fun sortBy(position : Int, selector : (Record) -> Comparable<*>) : Channel<Record>? {
+    fun sortBy(position: Int, selector: (Record) -> Comparable<*>): Channel<Record>? {
         return operator(position, {
             it.sortedWith(compareByDescending(selector))
         })
     }
 
-    fun reverse(position : Int) : Channel<Record>? {
+    fun reverse(position: Int): Channel<Record>? {
         return operator(position, { it.reversed() })
     }
 
-    fun states(position : Int, state : Int, start : Int, count : Int) : Channel<Record>? {
-        return operator(position, {
-            var temp = 0
-            it.forEachIndexed { index, record ->
-                if (0 == index - start - temp && (temp < count || - 1 == count)) {
-                    record.state = state
-                    temp += 1
-                }
+    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Record>? {
+        var temp = 0
+        return update(position, { index, record, iter ->
+            if (0 == index - start - temp && (temp < count || -1 == count)) {
+                record.state = state
+                temp += 1
+                true
+            } else {
+                false
             }
-            if (temp == it.size && state == STATE_CHECK) {
-                states.put(position, true)
-            }
-            it
         })
     }
 
-    fun toggleState(position : Int) : Channel<Record>? {
+    fun toggleState(position: Int): Channel<Record>? {
         val isChecked = states.get(position, false)
         val state = if (isChecked) {
             states.remove(position)
@@ -108,28 +105,32 @@ object RecordRep {
         } else {
             STATE_CHECK
         }
-        return states(position, state, 0, - 1)
-    }
-
-    fun delete(context : Context, position : Int) :Channel<Record>?{
         return operator(position, {
-            val datas = it.toMutableList()
-            val iter = datas.iterator()
-            while (iter.hasNext()) {
-                val data = iter.next()
-                if (STATE_CHECK==data.state) {
-                    val file = File(data.path)
-                    if (file.delete()) {
-                        iter.remove()
-                        updateStorage(context, data)
-                    }
-                }
+            it.forEach {
+                it.state = state
             }
-            datas
+            it
         })
     }
 
-    fun operator(position : Int, op : (List<Record>) -> List<Record>) : Channel<Record>? {
+    fun delete(context: Context, position: Int): Channel<Record>? {
+        return update(position, { index, record, iter ->
+            if (STATE_CHECK == record.state) {
+                val file = File(record.path)
+                if (file.delete()) {
+                    iter.remove()
+                    updateStorage(context, record)
+                    true
+                } else {
+                    false
+                }
+            }else{
+                false
+            }
+        })
+    }
+
+    fun operator(position: Int, op: (List<Record>) -> List<Record>): Channel<Record>? {
         val datas = records.get(position)
         datas?.let {
             val target = op(it)
@@ -139,8 +140,32 @@ object RecordRep {
         return null
     }
 
+    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Record>? {
+        val datas = records.get(position)
+        datas?.let {
+            if (it.isEmpty()) {
+                return null
+            }
+            val channel = Channel<Record>()
+            GlobalScope.launch(Dispatchers.IO) {
+                val iter = it.toMutableList().iterator()
+                var index = 0
+                while (iter.hasNext()) {
+                    val record = iter.next()
+                    val handled = action(index, record, iter)
+                    if (handled) {
+                        channel.send(record)
+                    }
+                    index += 1
+                }
+                channel.close()
+            }
+            return channel
+        }
+        return null
+    }
 
-    fun send(datas : List<Record?>?) : Channel<Record> {
+    fun send(datas: List<Record?>?): Channel<Record> {
         val channel = Channel<Record>()
         GlobalScope.launch(Dispatchers.IO) {
             datas?.let {
@@ -155,7 +180,7 @@ object RecordRep {
         return channel
     }
 
-    fun categories() : Array<Category> {
+    fun categories(): Array<Category> {
         return arrayOf(ImageCategory(),
                 MusicCategory(),
                 VideoCategory(),
