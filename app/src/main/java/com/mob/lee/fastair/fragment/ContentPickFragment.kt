@@ -46,7 +46,7 @@ class ContentPickFragment : AppFragment() {
                 } else {
                     STATE_CHECK
                 }
-                viewModel.updateState(mScope, state, position, 1)
+                viewModel.updateState(mScope, state, viewHolder.adapterPosition, 1)
             }
             viewHolder.check(R.id.item_file_selector, STATE_CHECK == record.state)
             val isChecked = viewHolder.view<CheckBox>(R.id.item_file_selector)?.isChecked ?: false
