@@ -35,7 +35,7 @@ object RecordRep {
     val states = SparseArray<Boolean>()
     var total = 0
 
-    const val DELAY = 32L
+    const val DELAY = 8L
 
     fun load(context: Context?, position: Int): Channel<Record> {
         val list = records.get(position)

@@ -1,6 +1,5 @@
 package com.mob.lee.fastair.fragment
 
-import kotlinx.coroutines.launch
 import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Bundle
@@ -10,15 +9,16 @@ import android.widget.TextView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
-import com.mob.lee.fastair.model.*
+import com.mob.lee.fastair.model.ADDRESS
+import com.mob.lee.fastair.model.IS_CHAT
+import com.mob.lee.fastair.model.IS_HOST
+import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.p2p.Subscriber
+import com.mob.lee.fastair.repository.RecordRep
 import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.successToast
 import kotlinx.android.synthetic.main.fragment_discover.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Andy on 2017/8/11.
@@ -80,13 +80,11 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
                     mParent?.fragment(HistoryFragment::class, bundle, addToIt = false)
                 }
                 mParent?.database(mScope, { dao ->
-                    val records = dao.checkedRecords()
-                    records?.let {
-                        it.forEach {
-                            it.state = STATE_WAIT
-                        }
-                        dao.updates(it)
+                    val records = RecordRep.selectRecords
+                    records.forEach {
+                        it.state = STATE_WAIT
                     }
+                    dao.insert(records)
                 })
             })
         }

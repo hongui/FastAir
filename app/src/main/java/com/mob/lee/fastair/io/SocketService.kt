@@ -1,7 +1,9 @@
 package com.mob.lee.fastair.io
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
@@ -39,6 +41,7 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
             channel?.let {
                 it.close()
             }
+            isOpen=false
         }
     }
 
@@ -101,7 +104,7 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
     /*读取特定长度的字节，可能会阻塞*/
     private fun readFix(targetSize: Int): ByteBuffer {
         val buffer = ByteBuffer.allocate(targetSize)
-        while (buffer.hasRemaining()) {
+        while (buffer.hasRemaining()&&isOpen) {
             channel?.read(buffer)
         }
         buffer.flip()
