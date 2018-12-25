@@ -22,13 +22,20 @@ import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
 object RecordRep {
     val records = SparseArray<List<Record>>()
+    /*
+    * HashSet在移除的时候会重新计算hash，导致移除失败，所以只能使用ArrayList
+    * */
+    val selectRecords = ArrayList<Record>()
     val states = SparseArray<Boolean>()
     var total = 0
+
+    const val DELAY = 32L
 
     fun load(context: Context?, position: Int): Channel<Record> {
         val list = records.get(position)
@@ -59,10 +66,11 @@ object RecordRep {
                     records.remove(key)
                 }
                 it.use {
-                    val temp = ArrayList<Record>()
+                    val temp = ArrayList<Record>(cursor.count)
                     while (cursor.moveToNext()) {
                         val record = category.read(cursor)
                         temp.add(record)
+                        delay(DELAY)
                         channel.send(record)
                     }
                     records.put(position, temp)
@@ -84,7 +92,7 @@ object RecordRep {
         return operator(position, { it.reversed() })
     }
 
-    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Pair<Int,Record>>? {
+    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Pair<Int, Record?>>? {
         var temp = 0
         return update(position, { index, record, iter ->
             if (0 == index - start - temp && (temp < count || -1 == count)) {
@@ -103,9 +111,15 @@ object RecordRep {
             states.remove(position)
             STATE_ORIGIN
         } else {
+            states.put(position, true)
             STATE_CHECK
         }
         return operator(position, {
+            if (state == STATE_CHECK) {
+                selectRecords.addAll(it)
+            } else {
+                selectRecords.clear()
+            }
             it.forEach {
                 it.state = state
             }
@@ -113,7 +127,7 @@ object RecordRep {
         })
     }
 
-    fun delete(context: Context, position: Int): Channel<Pair<Int,Record>>? {
+    fun delete(context: Context, position: Int): Channel<Pair<Int, Record?>>? {
         return update(position, { index, record, iter ->
             if (STATE_CHECK == record.state) {
                 val file = File(record.path)
@@ -124,7 +138,7 @@ object RecordRep {
                 } else {
                     false
                 }
-            }else{
+            } else {
                 false
             }
         })
@@ -140,21 +154,40 @@ object RecordRep {
         return null
     }
 
-    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Pair<Int,Record>>? {
+    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Pair<Int, Record?>>? {
         val datas = records.get(position)
         datas?.let {
             if (it.isEmpty()) {
                 return null
             }
-            val channel = Channel<Pair<Int,Record>>()
+            val channel = Channel<Pair<Int, Record?>>()
             GlobalScope.launch(Dispatchers.IO) {
-                val iter = it.toMutableList().iterator()
+                val iter = (it as MutableList).iterator()
                 var index = 0
+                var size = it.size
+                var newIndex = 0
                 while (iter.hasNext()) {
                     val record = iter.next()
                     val handled = action(index, record, iter)
                     if (handled) {
-                        channel.send(index to record)
+                        //如果操作更新了记录，则对应需要更新
+                        val result = if (size == it.size) {
+                            if (record.state == STATE_CHECK) {
+                                if (!selectRecords.contains(record)) {
+                                    selectRecords.add(record)
+                                }
+                            } else {
+                                selectRecords.remove(record)
+                            }
+                            record
+                        } else {
+                            selectRecords.remove(record)
+                            null
+                        }
+                        channel.send(index - newIndex to result)
+                        newIndex += size - it.size
+                        size = it.size
+                        delay(DELAY)
                     }
                     index += 1
                 }
@@ -172,6 +205,7 @@ object RecordRep {
                 for (d in it) {
                     d?.let {
                         channel.send(it)
+                        delay(DELAY)
                     }
                 }
             }

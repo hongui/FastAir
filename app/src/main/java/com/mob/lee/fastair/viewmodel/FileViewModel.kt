@@ -19,7 +19,8 @@ import kotlin.properties.Delegates
 class FileViewModel : ViewModel() {
     val record = MutableLiveData<Record>()
     val state = MutableLiveData<Int>()
-    val update = MutableLiveData<Pair<Int,Record>>()
+    val update = MutableLiveData<Pair<Int,Record?>>()
+    val hasSelect=MutableLiveData<Boolean>()
     var mCheckAll = false
     var mIsDes = true
     var position : Int by Delegates.observable(0, { property, oldValue, newValue ->
@@ -55,16 +56,18 @@ class FileViewModel : ViewModel() {
                     STATE_SUCCESS
                 }
                 state.value = flag
+                hasSelect.value=RecordRep.selectRecords.isNotEmpty()
             }
         }
     }
 
-    fun update(scope : AndroidScope, channel : Channel<Pair<Int,Record>>?){
+    fun update(scope : AndroidScope, channel : Channel<Pair<Int,Record?>>?){
         channel?:return
         scope.launch (Dispatchers.Main){
             channel.consumeEach {
                 update.value=it
             }
+            hasSelect.value=RecordRep.selectRecords.isNotEmpty()
         }
     }
 
