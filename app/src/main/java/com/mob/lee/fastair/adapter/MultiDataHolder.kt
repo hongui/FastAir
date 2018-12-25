@@ -15,33 +15,27 @@ open class MultiDataHolder<D>(override val layout: Int, val bindAction: ((positi
     }
 
     override fun change(pos: Int, data: Any?): Int {
-        if (startPosition == pos && null != data) {
-            var remove=-1
-            for ((i, d) in datas.withIndex()) {
-                //引用一样，说明要更新或者删除
-                if (d === data) {
-                    //完全相等，删除
-                    if (d == data) {
-                        remove=i
-                        break
-                    } else {
-                        datas[i] = data
-                        return i
-                    }
+        val target = data as? D
+        if (pos in startPosition until startPosition + size() && (null != target || null == data)) {
+            val origin = pos - startPosition
+            if (null == data) {
+                val temp = datas.removeAt(origin)
+                temp?.let {
+                    return origin
                 }
-            }
-            if(-1!=remove){
-                datas.removeAt(remove)
-                return remove
+                return -1
+            } else {
+                target?.let {
+                    datas[origin] = it
+                    return origin
+                }
+                return -1
             }
         }
         //没找到，加进去吧
-        data?.let {
-            val real = data as? D
-            real?.let {
-                datas.add(it)
-                return datas.size
-            }
+        target?.let {
+            datas.add(it)
+            return datas.size
         }
         return super.change(pos, data)
     }

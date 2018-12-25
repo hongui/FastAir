@@ -84,7 +84,7 @@ object RecordRep {
         return operator(position, { it.reversed() })
     }
 
-    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Record>? {
+    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Pair<Int,Record>>? {
         var temp = 0
         return update(position, { index, record, iter ->
             if (0 == index - start - temp && (temp < count || -1 == count)) {
@@ -113,7 +113,7 @@ object RecordRep {
         })
     }
 
-    fun delete(context: Context, position: Int): Channel<Record>? {
+    fun delete(context: Context, position: Int): Channel<Pair<Int,Record>>? {
         return update(position, { index, record, iter ->
             if (STATE_CHECK == record.state) {
                 val file = File(record.path)
@@ -140,13 +140,13 @@ object RecordRep {
         return null
     }
 
-    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Record>? {
+    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Pair<Int,Record>>? {
         val datas = records.get(position)
         datas?.let {
             if (it.isEmpty()) {
                 return null
             }
-            val channel = Channel<Record>()
+            val channel = Channel<Pair<Int,Record>>()
             GlobalScope.launch(Dispatchers.IO) {
                 val iter = it.toMutableList().iterator()
                 var index = 0
@@ -154,7 +154,7 @@ object RecordRep {
                     val record = iter.next()
                     val handled = action(index, record, iter)
                     if (handled) {
-                        channel.send(record)
+                        channel.send(index to record)
                     }
                     index += 1
                 }

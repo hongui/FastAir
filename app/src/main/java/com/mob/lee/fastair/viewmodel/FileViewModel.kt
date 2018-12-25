@@ -19,7 +19,7 @@ import kotlin.properties.Delegates
 class FileViewModel : ViewModel() {
     val record = MutableLiveData<Record>()
     val state = MutableLiveData<Int>()
-    val update = MutableLiveData<Record>()
+    val update = MutableLiveData<Pair<Int,Record>>()
     var mCheckAll = false
     var mIsDes = true
     var position : Int by Delegates.observable(0, { property, oldValue, newValue ->
@@ -59,7 +59,7 @@ class FileViewModel : ViewModel() {
         }
     }
 
-    fun update(scope : AndroidScope, channel : Channel<Record>?){
+    fun update(scope : AndroidScope, channel : Channel<Pair<Int,Record>>?){
         channel?:return
         scope.launch (Dispatchers.Main){
             channel.consumeEach {

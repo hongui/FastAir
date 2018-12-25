@@ -88,7 +88,7 @@ class ContentPickFragment : AppFragment() {
         }
 
         viewModel.update.observe({ lifecycle }) {
-            adapter.change(it)
+            adapter.change(it.second,it.first)
         }
     }
 

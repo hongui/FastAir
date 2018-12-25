@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * Created by Andy on 2017/8/8.
  */
-class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<ViewHolder>() {
+class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<ViewHolder>() {
     val datas = ArrayList<DataHolder<out Any>>()
 
     init {
@@ -15,7 +15,7 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         }
     }
 
-    override fun getItemViewType(position : Int) : Int {
+    override fun getItemViewType(position: Int): Int {
         for ((index, d) in datas.withIndex()) {
             if (d.canHandleIt(position)) {
                 return index
@@ -24,17 +24,17 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         return 0
     }
 
-    override fun onCreateViewHolder(parent : ViewGroup, viewType : Int) : ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = datas[viewType].targetView(parent)
         view ?: throw NullPointerException("DataType:$viewType has null View!")
         return ViewHolder(view, viewType)
     }
 
-    override fun onBindViewHolder(holder : ViewHolder, position : Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         datas[holder.dataType].bind(position, holder)
     }
 
-    override fun getItemCount() : Int {
+    override fun getItemCount(): Int {
         var total = 0
         for (d in datas) {
             total += d.size()
@@ -42,7 +42,7 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         return total
     }
 
-    fun add(data : DataHolder<out Any>, position : Int = datas.size) {
+    fun add(data: DataHolder<out Any>, position: Int = datas.size) {
         if (position < 0 || position > datas.size) {
             return
         }
@@ -51,7 +51,7 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         notifyItemRangeInserted(position, data.size())
     }
 
-    fun addSingle(data : DataHolder<out Any>, position : Int = datas.size) {
+    fun addSingle(data: DataHolder<out Any>, position: Int = datas.size) {
         for (d in datas) {
             if (d.layout == data.layout) {
                 return
@@ -60,22 +60,22 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         add(data, position)
     }
 
-    fun remove(data : DataHolder<out Any>? = null, position : Int = datas.indexOf(data)) {
+    fun remove(data: DataHolder<out Any>? = null, position: Int = datas.indexOf(data)) {
         if (position >= 0) {
             val holder = datas.removeAt(position)
             notifyItemRangeRemoved(holder.startPosition, holder.size())
         }
     }
 
-    fun remove(layout : Int=-1, count : Int = - 1) {
+    fun remove(layout: Int = -1, count: Int = -1) {
         val it = datas.iterator()
         var tempCount = 0
-        while (it.hasNext()){
-            val d=it.next()
-            if (-1!=layout&&layout != d.layout) {
+        while (it.hasNext()) {
+            val d = it.next()
+            if (-1 != layout && layout != d.layout) {
                 continue
             }
-            if (- 1 != count && tempCount == count) {
+            if (-1 != count && tempCount == count) {
                 return
             }
             it.remove()
@@ -84,35 +84,47 @@ class Adapter(vararg dataHolder : DataHolder<out Any>) : RecyclerView.Adapter<Vi
         }
     }
 
-    fun change(any : Any?) {
+    fun change(any: Any?, index: Int = -1, layout: Int = -1) {
         var position = 0
         var updateCount = 0
         var origin = 0
         for (d in datas) {
             origin = d.size()
-            val index = d.change(position - updateCount, any)
-            val pos = index + position
-            when {
-                origin > d.size() -> {
-                    notifyItemRemoved(pos)
-                    updateCount -= 1
-                }
-                origin == d.size() -> notifyItemChanged(pos)
-                origin < d.size() -> {
-                    notifyItemInserted(pos)
-                    updateCount += 1
+            if (d.layout != layout && -1 != layout) {
+                continue
+            }
+            val temp = position - updateCount + if (-1 == index) {
+                d.size()
+            } else {
+                index
+            }
+            val i = d.change(temp, any)
+            //判断之后才更新起点
+            if (-1 == i) {
+                continue
+            }else {
+                val pos = i + position
+                when {
+                    origin > d.size() -> {
+                        notifyItemRemoved(pos)
+                        updateCount -= 1
+                    }
+                    origin == d.size() -> notifyItemChanged(pos)
+                    origin < d.size() -> {
+                        notifyItemInserted(pos)
+                        updateCount += 1
+                    }
                 }
             }
-            //判断之后才更新起点
             d.startPosition = position
             position += d.size()
         }
     }
 
-    fun clearAndAdd(list : List<Any>) {
+    fun clearAndAdd(list: List<Any>) {
         clearAll()
-        for (l in list) {
-            change(l)
+        for ((i, d) in list.withIndex()) {
+            change(d, i)
         }
     }
 
