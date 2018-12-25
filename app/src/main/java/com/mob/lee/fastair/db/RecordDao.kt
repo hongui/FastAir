@@ -1,7 +1,15 @@
 package com.mob.lee.fastair.db
 
-import androidx.room.*
-import com.mob.lee.fastair.model.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.mob.lee.fastair.model.Record
+import com.mob.lee.fastair.model.STATE_CHECK
+import com.mob.lee.fastair.model.STATE_FAILED
+import com.mob.lee.fastair.model.STATE_SUCCESS
+import com.mob.lee.fastair.model.STATE_WAIT
 
 /**
  * Created by Andy on 2017/12/30.
@@ -9,16 +17,16 @@ import com.mob.lee.fastair.model.*
 @Dao
 interface RecordDao{
 
-    @Query("SELECT * FROM Record")
+    @Query("SELECT * FROM record")
     fun records():List<Record>
 
-    @Query("SELECT * FROM Record WHERE state=${STATE_WAIT}")
+    @Query("SELECT * FROM record WHERE state=${STATE_WAIT}")
     fun waitRecords():List<Record>
 
-    @Query("SELECT * FROM Record WHERE state=${STATE_CHECK}")
+    @Query("SELECT * FROM record WHERE state=${STATE_CHECK}")
     fun checkedRecords():List<Record>
 
-    @Query("SELECT * FROM Record WHERE state=${STATE_SUCCESS} OR state=${STATE_FAILED}")
+    @Query("SELECT * FROM record WHERE state=${STATE_SUCCESS} OR state=${STATE_FAILED}")
     fun completedRecords():List<Record>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
