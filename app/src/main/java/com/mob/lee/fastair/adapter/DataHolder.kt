@@ -19,5 +19,5 @@ interface DataHolder<D>{
 
     fun bind(position:Int,viewHolder:ViewHolder)
 
-    fun change(pos:Int,data: Any?):Int=0
+    fun change(pos:Int,data: Any?):Int=-1
 }
