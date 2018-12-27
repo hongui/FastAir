@@ -12,6 +12,7 @@ import java.io.FileOutputStream
 class FileReader(val context: Context?, val listener: ProcessListener? = null) : Reader {
     var length = 0L
     var alreadyFinished = 0L
+    var startTime=0L
     lateinit var file: File
     lateinit var stream: FileOutputStream
     override fun invoke(data: ProtocolByte) {
@@ -19,7 +20,7 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
             ProtocolType.E -> {
                 try {
                     stream.close()
-                    listener?.invoke(SuccessState(obj = file))
+                    listener?.invoke(SuccessState(System.currentTimeMillis()-startTime,obj = file))
                 } catch (e: Exception) {
                     e.printStackTrace()
                     listener?.invoke(FaildState(obj = file))
@@ -28,6 +29,8 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
 
             ProtocolType.L -> {
                 length = data.getLong()
+                alreadyFinished=0
+                startTime=System.currentTimeMillis()
             }
 
             ProtocolType.C -> {
@@ -37,12 +40,12 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
                     f?.let {
                         file = it
                         stream = file.outputStream()
+                        listener?.invoke(StartState(obj = file))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     listener?.invoke(FaildState(obj = file))
                 }
-                listener?.invoke(StartState(obj = file))
             }
 
             else -> {

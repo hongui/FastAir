@@ -5,7 +5,6 @@ import com.mob.lee.fastair.io.state.StartState
 import com.mob.lee.fastair.io.state.SuccessState
 import java.io.File
 import java.io.FileInputStream
-import java.lang.Exception
 
 class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer() {
     var state = 0
@@ -23,6 +22,8 @@ class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer
     }
 
     constructor(path: String) : this(File(path))
+
+    constructor(path: String,listener: ProcessListener? = null) : this(File(path),listener)
 
     override fun hasNext(): Boolean = state != -1
 
@@ -54,10 +55,10 @@ class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer
                         state = -1
                         try {
                             stream.close()
+                            listener?.invoke(SuccessState(obj = file))
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-                        listener?.invoke(SuccessState(obj = file))
                         ProtocolByte.empty()
                     } else {
                         alreadyFinished += tempLength

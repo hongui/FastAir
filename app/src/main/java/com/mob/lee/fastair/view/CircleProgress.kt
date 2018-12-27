@@ -1,7 +1,13 @@
 package com.mob.lee.fastair.view
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PathMeasure
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Build
 import android.text.TextPaint
 import android.util.AttributeSet
@@ -127,6 +133,7 @@ class CircleProgress : View {
         if (max <= progress) {
             updateState(SUCCESS)
         }
+        this.state= PROGRESS
         invalidate()
     }
 

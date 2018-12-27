@@ -17,10 +17,10 @@ sealed class State(val what: Int, val obj: Any? = null) {
 class StartState(obj: Any? = null) : State(START, obj)
 
 class ProcessState(val process: Long, val total: Long, obj: Any? = null) : State(PROCESS, obj) {
-    fun percentage(): Float = (process / total * 100).toFloat()
+    fun percentage(): Float = (process.toFloat() / total * 100)
 }
 
-class SuccessState(obj: Any? = null) : State(SUCCESS, obj)
+class SuccessState(val duration:Long=0L,obj: Any? = null) : State(SUCCESS, obj)
 
 class FaildState(obj: Any? = null) : State(FAILD, obj)
 

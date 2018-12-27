@@ -33,7 +33,6 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
         when(state){
             is ProcessState-> {
                 progress?.progress(state.percentage())
-                progress?.updateState(CircleProgress.PROGRESS)
             }
 
             is SuccessState->{
