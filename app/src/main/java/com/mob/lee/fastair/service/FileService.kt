@@ -84,8 +84,23 @@ class FileService : Service() {
         socket?.open(PORT_FILE, if (isHost) null else host)
         database(mScope, { dao ->
             val records = dao.waitRecords()
-            records?.forEach {
-                socket?.write(FileWriter(it.path))
+            records.forEach {
+                socket?.write(FileWriter(it.path, {
+                    it.sendMessage(mHandler)
+                    if (it is SuccessState) {
+                        val file = it.obj as? File
+                        file ?: return@FileWriter
+                        for (r in records) {
+                            if (r.path == file.absolutePath) {
+                                r.state = STATE_SUCCESS
+                                database(mScope, { dao ->
+                                    dao.update(r)
+                                })
+                                break
+                            }
+                        }
+                    }
+                }))
             }
         })
         socket?.read(FileReader(this@FileService) {
@@ -93,10 +108,9 @@ class FileService : Service() {
             if (it is SuccessState) {
                 val file = it.obj as? File
                 file ?: return@FileReader
-                val record = Record(file.lastModified(), file.length(), file.lastModified(), file.path)
-                record.state= STATE_SUCCESS
+                val record = Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, it.duration)
                 database(mScope, { dao ->
-                    dao.update(record)
+                    dao.insert(record)
                 })
             }
         })
@@ -112,7 +126,7 @@ class FileService : Service() {
         }
         builder.setContentTitle(title)
         builder.setSmallIcon(R.mipmap.ic_launcher)
-        builder.setProgress(100, progress, true)
+        builder.setProgress(100, progress, false)
         startForeground(9727, builder.build())
     }
 }

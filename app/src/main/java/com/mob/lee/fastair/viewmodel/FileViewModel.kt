@@ -11,7 +11,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.consumeEachIndexed
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 /**
  * Created by Andy on 2017/11/13.
@@ -23,9 +22,7 @@ class FileViewModel : ViewModel() {
     val hasSelect=MutableLiveData<Boolean>()
     var mCheckAll = false
     var mIsDes = true
-    var position : Int by Delegates.observable(0, { property, oldValue, newValue ->
-        state.value = STATE_PRE
-    })
+    var position : Int = 0
     var mCurrentChannel:Channel<Record>?=null
 
     companion object {
@@ -46,7 +43,7 @@ class FileViewModel : ViewModel() {
                 if (0 == it.index) {
                     state.value = STATE_START
                 }
-                size = it.index
+                size = it.index+1
                 record.value = it.value
             }
             channel.invokeOnClose {

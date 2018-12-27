@@ -12,6 +12,7 @@ import com.mob.lee.fastair.adapter.History
 import com.mob.lee.fastair.adapter.HistoryAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.io.state.StartState
+import com.mob.lee.fastair.io.state.SuccessState
 import com.mob.lee.fastair.io.state.parseFile
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.service.BinderImpl
@@ -43,6 +44,7 @@ class HistoryFragment : AppFragment() {
             return
         }
         if (arguments?.getBoolean("isHistory") ?: false) {
+            val adapter = fragment_history.adapter as Adapter
             mScope.launch {
                 val channel = Channel<List<Record>?>()
                 mParent?.database(mScope, { dao ->
@@ -51,9 +53,8 @@ class HistoryFragment : AppFragment() {
                 })
                 val records = channel.receive()
                 records?.let {
-                    val adapter = fragment_history.adapter as Adapter
                     for (i in it) {
-                        adapter.change(i)
+                        adapter.change(i to SuccessState())
                     }
                 }
             }
@@ -76,7 +77,7 @@ class HistoryFragment : AppFragment() {
 
                             is StartState -> - 1
 
-                            else -> holder?.datas?.size ?: 1 - 1 ?: 0
+                            else -> (holder?.datas?.size ?: 1) - 1
                         }
                         parseFile(state)?.let { record ->
                             adapter.change(History(record, state), index)
@@ -91,8 +92,13 @@ class HistoryFragment : AppFragment() {
 
     override fun onStop() {
         super.onStop()
-        if (null != mConntect) {
-            mParent?.unbindService(mConntect)
+        try {
+            if (null != mConntect) {
+                mParent?.unbindService(mConntect)
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
         }
+
     }
 }
