@@ -8,7 +8,6 @@ import com.mob.lee.fastair.io.state.SuccessState
 import com.mob.lee.fastair.utils.createFile
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 
 class FileReader(val context: Context?, val listener: ProcessListener? = null) : Reader {
     var length = 0L
@@ -20,10 +19,11 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
             ProtocolType.E -> {
                 try {
                     stream.close()
+                    listener?.invoke(SuccessState(obj = file))
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    listener?.invoke(FaildState(obj = file))
                 }
-                listener?.invoke(SuccessState(obj = file))
             }
 
             ProtocolType.L -> {

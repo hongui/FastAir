@@ -2,16 +2,13 @@ package com.mob.lee.fastair.fragment
 
 import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
-import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.widget.TextView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
-import com.mob.lee.fastair.model.ADDRESS
 import com.mob.lee.fastair.model.IS_CHAT
-import com.mob.lee.fastair.model.IS_HOST
 import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.p2p.Subscriber
@@ -70,9 +67,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
             P2PManager.connectInfo({ info ->
                 P2PManager.stop(mParent !!)
                 val isChat = arguments?.getBoolean(IS_CHAT, false) ?: false
-                val bundle = Bundle()
-                bundle.putString(ADDRESS, info.groupOwnerAddress.hostAddress)
-                bundle.putBoolean(IS_HOST, info.isGroupOwner)
+                val bundle = P2PManager.bundle()
                 bundle.putAll(arguments)
                 if (isChat) {
                     mParent?.fragment(ChatFragment::class, bundle, addToIt = false)

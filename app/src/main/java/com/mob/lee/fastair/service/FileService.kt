@@ -1,21 +1,27 @@
 package com.mob.lee.fastair.service
 
-import android.app.IntentService
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
-import android.os.*
+import android.os.Build
+import android.os.Handler
+import android.os.IBinder
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AndroidScope
-import com.mob.lee.fastair.io.*
+import com.mob.lee.fastair.io.FileReader
+import com.mob.lee.fastair.io.FileWriter
+import com.mob.lee.fastair.io.ProcessListener
+import com.mob.lee.fastair.io.SocketService
 import com.mob.lee.fastair.io.state.ProcessState
 import com.mob.lee.fastair.io.state.StartState
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.io.state.SuccessState
-import com.mob.lee.fastair.model.*
+import com.mob.lee.fastair.model.ADDRESS
+import com.mob.lee.fastair.model.IS_HOST
+import com.mob.lee.fastair.model.PORT_FILE
+import com.mob.lee.fastair.model.Record
+import com.mob.lee.fastair.model.STATE_SUCCESS
 import com.mob.lee.fastair.utils.database
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -88,6 +94,7 @@ class FileService : Service() {
                 val file = it.obj as? File
                 file ?: return@FileReader
                 val record = Record(file.lastModified(), file.length(), file.lastModified(), file.path)
+                record.state= STATE_SUCCESS
                 database(mScope, { dao ->
                     dao.update(record)
                 })
@@ -98,7 +105,7 @@ class FileService : Service() {
 
 
     fun notification(progress : Int, title : String) {
-        /*val builder = if (26 <= Build.VERSION.SDK_INT) {
+        val builder = if (26 <= Build.VERSION.SDK_INT) {
             Notification.Builder(this, "FastAir")
         } else {
             Notification.Builder(this)
@@ -106,6 +113,6 @@ class FileService : Service() {
         builder.setContentTitle(title)
         builder.setSmallIcon(R.mipmap.ic_launcher)
         builder.setProgress(100, progress, true)
-        startForeground(9727, builder.build())*/
+        startForeground(9727, builder.build())
     }
 }

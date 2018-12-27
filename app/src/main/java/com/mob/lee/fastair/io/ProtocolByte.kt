@@ -22,7 +22,7 @@ data class ProtocolByte(val bytes:ByteBuffer, val type: ProtocolType){
         fun wrap(bytes: ByteArray,type: ProtocolType):ProtocolByte{
             val buffer = ByteBuffer.allocate(size(bytes))
             /*类型*/
-            buffer.put(type.ordinal.toByte())
+            buffer.put(type.type)
             /*内容长度*/
             buffer.putInt(bytes.size)
             /*内容*/
@@ -78,7 +78,7 @@ data class ProtocolByte(val bytes:ByteBuffer, val type: ProtocolType){
     }
 
     fun bytes():ByteArray{
-        val content=ByteBuffer.wrap(bytes.array(), HEAD_LENGTH,bytes.limit()- HEAD_LENGTH)
-        return content.array()
+        val array=bytes.array()
+        return array.sliceArray(HEAD_LENGTH until array.size)
     }
 }

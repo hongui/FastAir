@@ -14,12 +14,30 @@ import java.nio.channels.SocketChannel
  * Created by Andy on 2017/11/29.
  */
 class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
+    /**
+     * 读取监听器，消息到来会通知
+     * @see read
+     */
     private val readers = HashSet<Reader>()
+    /**
+     *发送消息
+     * @see write
+     */
     private val writers = Channel<Writer>()
+    /**
+     * 指示当前连接是否已经开启
+     */
     private var isOpen: Boolean = false
+    /**
+     * 通信通道
+     */
     private var channel: SocketChannel? = null
 
-    /*建立连接，host为空作为客户端，否则作为服务器*/
+    /**
+     * 建立连接，host为空作为客户端，否则作为服务器
+     * @param port 端口号
+     * @param host 主机地址，当该参数为null时，则开启一个socket监听
+     **/
     fun open(port: Int, host: String? = null) = scope.launch(Dispatchers.IO) {
         if (isOpen) {
             return@launch
@@ -41,28 +59,47 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
             channel?.let {
                 it.close()
             }
-            isOpen=false
+            close(e)
         }
     }
 
-    /*添加收到数据的监听*/
+    /**
+     * 添加收到数据的监听
+     **/
     fun read(reader: Reader) {
         readers.add(reader)
     }
 
-    /*添加写入数据的监听*/
+    /**
+     * 添加写入数据的监听
+     */
     fun write(writer: Writer) = scope.launch {
         writers.send(writer)
     }
 
-    /*关闭连接*/
-    fun close() {
+    /**
+     * 关闭连接
+     */
+    fun close(e:Exception?=null) {
         isOpen = false
         keepAlive = false
         writers.close()
+        for(r in readers){
+            r.onError(e?.message)
+        }
     }
 
-    /*读取数据*/
+    /**
+     * 读取数据
+     *
+     * 1、读取固定的5个字节，里面包含4个字节的内容长度，和1个字节的类型标识
+     * 2、分解类型和长度
+     * 3、读取真正内容
+     * 4、组装成消息对象，通知每个监听
+     *
+     * @see ProtocolType
+     * @see ProtocolByte
+     */
     private fun handleRead() = scope.launch(Dispatchers.IO) {
         while (isOpen || keepAlive) {
             try {
@@ -83,8 +120,10 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
         channel?.socket()?.shutdownInput()
     }
 
-    /*发送数据*/
-    private fun handleWrite()=scope.launch(Dispatchers.IO) {
+    /**
+     * 发送数据
+     */
+    private fun handleWrite()=scope.launch(Dispatchers.Default) {
         while (isOpen || keepAlive) {
             try {
                 val data = writers.receive()
@@ -101,7 +140,9 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
         channel?.socket()?.shutdownOutput()
     }
 
-    /*读取特定长度的字节，可能会阻塞*/
+    /**
+     * 读取特定长度的字节，可能会阻塞
+     */
     private fun readFix(targetSize: Int): ByteBuffer {
         val buffer = ByteBuffer.allocate(targetSize)
         while (buffer.hasRemaining()&&isOpen) {

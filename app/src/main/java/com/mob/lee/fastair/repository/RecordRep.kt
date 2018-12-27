@@ -28,7 +28,7 @@ import java.io.File
 
 object RecordRep {
     val records = SparseArray<List<Record>>()
-    /*
+    /**
     * HashSet在移除的时候会重新计算hash，导致移除失败，所以只能使用ArrayList
     * */
     val selectRecords = ArrayList<Record>()
@@ -36,6 +36,14 @@ object RecordRep {
     var total = 0
 
     const val DELAY = 8L
+
+    var order:String="DESC"
+    set(value) {
+        field=when(field){
+            "ASC"->"DESC"
+            else->"DESC"
+        }
+    }
 
     fun load(context: Context?, position: Int): Channel<Record> {
         val list = records.get(position)
@@ -55,7 +63,7 @@ object RecordRep {
                     category.columns(),
                     category.select(),
                     category.value(),
-                    MediaStore.MediaColumns.DATE_MODIFIED + " DESC")
+                    MediaStore.MediaColumns.DATE_MODIFIED + " ${order}")
             cursor?.let {
                 val count = it.count
                 //应该可以存得下吧o(*￣▽￣*)ブ
@@ -89,6 +97,7 @@ object RecordRep {
     }
 
     fun reverse(position: Int): Channel<Record>? {
+        order=""
         return operator(position, { it.reversed() })
     }
 
