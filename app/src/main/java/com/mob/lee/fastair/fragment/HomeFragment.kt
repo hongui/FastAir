@@ -9,9 +9,11 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
@@ -41,6 +43,18 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         homeDrawer?.addDrawerListener(toggle)
         homeNavgation?.setNavigationItemSelectedListener(this)
+        homeDrawer?.addDrawerListener(object :DrawerLayout.SimpleDrawerListener(){
+            override fun onDrawerOpened(drawerView : View) {
+                super.onDrawerOpened(drawerView)
+                val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
+                val title=if (P2PManager.connected) {
+                    R.string.device_disconnect
+                } else {
+                    R.string.device_connect
+                }
+                item.setTitle(title)
+            }
+        })
 
         val viewmodel = ViewModelProviders.of(mParent!!).get(FileViewModel::class.java)
         homeContent.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
@@ -60,7 +74,12 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             toolOperation.setImageDrawable(ContextCompat.getDrawable(context!!,id))
         }
         toolOperation.setOnClickListener {
-            mParent?.fragment(DiscoverFragment::class)
+            if(P2PManager.connected){
+                val bundle=P2PManager.bundle()
+                mParent?.fragment(HistoryFragment::class,bundle)
+            }else {
+                mParent?.fragment(DiscoverFragment::class)
+            }
         }
         toolSwap.setOnClickListener {
             viewmodel.reverse(mScope)
@@ -105,16 +124,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         permisionCheck()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
-        if (P2PManager.connected) {
-            item.title = "断开连接"
-        } else {
-            item.title = "连接设备"
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var data: Bundle? = null
         when (item.getItemId()) {
@@ -122,7 +131,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 if (P2PManager.connected) {
                     P2PManager.disconnect(context!!)
                     val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
-                    item.title = "连接设备"
+                    item.setTitle(R.string.device_connect)
                 } else {
                     data = Bundle()
                     data.putBoolean("isJustConnect", true)

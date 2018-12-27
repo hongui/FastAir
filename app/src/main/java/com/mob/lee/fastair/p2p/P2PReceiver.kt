@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.NetworkInfo
 import android.net.wifi.p2p.WifiP2pDevice
-import android.net.wifi.p2p.WifiP2pGroup
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 
@@ -34,8 +33,7 @@ class P2PReceiver : BroadcastReceiver() {
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
                 val networkInfo = intent.getParcelableExtra<NetworkInfo>(WifiP2pManager.EXTRA_NETWORK_INFO)
                 val wifiP2pInfo = intent.getParcelableExtra<WifiP2pInfo>(WifiP2pManager.EXTRA_WIFI_P2P_INFO)
-                val wifiP2pGroup = intent.getParcelableExtra<WifiP2pGroup>(WifiP2pManager.EXTRA_WIFI_P2P_GROUP)
-                P2PManager.connected(networkInfo.isConnected)
+                P2PManager.connected(networkInfo.isConnected,wifiP2pInfo)
             }
         }
     }

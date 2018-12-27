@@ -71,5 +71,8 @@
     <string name="chooseDownloadPath">选择文件接收路径</string>
     <string name="dontSelect">还没有选择文件哦，我不知道要删除什么</string>
 
+    <string name="device_connect">连接设备</string>
+    <string name="device_disconnect">断开连接</string>
+
     <string name="dropbehavior">com.mob.lee.fastair.view.TranslationBehavior</string>
 </resources>

@@ -7,6 +7,9 @@ import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
+import android.os.Bundle
+import com.mob.lee.fastair.model.ADDRESS
+import com.mob.lee.fastair.model.IS_HOST
 
 /**
  * Created by Andy on 2017/8/16.
@@ -17,6 +20,7 @@ object P2PManager {
     var receiver: P2PReceiver? = null
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
+    var p2pInfo:WifiP2pInfo?=null
     var connected=false
 
 
@@ -37,10 +41,28 @@ object P2PManager {
         manager = context.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
         channel = manager!!.initialize(context, context.mainLooper, object : WifiP2pManager.ChannelListener {
             override fun onChannelDisconnected() {
-                connected(false)
-                connected=false
+                unregister(context)
             }
         })
+    }
+
+    fun unregister(context : Context){
+        connected(false)
+        p2pInfo=null
+        removeService(context)
+        disconnect(context)
+    }
+
+    fun bundle():Bundle{
+        val bundle = Bundle()
+        bundle.putString(ADDRESS, p2pInfo?.groupOwnerAddress?.hostAddress)
+        bundle.putBoolean(IS_HOST, p2pInfo?.isGroupOwner?:false)
+        return bundle
+    }
+
+    fun unBundle(bundle : Bundle?):Pair<String?,Boolean>{
+        bundle?:return null to false
+        return bundle.getString(ADDRESS,null) to bundle.getBoolean(IS_HOST,false)
     }
 
     fun discover(context : Context){
@@ -103,11 +125,12 @@ object P2PManager {
         }
     }
 
-    fun connected(connected: Boolean) {
+    fun connected(connected: Boolean,info:WifiP2pInfo?=null) {
         for (subcriber in subcriper) {
             subcriber.connect(connected)
         }
         this.connected=connected
+        this.p2pInfo=info
     }
 
     fun disconnect(context: Context){

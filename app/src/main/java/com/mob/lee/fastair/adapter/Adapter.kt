@@ -84,6 +84,11 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         }
     }
 
+    fun <D> get(position : Int):D?{
+        val d = datas.get(position)
+        return d as? D
+    }
+
     fun change(any: Any?, index: Int = -1, layout: Int = -1) {
         var position = 0
         var updateCount = 0
