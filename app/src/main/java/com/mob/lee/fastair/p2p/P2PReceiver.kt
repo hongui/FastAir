@@ -16,7 +16,7 @@ class P2PReceiver : BroadcastReceiver() {
         when (intent?.action) {
             WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
                 WifiP2pManager.EXTRA_WIFI_P2P_INFO
-                P2PManager.enable(WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, WifiP2pManager.WIFI_P2P_STATE_DISABLED))
+                P2PManager.p2pIsEnable(WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, WifiP2pManager.WIFI_P2P_STATE_DISABLED))
             }
 
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {

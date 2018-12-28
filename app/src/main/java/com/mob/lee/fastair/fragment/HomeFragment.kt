@@ -135,7 +135,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.connected) {
-                    P2PManager.disconnect(context !!)
+                    P2PManager.stopConnect(context !!)
                     val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
                     item.setTitle(R.string.device_connect)
                 } else {

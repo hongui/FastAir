@@ -49,8 +49,8 @@ object P2PManager {
     fun unregister(context : Context){
         connected(false)
         p2pInfo=null
-        removeService(context)
-        disconnect(context)
+        stopReceiver(context)
+        stopConnect(context)
     }
 
     fun bundle():Bundle{
@@ -83,31 +83,31 @@ object P2PManager {
         manager?.requestConnectionInfo(channel, info)
     }
 
-    fun stop(context: Context) {
+    fun stopDiscovery(context: Context) {
         if (null != channel) {
             manager?.stopPeerDiscovery(channel, ActionListener(context))
         }
     }
 
-    fun removeService(context: Context) {
+    fun stopReceiver(context: Context) {
         if (null != receiver) {
             context.unregisterReceiver(receiver)
         }
     }
 
-    fun add(subscriber: Subscriber) {
+    fun addSubcriber(subscriber: Subscriber) {
         synchronized(this) {
             subcriper.add(subscriber)
         }
     }
 
-    fun remove(subscriber: Subscriber) {
+    fun removeSubcripber(subscriber: Subscriber) {
         synchronized(this) {
             subcriper.remove(subscriber)
         }
     }
 
-    fun enable(enable: Boolean) {
+    fun p2pIsEnable(enable: Boolean) {
         for (subcriber in subcriper) {
             subcriber.wifiState(enable)
         }
@@ -133,8 +133,8 @@ object P2PManager {
         this.p2pInfo=info
     }
 
-    fun disconnect(context: Context){
-        stop(context)
+    fun stopConnect(context: Context){
         manager?.removeGroup(channel,ActionListener(context))
+        manager?.cancelConnect(channel,ActionListener(context))
     }
 }

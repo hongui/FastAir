@@ -32,7 +32,7 @@ class ContainerActivity : AppActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.removeService(this)
+        P2PManager.stopReceiver(this)
     }
 
     fun parseClipData(clipData : ClipData) {

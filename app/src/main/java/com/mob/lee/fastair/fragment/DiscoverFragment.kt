@@ -58,7 +58,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
         if (connected) {
             context?.successToast("连接成功,正在跳转，请稍等...")
             P2PManager.connectInfo({ info ->
-                P2PManager.stop(mParent !!)
+                P2PManager.stopDiscovery(mParent !!)
                 mParent?.fragment(HomeFragment::class)
             })
         }
@@ -70,7 +70,7 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
         setHasOptionsMenu(true)
         toolbar(R.string.discoverDevice,false)
 
-        P2PManager.add(this)
+        P2PManager.addSubcriber(this)
     }
 
     override fun onCreateOptionsMenu(menu : Menu?, inflater : MenuInflater?) {
@@ -93,16 +93,16 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.stop(context !!)
-        P2PManager.remove(this)
+        P2PManager.stopDiscovery(context !!)
+        P2PManager.removeSubcripber(this)
     }
 
     override fun onPressed() : Boolean {
         if (! backIt) {
             showDialog(getString(R.string.disconverBackInfo), { dialog, which ->
                 backIt = true
-                P2PManager.stop(context !!)
-                P2PManager.remove(this)
+                P2PManager.stopDiscovery(context !!)
+                P2PManager.removeSubcripber(this)
                 mParent?.onBackPressed()
             }, getString(R.string.stop))
             return true

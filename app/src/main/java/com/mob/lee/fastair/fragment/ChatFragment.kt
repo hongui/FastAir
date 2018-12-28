@@ -47,7 +47,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
 
     override fun setting() {
         toolbar(R.string.base_chat)
-        P2PManager.add(this)
+        P2PManager.addSubcriber(this)
 
         mAdapter = MessageAdapter()
         chatContent?.layoutManager = LinearLayoutManager(mParent as Context)
@@ -114,7 +114,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         }
         showDialog(getString(R.string.chatOverInfo), { dialog, which ->
             mBack = true
-            P2PManager.removeService(mParent!!)
+            P2PManager.stopReceiver(mParent!!)
             mParent?.fragment(HomeFragment::class)
             mParent?.stopService(Intent(context, MessageService::class.java))
             if (null != mConnect) {
@@ -126,7 +126,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.remove(this)
+        P2PManager.removeSubcripber(this)
         if (null != mConnect) {
             context?.unbindService(mConnect)
         }
