@@ -38,7 +38,7 @@ class FileService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mHandler = Handler({
+        mHandler = Handler{
             if (null == it.obj) {
                 return@Handler true
             }
@@ -58,10 +58,11 @@ class FileService : Service() {
 
                 is SuccessState -> {
                     notification(100, file?.name ?: "")
+                    startSendNew()
                 }
             }
             true
-        })
+        }
         mScope.create()
     }
 
@@ -76,47 +77,49 @@ class FileService : Service() {
 
     override fun onStartCommand(intent : Intent?, flags : Int, startId : Int) : Int {
         if (null == intent && null != socket) {
+            startSendNew()
             return super.onStartCommand(intent, flags, startId)
         }
         val host = intent?.getStringExtra(ADDRESS)
         val isHost = intent?.getBooleanExtra(IS_HOST, false) ?: false
         socket = SocketService(mScope)
         socket?.open(PORT_FILE, if (isHost) null else host)
-        database(mScope, { dao ->
-            val records = dao.waitRecords()
-            records.forEach {
-                socket?.write(FileWriter(it.path, {
-                    it.sendMessage(mHandler)
-                    if (it is SuccessState) {
-                        val file = it.obj as? File
-                        file ?: return@FileWriter
-                        for (r in records) {
-                            if (r.path == file.absolutePath) {
-                                r.state = STATE_SUCCESS
-                                database(mScope, { dao ->
-                                    dao.update(r)
-                                })
-                                break
-                            }
-                        }
-                    }
-                }))
-            }
-        })
         socket?.read(FileReader(this@FileService) {
             it.sendMessage(mHandler)
-            if (it is SuccessState) {
-                val file = it.obj as? File
-                file ?: return@FileReader
-                val record = Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, it.duration)
-                database(mScope, { dao ->
-                    dao.insert(record)
-                })
-            }
+            updateRecord(it)
         })
+        startSendNew()
         return super.onStartCommand(intent, flags, startId)
     }
 
+    fun startSendNew() {
+        database(mScope) { dao ->
+            val record = dao.waitRecord()
+            record ?: return@database
+
+            socket?.write(FileWriter(record.path) {
+                it.sendMessage(mHandler)
+                updateRecord(it,record.id)
+            })
+        }
+    }
+
+    fun updateRecord(state : State?,recordId:Long=-1) {
+        if (state !is SuccessState) {
+            return
+        }
+        val file = state.obj as? File
+        file ?: return
+        val id=if(-1L==recordId){
+            file.lastModified()
+        }else{
+            recordId
+        }
+        val record = Record(id, file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
+        database(mScope) { dao ->
+            dao.update(record)
+        }
+    }
 
     fun notification(progress : Int, title : String) {
         val builder = if (26 <= Build.VERSION.SDK_INT) {

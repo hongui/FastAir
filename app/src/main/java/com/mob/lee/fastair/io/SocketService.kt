@@ -87,6 +87,11 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
         for(r in readers){
             r.onError(e?.message)
         }
+        try {
+            channel?.close()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     /**

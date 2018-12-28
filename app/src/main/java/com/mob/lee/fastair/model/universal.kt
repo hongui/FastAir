@@ -59,44 +59,6 @@ const val STATE_SUCCESS=4
 /*传输失败状态*/
 const val STATE_FAILED=5
 
-fun parseCategory(path: String): FileCategory {
-
-    val index = path.lastIndexOf(char = '.', ignoreCase = true)
-    if (0 < index) {
-        when (path.substring(index).toLowerCase()) {
-            ".jpg", ".png", ".gif", ".webp", ".jpeg", ".bmp" -> return FileCategory(PICTURE)
-            ".wmv", ".mp4", ".mkv", ".3gp", ".avi", ".flv", ".rm", ".rmvb", ".mpeg" -> return FileCategory(VIDEO)
-            ".flac", ".mp3", ".wma", ".ogg", ".aiff" -> return FileCategory(MUSIC)
-            ".doc", ".docx" -> return FileCategory(WORD)
-            ".xls", "xlsx" -> return FileCategory(EXCEL)
-            ".ppt", ".pptx" -> return FileCategory(POWERPOINT)
-            ".pdf" -> return FileCategory(PDF)
-            ".txt" -> return FileCategory(TXT)
-            ".zip", ".rar", ".iso", ".7z" -> return FileCategory(ZIP)
-            ".apk" -> return FileCategory(APPLICATION)
-            else -> return FileCategory(OTHER)
-        }
-    }
-    return FileCategory(OTHER)
-}
-
-fun category():List<FileCategory>{
-    val categories=ArrayList<FileCategory>()
-    categories.add(FileCategory(PICTURE))
-    categories.add(FileCategory(VIDEO))
-    categories.add(FileCategory(MUSIC))
-    categories.add(FileCategory(WORD))
-    categories.add(FileCategory(EXCEL))
-    categories.add(FileCategory(POWERPOINT))
-    categories.add(FileCategory(PDF))
-    categories.add(FileCategory(TXT))
-    categories.add(FileCategory(ZIP))
-    categories.add(FileCategory(APPLICATION))
-    categories.add(FileCategory(OTHER))
-    categories.add(FileCategory(CHAT))
-    return categories
-}
-
 fun Long.formatDate(parttern:String="MM/dd/yyyy HH:mm"):String{
     val formater=SimpleDateFormat(parttern)
     return formater.format(this)

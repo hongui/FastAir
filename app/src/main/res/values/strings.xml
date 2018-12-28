@@ -14,7 +14,7 @@
     <string name="base.again">再来一发</string>
     <string name="base.chat">聊天</string>
     <string name="base.exit">退出</string>
-    <string name="discoverDevice">发现设备</string>
+    <string name="discoverDevice">设备连接</string>
     <string name="discover.tips">系统正在查找周围设备，请稍等...</string>
     <string name="action.copy">复制内容</string>
     <string name="toast.alreadyCopy">内容已成功复制到剪切板</string>
@@ -24,6 +24,12 @@
     <string name="toast.connectSuccess">连接成功,正在跳转，请稍等...</string>
     <string name="toast.failedOpen">找不到合适的程序处理文件，文件打开失败</string>
     <string name="toast.failedFinder">查找出错</string>
+    <string name="tip_error_p2p_unsupport">很抱歉，该设备不支持Wi-Fi P2P服务，暂不能使用！</string>
+    <string name="tip_error_p2p_busy">设备正在处理请求，请稍等</string>
+    <string name="tip_error_p2p_inter">服务暂不可用,正在重启...</string>
+    <string name="tip_use_click">点击手机图标，完成配对</string>
+    <string name="tip_use_conntect">应用需要先和您周围的设备配对后才能使用</string>
+    <string name="knowIt">知道了</string>
     <string name="toggle_open">设置</string>
     <string name="toggle_close">@string/app_name</string>
     <string name="aes">升序</string>
@@ -73,6 +79,8 @@
 
     <string name="device_connect">连接设备</string>
     <string name="device_disconnect">断开连接</string>
+    <string name="help">帮助</string>
+    <string name="discover_help">1、软件需要连接你周围的设备，才能正常使用。请确保你想连接的设备也打开了本软件\n2、当页面中出现手机图标和名称后，点击图标，完成连接\n3、需要关闭连接，可以在主页的抽屉菜单中点击断开连接按钮进行关闭</string>
 
     <string name="dropbehavior">com.mob.lee.fastair.view.TranslationBehavior</string>
 </resources>

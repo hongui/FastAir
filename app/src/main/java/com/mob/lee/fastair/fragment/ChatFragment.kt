@@ -15,7 +15,8 @@ import com.mob.lee.fastair.adapter.MessageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
 import com.mob.lee.fastair.model.Message
-import com.mob.lee.fastair.p2p.*
+import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.p2p.Subscriber
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
 import com.mob.lee.fastair.utils.errorToast
@@ -98,6 +99,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
                     val msg = it.obj as? String
                     msg?.let {
                         mAdapter.add(Message(it, Message.OTHER))
+                        chatContent?.smoothScrollToPosition(mAdapter.getItemCount())
                     }
                 }
             }
@@ -113,7 +115,11 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         showDialog(getString(R.string.chatOverInfo), { dialog, which ->
             mBack = true
             P2PManager.removeService(mParent!!)
-            mParent?.onBackPressed()
+            mParent?.fragment(HomeFragment::class)
+            mParent?.stopService(Intent(context, MessageService::class.java))
+            if (null != mConnect) {
+                context?.unbindService(mConnect)
+            }
         }, getString(R.string.disconnect))
         return true
     }

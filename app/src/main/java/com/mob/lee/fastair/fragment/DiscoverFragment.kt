@@ -4,16 +4,15 @@ import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
 import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.TextView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
-import com.mob.lee.fastair.model.IS_CHAT
-import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.p2p.Subscriber
-import com.mob.lee.fastair.repository.RecordRep
-import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.successToast
 import kotlinx.android.synthetic.main.fragment_discover.*
 
@@ -57,30 +56,10 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
 
     override fun connect(connected : Boolean) {
         if (connected) {
-            if (arguments?.getBoolean("isJustConnect") ?: false) {
-                context?.successToast("连接成功,可以收发信息了")
-                backIt = true
-                mParent?.onBackPressed()
-                return
-            }
             context?.successToast("连接成功,正在跳转，请稍等...")
             P2PManager.connectInfo({ info ->
                 P2PManager.stop(mParent !!)
-                val isChat = arguments?.getBoolean(IS_CHAT, false) ?: false
-                val bundle = P2PManager.bundle()
-                bundle.putAll(arguments)
-                if (isChat) {
-                    mParent?.fragment(ChatFragment::class, bundle, addToIt = false)
-                } else {
-                    mParent?.fragment(HistoryFragment::class, bundle, addToIt = false)
-                }
-                mParent?.database(mScope, { dao ->
-                    val records = RecordRep.selectRecords
-                    records.forEach {
-                        it.state = STATE_WAIT
-                    }
-                    dao.insert(records)
-                })
+                mParent?.fragment(HomeFragment::class)
             })
         }
     }
@@ -88,14 +67,27 @@ class DiscoverFragment : AppFragment(), Subscriber, OnBackpressEvent {
     override fun layout() : Int = R.layout.fragment_discover
 
     override fun setting() {
-        toolbar(R.string.discoverDevice, true)
+        setHasOptionsMenu(true)
+        toolbar(R.string.discoverDevice,false)
 
         P2PManager.add(this)
     }
 
+    override fun onCreateOptionsMenu(menu : Menu?, inflater : MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.menu_discover,menu)
+    }
+
+    override fun onOptionsItemSelected(item : MenuItem?) : Boolean {
+        if(R.id.menu_discover_help==item?.itemId){
+            showDialog(getString(R.string.discover_help),{dialog, which ->
+            },positive = getString(R.string.knowIt),negative = "")
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
     override fun onResume() {
         super.onResume()
-
         P2PManager.discover(context !!)
     }
 

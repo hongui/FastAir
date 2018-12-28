@@ -2,6 +2,7 @@ package com.mob.lee.fastair.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import kotlin.reflect.KClass
 
 /**
@@ -55,10 +56,9 @@ open class AppActivity : AppCompatActivity() {
         val manager = supportFragmentManager
         var fragment=manager.findFragmentByTag(cls.simpleName)
         if(null==fragment) {
-            val constructors = cls.constructors
-            val constructor = constructors.elementAt(0)
-            fragment = constructor.call()
+            fragment=Fragment.instantiate(this,cls.qualifiedName)
         }
+        fragment?:throw NullPointerException("fragment is null")
         if (null != fragment.arguments) {
             fragment.arguments?.putAll(bundle)
         } else {
@@ -66,7 +66,6 @@ open class AppActivity : AppCompatActivity() {
         }
         val transaction = manager.beginTransaction()
         transaction.replace(android.R.id.content, fragment,cls.simpleName)
-
         if (addToIt) {
             transaction.addToBackStack(null)
         }
