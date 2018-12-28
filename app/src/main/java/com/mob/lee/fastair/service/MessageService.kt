@@ -5,7 +5,10 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import com.mob.lee.fastair.base.AndroidScope
-import com.mob.lee.fastair.io.*
+import com.mob.lee.fastair.io.ProcessListener
+import com.mob.lee.fastair.io.SocketService
+import com.mob.lee.fastair.io.StringReader
+import com.mob.lee.fastair.io.StringWriter
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.model.ADDRESS
 import com.mob.lee.fastair.model.IS_HOST
@@ -60,6 +63,10 @@ class MessageService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    override fun onUnbind(intent : Intent?) : Boolean {
+        socket?.close()
+        return super.onUnbind(intent)
+    }
     override fun onDestroy() {
         super.onDestroy()
         socket?.close()

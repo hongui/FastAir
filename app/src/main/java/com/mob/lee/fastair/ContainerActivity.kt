@@ -4,8 +4,10 @@ import android.content.ClipData
 import android.content.ContentUris
 import android.os.Bundle
 import com.mob.lee.fastair.base.AppActivity
+import com.mob.lee.fastair.fragment.DiscoverFragment
 import com.mob.lee.fastair.fragment.HomeFragment
 import com.mob.lee.fastair.model.Record
+import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.utils.database
 import java.io.File
@@ -20,8 +22,11 @@ class ContainerActivity : AppActivity() {
         val data = supportParentActivityIntent?.clipData
         if (null != data) {
             parseClipData(data)
-        } else {
+        }
+        if(P2PManager.connected){
             fragment(HomeFragment::class)
+        }else{
+            fragment(DiscoverFragment::class,addToIt = false)
         }
     }
 
@@ -42,7 +47,8 @@ class ContainerActivity : AppActivity() {
                         ContentUris.parseId(uri),
                         file.length(),
                         file.lastModified(),
-                        file.absolutePath)
+                        file.absolutePath,
+                        STATE_WAIT)
                 records.add(record)
             }
         }

@@ -12,7 +12,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.room.Room
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.base.AndroidScope
 import com.mob.lee.fastair.db.AppDatabase
 import com.mob.lee.fastair.db.RecordDao
 import com.mob.lee.fastair.model.Record
@@ -20,9 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import java.io.File
-import java.lang.Exception
 import java.util.*
-import kotlin.coroutines.experimental.CoroutineContext
 
 /**
  * Created by Andy on 2017/7/7.
@@ -87,8 +84,20 @@ fun Context.toast(message : String?, bg : Int) {
     toast.show()
 }
 
+fun Context.errorToast(message : Int){
+    val msg=getString(message)
+    msg?:return
+    errorToast(msg)
+}
+
 fun Context.errorToast(message : String) {
     toast(message, R.drawable.bg_toast_failed)
+}
+
+fun Context.successToast(message : Int){
+    val msg=getString(message)
+    msg?:return
+    successToast(msg)
 }
 
 fun Context.successToast(message : String) {
@@ -103,7 +112,7 @@ fun Context.database(scope : CoroutineScope, action : suspend (RecordDao) -> Uni
         val dao = db.recordDao()
         scope.async(Dispatchers.IO) {
             action(dao)
-            db?.close()
+            db.close()
         }
     } catch (e : Exception) {
         Log.d(database, e.toString())

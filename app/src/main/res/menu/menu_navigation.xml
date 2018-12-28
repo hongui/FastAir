@@ -11,10 +11,10 @@
         android:title="传输历史"
         android:icon="@drawable/ic_action_history"/>
 
-  <!--  <item
-        android:id="@+id/menu_connect_cumputer"
-        android:title="连接电脑"
-        android:icon="@drawable/ic_hardware_computer"/>-->
+    <item
+        android:id="@+id/menu_connect_chat"
+        android:title="立即聊天"
+        android:icon="@drawable/ic_action_chat"/>
 
     <item
         android:id="@+id/menu_change_path"

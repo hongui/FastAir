@@ -23,6 +23,9 @@ interface RecordDao{
     @Query("SELECT * FROM record WHERE state=${STATE_WAIT}")
     fun waitRecords():List<Record>
 
+    @Query("SELECT * FROM record WHERE state=${STATE_WAIT} limit 1")
+    fun waitRecord():Record
+
     @Query("SELECT * FROM record WHERE state=${STATE_CHECK}")
     fun checkedRecords():List<Record>
 

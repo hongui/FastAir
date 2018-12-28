@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.mob.lee.fastair.R
@@ -70,12 +71,15 @@ class DiscoverView : ViewGroup {
 
         var temp = currentRadius.toInt()
         paint.color=backColor
+        paint.style=Paint.Style.STROKE
+        paint.strokeWidth= TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,1F,resources.displayMetrics)
         for (i in den..temp step den) {
             paint.alpha=(i*1.0/temp*157.59).toInt()
             canvas?.drawCircle(x, y, currentRadius - i, paint)
         }
         paint.alpha=255
         paint.color=accentColor
+        paint.style=Paint.Style.FILL
         canvas?.drawCircle(x, y, den.toFloat(), paint)
 
         currentRadius += 10

@@ -8,7 +8,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_content_all"
-        android:icon="@drawable/ic_action_select"
+        android:icon="@drawable/ic_action_all"
         android:title="@string/selectAll"
         app:showAsAction="always" />
 

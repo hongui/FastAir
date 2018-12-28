@@ -13,10 +13,6 @@ data class Record(@PrimaryKey var id: Long, @ColumnInfo var size: Long, @ColumnI
 
     val name: String
         get() {
-            val index = path.lastIndexOf(File.separator)
-            if (-1 == index) {
-                return path
-            }
-            return path.substring(index + 1)
+            return path.substringAfterLast(File.separator)
         }
 }
