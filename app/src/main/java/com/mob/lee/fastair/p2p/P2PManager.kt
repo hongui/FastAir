@@ -134,7 +134,7 @@ object P2PManager {
     }
 
     fun stopConnect(context: Context){
-        manager?.removeGroup(channel,ActionListener(context))
-        manager?.cancelConnect(channel,ActionListener(context))
+        manager?.removeGroup(channel,null)
+        manager?.cancelConnect(channel,null)
     }
 }
