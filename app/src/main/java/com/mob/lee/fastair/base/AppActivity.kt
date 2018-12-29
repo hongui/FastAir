@@ -55,18 +55,21 @@ open class AppActivity : AppCompatActivity() {
     fun fragment(cls: KClass<out AppFragment>, bundle: Bundle = Bundle(), addToIt: Boolean = true) {
         val manager = supportFragmentManager
         var fragment=manager.findFragmentByTag(cls.simpleName)
-        if(null==fragment) {
+        val alreadyAdd=null!=fragment
+        if(!alreadyAdd) {
             fragment=Fragment.instantiate(this,cls.qualifiedName)
         }
         fragment?:throw NullPointerException("fragment is null")
+
         if (null != fragment.arguments) {
             fragment.arguments?.putAll(bundle)
         } else {
             fragment.arguments = bundle
         }
         val transaction = manager.beginTransaction()
+
         transaction.replace(android.R.id.content, fragment,cls.simpleName)
-        if (addToIt) {
+        if (addToIt && !alreadyAdd) {
             transaction.addToBackStack(null)
         }
         transaction.commit()

@@ -42,7 +42,6 @@ class ActionListener(val context : Context?) : WifiP2pManager.ActionListener {
             WifiP2pManager.ERROR -> context?.let {
                 it.errorToast(R.string.tip_error_p2p_inter)
                 P2PManager.stopConnect(it)
-
             }
         }
     }

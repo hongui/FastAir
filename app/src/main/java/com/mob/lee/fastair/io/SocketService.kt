@@ -3,9 +3,13 @@ package com.mob.lee.fastair.io
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.InetSocketAddress
+import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
+import java.nio.channels.AsynchronousCloseException
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 
@@ -45,8 +49,11 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
         isOpen = true
         try {
             if (null != host) {
-                channel = SocketChannel.open()
-                channel?.connect(InetSocketAddress(host, port))
+                while (!(channel?.isConnected?:false)) {
+                    channel = SocketChannel.open()
+                    channel?.connect(InetSocketAddress(host, port))
+                    delay(100)
+                }
             } else {
                 val server = ServerSocketChannel.open()
                 server.socket().bind(InetSocketAddress(port))
@@ -81,11 +88,18 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
      * 关闭连接
      */
     fun close(e:Exception?=null) {
+        if(!isOpen){
+            return
+        }
         isOpen = false
-        keepAlive = false
         writers.close()
         for(r in readers){
             r.onError(e?.message)
+        }
+        try {
+            channel?.close()
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 
@@ -115,6 +129,11 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
                 for (reader in readers) {
                     reader?.onError(e.message)
                 }
+                //读取失败
+                if(e is BufferUnderflowException || e is AsynchronousCloseException){
+                    close(e)
+                    break
+                }
             }
         }
         channel?.socket()?.shutdownInput()
@@ -135,6 +154,10 @@ class SocketService(val scope: CoroutineScope, var keepAlive: Boolean = false) {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                if(e is ClosedReceiveChannelException){
+                    close(e)
+                    break
+                }
             }
         }
         channel?.socket()?.shutdownOutput()

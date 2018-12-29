@@ -85,7 +85,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 dao.insert(records)
             })
             val bundle = P2PManager.bundle()
-            mParent?.fragment(HistoryFragment::class, bundle, false)
+            mParent?.fragment(HistoryFragment::class, bundle)
         }
         toolSwap.setOnClickListener {
             viewmodel.reverse(mScope)
@@ -146,7 +146,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             R.id.menu_history -> {
                 data = Bundle()
                 data.putBoolean("isHistory", true)
-                mParent?.fragment(HistoryFragment::class, data, false)
+                mParent?.fragment(HistoryFragment::class, data)
             }
 
             R.id.menu_connect_chat->mParent?.fragment(ChatFragment::class,P2PManager.bundle())

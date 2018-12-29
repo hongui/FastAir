@@ -27,23 +27,29 @@ import kotlinx.android.synthetic.main.fragment_chat.*
  */
 class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
     var mBack = false
-    var mConnect: ServiceConnection? = null
-    var mService: MessageService? = null
-    lateinit var mAdapter: MessageAdapter
+    var mConnect : ServiceConnection? = null
+    var mService : MessageService? = null
+    lateinit var mAdapter : MessageAdapter
 
-    override fun wifiState(enable: Boolean) {
+    override fun wifiState(enable : Boolean) {
     }
 
-    override fun peers(devices: List<WifiP2pDevice>) {
+    override fun peers(devices : List<WifiP2pDevice>) {
     }
 
-    override fun connect(connected: Boolean) {
-        mParent?.errorToast("对方中断了连接")
-        mParent?.onBackPressed()
+    override fun connect(connected : Boolean) {
+        showDialog(R.string.msg_disconnect,
+                { dialog, which ->
+                    mParent?.fragment(DiscoverFragment::class, addToIt = false)
+                }, R.string.reconnect,
+                R.string.title_error,
+                R.string.exit, { dialog, which ->
+            mParent?.supportFinishAfterTransition()
+        })
     }
 
 
-    override fun layout(): Int = R.layout.fragment_chat
+    override fun layout() : Int = R.layout.fragment_chat
 
     override fun setting() {
         toolbar(R.string.base_chat)
@@ -54,13 +60,13 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         chatContent?.adapter = mAdapter
 
         chatInput?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
+            override fun afterTextChanged(s : Editable?) {
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(s : CharSequence?, start : Int, count : Int, after : Int) {
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            override fun onTextChanged(s : CharSequence?, start : Int, before : Int, count : Int) {
                 if (TextUtils.isEmpty(s)) {
                     chatSend?.isEnabled = false
                 } else {
@@ -85,11 +91,11 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         val intent = Intent(context, MessageService::class.java)
         intent.putExtras(arguments)
         mConnect = object : ServiceConnection {
-            override fun onServiceDisconnected(name: ComponentName?) {
+            override fun onServiceDisconnected(name : ComponentName?) {
                 context?.errorToast("连接断开")
             }
 
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            override fun onServiceConnected(name : ComponentName?, service : IBinder?) {
                 if (null == service) {
                     return
                 }
@@ -108,18 +114,13 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         context?.startService(intent)
     }
 
-    override fun onPressed(): Boolean {
+    override fun onPressed() : Boolean {
         if (mBack) {
             return false
         }
         showDialog(getString(R.string.chatOverInfo), { dialog, which ->
             mBack = true
-            P2PManager.stopReceiver(mParent!!)
-            mParent?.fragment(HomeFragment::class)
-            mParent?.stopService(Intent(context, MessageService::class.java))
-            if (null != mConnect) {
-                context?.unbindService(mConnect)
-            }
+            mParent?.onBackPressed()
         }, getString(R.string.disconnect))
         return true
     }
@@ -127,6 +128,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
     override fun onDestroy() {
         super.onDestroy()
         P2PManager.removeSubcripber(this)
+        mParent?.stopService(Intent(context, MessageService::class.java))
         if (null != mConnect) {
             context?.unbindService(mConnect)
         }
