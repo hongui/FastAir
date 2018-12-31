@@ -22,16 +22,16 @@ class MessageAdapter : RecyclerView.Adapter<ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         val message = mMessages[position]
-        when (message.type) {
-            Message.OTHER -> return R.layout.item_chat_receive
-
-            Message.SELF -> return R.layout.item_chat_send
-        }
-        return R.layout.item_chat_date
+        return message.from
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false),0)
+        val layout=when(viewType){
+            Message.SELF->R.layout.item_chat_send
+            Message.OTHER->R.layout.item_chat_receive
+            else->R.layout.item_chat_date
+        }
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false),viewType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,7 +40,7 @@ class MessageAdapter : RecyclerView.Adapter<ViewHolder>() {
             popupMenu(v, message.content)
             true
         }
-        when (message.type) {
+        when (message.from) {
             Message.OTHER -> holder.text(R.id.item_chat_receive_content, message.content)
 
             Message.SELF -> holder.text(R.id.item_chat_send_content, message.content)
