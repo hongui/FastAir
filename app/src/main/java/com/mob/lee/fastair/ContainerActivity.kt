@@ -30,11 +30,6 @@ class ContainerActivity : AppActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        P2PManager.stopReceiver(this)
-    }
-
     fun parseClipData(clipData : ClipData) {
         val records = ArrayList<Record>()
         val itemCount = clipData.itemCount

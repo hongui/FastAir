@@ -29,6 +29,7 @@ import java.io.File
  */
 class FileService : Service() {
     var socket : SocketService? = null
+    var writing=false
     var mHandler : Handler? = null
     var mFileChangeListener : ProcessListener? = null
 
@@ -58,6 +59,7 @@ class FileService : Service() {
 
                 is SuccessState -> {
                     notification(100, file?.name ?: "")
+                    writing=false
                     startSendNew()
                 }
             }
@@ -76,7 +78,7 @@ class FileService : Service() {
     }
 
     override fun onStartCommand(intent : Intent?, flags : Int, startId : Int) : Int {
-        if (null == intent && null != socket) {
+        if (null == intent || null != socket) {
             startSendNew()
             return super.onStartCommand(intent, flags, startId)
         }
@@ -93,10 +95,17 @@ class FileService : Service() {
     }
 
     fun startSendNew() {
+        if(writing){
+            return
+        }
         database(mScope) { dao ->
             val record = dao.waitRecord()
-            record ?: return@database
+            record ?: let {
+                writing=false
+                return@database
+            }
 
+            writing=true
             socket?.write(FileWriter(record.path) {
                 it.sendMessage(mHandler)
                 updateRecord(it,record.id)

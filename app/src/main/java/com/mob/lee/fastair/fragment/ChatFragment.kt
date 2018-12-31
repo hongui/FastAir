@@ -56,7 +56,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
         P2PManager.addSubcriber(this)
 
         mAdapter = MessageAdapter()
-        chatContent?.layoutManager = LinearLayoutManager(mParent as Context)
+        chatContent?.layoutManager = LinearLayoutManager(mParent)
         chatContent?.adapter = mAdapter
 
         chatInput?.addTextChangedListener(object : TextWatcher {

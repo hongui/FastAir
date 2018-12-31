@@ -45,10 +45,6 @@ class MessageService : Service() {
         socket?.write(StringWriter(content))
     }
 
-    fun close() {
-        socket?.close()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (null == intent && null != socket) {
             return super.onStartCommand(intent, flags, startId)
@@ -69,7 +65,6 @@ class MessageService : Service() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        socket?.close()
         mScope.destory()
     }
 }
