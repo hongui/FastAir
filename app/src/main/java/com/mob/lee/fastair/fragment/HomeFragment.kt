@@ -23,6 +23,7 @@ import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.repository.RecordRep
+import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.viewmodel.FileViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -136,8 +137,8 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             R.id.menu_disconnet -> {
                 if (P2PManager.connected) {
                     P2PManager.stopConnect(context !!)
-                    val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
-                    item.setTitle(R.string.device_connect)
+                    mParent?.stopService(Intent(mParent,FileService::class.java))
+                    mParent?.supportFinishAfterTransition()
                 } else {
                     mParent?.fragment(DiscoverFragment::class, addToIt = false)
                 }
