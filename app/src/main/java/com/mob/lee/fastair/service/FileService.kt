@@ -29,7 +29,7 @@ import java.io.File
  */
 class FileService : Service() {
     var socket : SocketService? = null
-    var writing=false
+    var writing = false
     var mHandler : Handler? = null
     var mFileChangeListener : ProcessListener? = null
 
@@ -39,7 +39,7 @@ class FileService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mHandler = Handler{
+        mHandler = Handler {
             if (null == it.obj) {
                 return@Handler true
             }
@@ -59,7 +59,7 @@ class FileService : Service() {
 
                 is SuccessState -> {
                     notification(100, file?.name ?: "")
-                    writing=false
+                    writing = false
                     startSendNew()
                 }
             }
@@ -95,38 +95,37 @@ class FileService : Service() {
     }
 
     fun startSendNew() {
-        if(writing){
+        if (writing) {
             return
         }
         database(mScope) { dao ->
             val record = dao.waitRecord()
             record ?: let {
-                writing=false
+                writing = false
                 return@database
             }
-
-            writing=true
+            writing = true
             socket?.write(FileWriter(record.path) {
                 it.sendMessage(mHandler)
-                updateRecord(it,record.id)
+                updateRecord(it, record)
             })
         }
     }
 
-    fun updateRecord(state : State?,recordId:Long=-1) {
+    fun updateRecord(state : State?, record : Record? = null) {
         if (state !is SuccessState) {
             return
         }
         val file = state.obj as? File
         file ?: return
-        val id=if(-1L==recordId){
-            file.lastModified()
-        }else{
-            recordId
+        val target = if (null == record) {
+            Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
+        } else {
+            record.state= STATE_SUCCESS
+            record
         }
-        val record = Record(id, file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
         database(mScope) { dao ->
-            dao.update(record)
+            dao.update(target)
         }
     }
 
