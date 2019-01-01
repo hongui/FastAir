@@ -14,7 +14,18 @@ A Android APP design to transferring files and IM between two Android device.Usi
 [debug apk.(release sign file had lost)](https://github.com/hongui/FastAir/blob/master/apk/app-debug.apk)
 
 # Preview
-![FastAir](https://github.com/hongui/FastAir/blob/master/Screenshots/discover.png)
-![FastAir](https://github.com/hongui/FastAir/blob/master/Screenshots/list.png)
-![FastAir](https://github.com/hongui/FastAir/blob/master/Screenshots/chat.png)
-![FastAir](https://github.com/hongui/FastAir/blob/master/Screenshots/file.png)
+## Discover Device
+
+<img width="300" src="Screenshots/discover.png" alt="discover page" />
+
+## Home List
+
+<img width="300" src="Screenshots/list.png" alt="home list page" />
+
+## Chat List
+
+<img width="300" src="Screenshots/chat.png" alt="chat list page" />
+
+## Transmission List
+
+<img width="300" src="Screenshots/file.png" alt="transmission page" />
