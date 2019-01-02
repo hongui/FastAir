@@ -12,7 +12,9 @@ import com.mob.lee.fastair.io.FileReader
 import com.mob.lee.fastair.io.FileWriter
 import com.mob.lee.fastair.io.ProcessListener
 import com.mob.lee.fastair.io.SocketService
+import com.mob.lee.fastair.io.state.FaildState
 import com.mob.lee.fastair.io.state.ProcessState
+import com.mob.lee.fastair.io.state.STATE_DISCONNECTED
 import com.mob.lee.fastair.io.state.StartState
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.io.state.SuccessState
@@ -85,6 +87,14 @@ class FileService : Service() {
         val host = intent?.getStringExtra(ADDRESS)
         val isHost = intent?.getBooleanExtra(IS_HOST, false) ?: false
         socket = SocketService(mScope)
+        socket?.addListener{
+            state,info->
+            when(state){
+                STATE_DISCONNECTED->{
+                    mFileChangeListener?.invoke(FaildState())
+                }
+            }
+        }
         socket?.open(PORT_FILE, if (isHost) null else host)
         socket?.read(FileReader(this@FileService) {
             it.sendMessage(mHandler)

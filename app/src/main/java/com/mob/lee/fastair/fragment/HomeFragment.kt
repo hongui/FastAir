@@ -84,6 +84,8 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                     it.state = STATE_WAIT
                 }
                 dao.insert(records)
+                //不清除会造成下次重复发送
+                RecordRep.selectRecords.clear()
             })
             val bundle = P2PManager.bundle()
             mParent?.fragment(HistoryFragment::class, bundle)

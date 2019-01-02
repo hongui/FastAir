@@ -1,5 +1,15 @@
 package com.mob.lee.fastair.io
 
+import com.mob.lee.fastair.io.state.STATE_CONNECTED
+import com.mob.lee.fastair.io.state.STATE_DISCONNECTED
+import com.mob.lee.fastair.io.state.STATE_READ_FAILD
+import com.mob.lee.fastair.io.state.STATE_READ_FINISH
+import com.mob.lee.fastair.io.state.STATE_READ_START
+import com.mob.lee.fastair.io.state.STATE_WRITE_FAILD
+import com.mob.lee.fastair.io.state.STATE_WRITE_FINISH
+import com.mob.lee.fastair.io.state.STATE_WRITE_START
+import com.mob.lee.fastair.io.state.SocketState
+import com.mob.lee.fastair.io.state.SocketStateListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -39,6 +49,8 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
     private var channel : SocketChannel? = null
 
     private var server : ServerSocketChannel? = null
+
+    private val listeners=ArrayList<SocketStateListener>()
     /**
      * 建立连接，host为空作为客户端，否则作为服务器
      * @param port 端口号
@@ -70,6 +82,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
                 server?.socket()?.bind(InetSocketAddress(port))
                 channel = server?.accept()
             }
+            updateState(STATE_CONNECTED)
             handleRead()
             handleWrite()
         } catch (e : Exception) {
@@ -113,6 +126,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
         } catch (e : Exception) {
             e.printStackTrace()
         }
+        listeners.clear()
     }
 
     /**
@@ -129,6 +143,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
     private fun handleRead() = scope.launch(Dispatchers.IO) {
         while (isOpen || keepAlive) {
             try {
+                updateState(STATE_READ_START)
                 val head = readFix(5)
                 val type = head.get()
                 val length = head.int
@@ -136,13 +151,15 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
                 for (reader in readers) {
                     reader(ProtocolByte.wrap(bytes.array(), ProtocolType.wrap(type)))
                 }
+                updateState(STATE_READ_FINISH)
             } catch (e : Exception) {
-                e.printStackTrace()
+                updateState(STATE_READ_FAILD,e.message)
                 for (reader in readers) {
-                    reader?.onError(e.message)
+                    reader.onError(e.message)
                 }
                 //读取失败
                 if (e is BufferUnderflowException || e is AsynchronousCloseException) {
+                    updateState(STATE_DISCONNECTED)
                     close(e)
                     break
                 }
@@ -157,16 +174,19 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
         while (isOpen || keepAlive) {
             try {
                 val data = writers.receive()
+                updateState(STATE_WRITE_START)
                 for (d in data) {
                     val bytes = d.bytes
                     while (bytes.hasRemaining()) {
                         channel?.write(bytes)
                     }
                 }
+                updateState(STATE_WRITE_FINISH)
             } catch (e : Exception) {
-                e.printStackTrace()
+                updateState(STATE_WRITE_FAILD,e.message)
                 if (e is ClosedReceiveChannelException) {
                     close(e)
+                    updateState(STATE_DISCONNECTED)
                     break
                 }
             }
@@ -183,5 +203,27 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
         }
         buffer.flip()
         return buffer
+    }
+
+    /**
+     * 状态更新
+     * @see SocketState
+     */
+    private fun updateState(@SocketState state:Int,info:String?=null){
+        for(l in listeners){
+            l.invoke(state,info)
+        }
+    }
+
+    fun addListener(listener : SocketStateListener):Int{
+        val index=listeners.size
+        listeners.add(listener)
+        return index
+    }
+
+    fun removeListener(index:Int){
+        if(index in 0 until listeners.size){
+            listeners.removeAt(index)
+        }
     }
 }

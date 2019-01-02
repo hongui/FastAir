@@ -81,6 +81,8 @@ class HistoryFragment : AppFragment() {
                         }
                         parseFile(state)?.let { record ->
                             adapter.change(History(record, state), index)
+                        }?:let {
+                            toast(R.string.msg_disconnect_toast)
                         }
                     }
                 }
