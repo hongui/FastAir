@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.net.wifi.p2p.WifiP2pDevice
 import android.os.IBinder
 import android.text.Editable
 import android.text.TextUtils
@@ -15,8 +14,6 @@ import com.mob.lee.fastair.adapter.MessageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
 import com.mob.lee.fastair.model.Message
-import com.mob.lee.fastair.p2p.P2PManager
-import com.mob.lee.fastair.p2p.Subscriber
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
 import com.mob.lee.fastair.utils.errorToast
@@ -25,35 +22,16 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 /**
  * Created by Andy on 2017/6/7.
  */
-class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
+class ChatFragment : AppFragment(), OnBackpressEvent {
     var mBack = false
     var mConnect : ServiceConnection? = null
     var mService : MessageService? = null
     lateinit var mAdapter : MessageAdapter
 
-    override fun wifiState(enable : Boolean) {
-    }
-
-    override fun peers(devices : List<WifiP2pDevice>) {
-    }
-
-    override fun connect(connected : Boolean) {
-        showDialog(R.string.msg_disconnect,
-                { dialog, which ->
-                    mParent?.fragment(DiscoverFragment::class, addToIt = false)
-                }, R.string.reconnect,
-                R.string.title_error,
-                R.string.exit, { dialog, which ->
-            mParent?.supportFinishAfterTransition()
-        })
-    }
-
-
     override fun layout() : Int = R.layout.fragment_chat
 
     override fun setting() {
         toolbar(R.string.base_chat)
-        P2PManager.addSubcriber(this)
 
         mAdapter = MessageAdapter()
         chatContent?.layoutManager = LinearLayoutManager(mParent)
@@ -127,7 +105,6 @@ class ChatFragment : AppFragment(), OnBackpressEvent, Subscriber {
 
     override fun onDestroy() {
         super.onDestroy()
-        P2PManager.removeSubcripber(this)
         mParent?.stopService(Intent(context, MessageService::class.java))
         if (null != mConnect) {
             context?.unbindService(mConnect)
