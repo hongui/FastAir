@@ -81,8 +81,11 @@
     <string name="device_disconnect">断开连接</string>
     <string name="help">帮助</string>
     <string name="msg_disconnect">对方中断了连接，是否重新连接</string>
+    <string name="msg_disconnect_or_exit">是否要停止服务，并断开连接（下次使用可能需要重新连接）</string>
     <string name="reconnect">重新连接</string>
     <string name="exit">退出</string>
+    <string name="onlyDisconnect">仅停止</string>
+    <string name="stopAndDisconnect">停止并断开</string>
     <string name="title_error">发生了错误</string>
     <string name="msg_disconnect_toast">连接中断了</string>
     <string name="discover_help">1、软件需要连接你周围的设备，才能正常使用。请确保你想连接的设备也打开了本软件\n2、当页面中出现手机图标和名称后，点击图标，完成连接\n3、需要关闭连接，可以在主页的抽屉菜单中点击断开连接按钮进行关闭</string>

@@ -92,6 +92,7 @@ class FileService : Service() {
             when(state){
                 STATE_DISCONNECTED->{
                     mFileChangeListener?.invoke(FaildState())
+                    stopSelf()
                 }
             }
         }

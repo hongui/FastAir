@@ -8,6 +8,7 @@ import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
+import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.model.ADDRESS
 import com.mob.lee.fastair.model.IS_HOST
 
@@ -15,13 +16,18 @@ import com.mob.lee.fastair.model.IS_HOST
  * Created by Andy on 2017/8/16.
  */
 object P2PManager {
-    val devices = ArrayList<WifiP2pDevice>()
-    val subcriper = ArrayList<Subscriber>()
+    //设备信息列表
+    val devices = MutableLiveData<List<WifiP2pDevice>>()
+    //连接状态
+    val connected=MutableLiveData<Boolean?>()
+    //使能状态
+    val enable= MutableLiveData<Boolean>()
+    //连接信息
+    var p2pInfo=MutableLiveData<WifiP2pInfo?>()
+
     var receiver: P2PReceiver? = null
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
-    var p2pInfo:WifiP2pInfo?=null
-    var connected=false
 
 
     fun register(context: Context) {
@@ -47,16 +53,29 @@ object P2PManager {
     }
 
     fun unregister(context : Context){
-        connected(false)
-        p2pInfo=null
+        devices.value=null
+        connected.value=false
+        p2pInfo.value=null
         stopReceiver(context)
         stopConnect(context)
     }
 
+    fun stopReceiver(context: Context) {
+        if (null != receiver) {
+            context.unregisterReceiver(receiver)
+        }
+    }
+
+    fun stopConnect(context: Context){
+        manager?.removeGroup(channel,null)
+        manager?.cancelConnect(channel,null)
+    }
+
     fun bundle():Bundle{
+        val info= p2pInfo?.value
         val bundle = Bundle()
-        bundle.putString(ADDRESS, p2pInfo?.groupOwnerAddress?.hostAddress)
-        bundle.putBoolean(IS_HOST, p2pInfo?.isGroupOwner?:false)
+        bundle.putString(ADDRESS, info?.groupOwnerAddress?.hostAddress)
+        bundle.putBoolean(IS_HOST, info?.isGroupOwner?:false)
         return bundle
     }
 
@@ -85,56 +104,8 @@ object P2PManager {
 
     fun stopDiscovery(context: Context) {
         if (null != channel) {
+            devices.value=null
             manager?.stopPeerDiscovery(channel, ActionListener(context))
         }
-    }
-
-    fun stopReceiver(context: Context) {
-        if (null != receiver) {
-            context.unregisterReceiver(receiver)
-        }
-    }
-
-    fun addSubcriber(subscriber: Subscriber) {
-        synchronized(this) {
-            subcriper.add(subscriber)
-        }
-    }
-
-    fun removeSubcripber(subscriber: Subscriber) {
-        synchronized(this) {
-            subcriper.remove(subscriber)
-        }
-    }
-
-    fun p2pIsEnable(enable: Boolean) {
-        for (subcriber in subcriper) {
-            subcriber.wifiState(enable)
-        }
-    }
-
-    fun peer(list:List<WifiP2pDevice>) {
-        for (device in list) {
-            if (devices.contains(device)) {
-                continue
-            }
-            devices.add(device)
-        }
-        for (subcriber in subcriper) {
-            subcriber.peers(devices)
-        }
-    }
-
-    fun connected(connected: Boolean,info:WifiP2pInfo?=null) {
-        for (subcriber in subcriper) {
-            subcriber.connect(connected)
-        }
-        this.connected=connected
-        this.p2pInfo=info
-    }
-
-    fun stopConnect(context: Context){
-        manager?.removeGroup(channel,null)
-        manager?.cancelConnect(channel,null)
     }
 }

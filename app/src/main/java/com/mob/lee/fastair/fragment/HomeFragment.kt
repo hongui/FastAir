@@ -51,7 +51,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             override fun onDrawerOpened(drawerView : View) {
                 super.onDrawerOpened(drawerView)
                 val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
-                val title = if (P2PManager.connected) {
+                val title = if (true==P2PManager.connected.value) {
                     R.string.device_disconnect
                 } else {
                     R.string.device_connect
@@ -137,10 +137,19 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         var data : Bundle? = null
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
-                if (P2PManager.connected) {
-                    P2PManager.stopConnect(context !!)
-                    mParent?.stopService(Intent(mParent,FileService::class.java))
-                    mParent?.supportFinishAfterTransition()
+                if (true==P2PManager.connected.value) {
+                    showDialog(R.string.msg_disconnect,
+                            { dialog, which ->
+                                P2PManager.stopConnect(context !!)
+                                mParent?.stopService(Intent(mParent, FileService::class.java))
+                                mParent?.supportFinishAfterTransition()
+                            },
+                            R.string.stopAndDisconnect,
+                            negative = R.string.onlyDisconnect,
+                            negativeListener = { dialog, which ->
+                                mParent?.stopService(Intent(mParent, FileService::class.java))
+                            })
+
                 } else {
                     mParent?.fragment(DiscoverFragment::class, addToIt = false)
                 }
@@ -152,7 +161,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 mParent?.fragment(HistoryFragment::class, data)
             }
 
-            R.id.menu_connect_chat->mParent?.fragment(ChatFragment::class,P2PManager.bundle())
+            R.id.menu_connect_chat -> mParent?.fragment(ChatFragment::class, P2PManager.bundle())
 
             R.id.menu_change_path -> mParent?.fragment(PathPickFragment::class)
 
