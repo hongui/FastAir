@@ -51,7 +51,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             override fun onDrawerOpened(drawerView : View) {
                 super.onDrawerOpened(drawerView)
                 val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
-                val title = if (true==P2PManager.connected.value) {
+                val title = if (P2PManager.isConnected()) {
                     R.string.device_disconnect
                 } else {
                     R.string.device_connect
@@ -137,7 +137,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         var data : Bundle? = null
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
-                if (true==P2PManager.connected.value) {
+                if (P2PManager.isConnected()) {
                     showDialog(R.string.msg_disconnect,
                             { dialog, which ->
                                 P2PManager.stopConnect(context !!)

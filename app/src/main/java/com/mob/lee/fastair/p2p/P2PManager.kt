@@ -29,6 +29,9 @@ object P2PManager {
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
 
+    init {
+        connected.value=null
+    }
 
     fun register(context: Context) {
         val intentFilter = IntentFilter()
@@ -54,7 +57,7 @@ object P2PManager {
 
     fun unregister(context : Context){
         devices.value=null
-        connected.value=false
+        connected.value= null
         p2pInfo.value=null
         stopReceiver(context)
         stopConnect(context)
@@ -108,4 +111,6 @@ object P2PManager {
             manager?.stopPeerDiscovery(channel, ActionListener(context))
         }
     }
+
+    fun isConnected()=true==P2PManager.connected.value
 }
