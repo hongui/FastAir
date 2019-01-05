@@ -7,22 +7,8 @@
     <include
         layout="@layout/toolbar" />
 
-    <ScrollView
+    <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/textContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/dp8"
-            android:layout_marginLeft="@dimen/dp16"
-            android:layout_marginRight="@dimen/dp16"
-            android:layout_marginBottom="@dimen/dp8"
-            android:textSize="@dimen/sp16"
-            android:textColor="@color/colorSecondaryText"
-            android:textIsSelectable="true"
-            android:lineSpacingMultiplier="1.5"/>
-
-    </ScrollView>
+        android:layout_height="wrap_content"/>
 </LinearLayout>
