@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.NetworkInfo
 import android.net.wifi.p2p.WifiP2pDevice
-import android.net.wifi.p2p.WifiP2pDeviceList
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 
@@ -21,18 +20,19 @@ class P2PReceiver : BroadcastReceiver() {
             }
 
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
-                val list = intent.getParcelableExtra<WifiP2pDeviceList>(WifiP2pManager.EXTRA_P2P_DEVICE_LIST)
-                val deviceList = list.deviceList
-                if (deviceList.isEmpty()) {
-                    return
-                }
-                val devices = ArrayList<WifiP2pDevice>()
-                for (d in deviceList) {
-                    if (null != d) {
-                        devices.add(d)
+                P2PManager.manager?.requestPeers(P2PManager.channel) {
+                    val deviceList = it.deviceList
+                    if (deviceList.isEmpty()) {
+                        return@requestPeers
                     }
+                    val devices = ArrayList<WifiP2pDevice>()
+                    for (d in deviceList) {
+                        if (null != d) {
+                            devices.add(d)
+                        }
+                    }
+                    P2PManager.devices.value = devices
                 }
-                P2PManager.devices.value = devices
             }
 
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
@@ -41,10 +41,10 @@ class P2PReceiver : BroadcastReceiver() {
                 val connected = P2PManager.isConnected()
                 if (connected && ! networkInfo.isConnected) {
                     P2PManager.connected.value = false
-                    P2PManager.p2pInfo.value = wifiP2pInfo
+                    P2PManager.p2pInfo.value = null
                 } else if (networkInfo.isConnected) {
                     P2PManager.connected.value = true
-                    P2PManager.p2pInfo.value = null
+                    P2PManager.p2pInfo.value = wifiP2pInfo
                 }
             }
         }

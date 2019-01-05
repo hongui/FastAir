@@ -16,6 +16,7 @@ import com.mob.lee.fastair.base.OnBackpressEvent
 import com.mob.lee.fastair.model.Message
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
+import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import kotlinx.android.synthetic.main.fragment_chat.*
 
@@ -57,7 +58,7 @@ class ChatFragment : AppFragment(), OnBackpressEvent {
             val s = chatInput?.text.toString()
             chatInput?.setText("")
             if (s.matches("\\s+".toRegex())) {
-                toast(R.string.toast_sendIllegal)
+                mParent?.errorToast(R.string.toast_sendIllegal)
                 return@setOnClickListener
             }
             val message = Message(s)
@@ -96,10 +97,14 @@ class ChatFragment : AppFragment(), OnBackpressEvent {
         if (mBack) {
             return false
         }
-        showDialog(getString(R.string.chatOverInfo), { dialog, which ->
-            mBack = true
-            mParent?.onBackPressed()
-        }, getString(R.string.disconnect))
+        mParent?.dialog {
+            it.setMessage(R.string.chatOverInfo)
+                    .setPositiveButton(R.string.disconnect) { dialog, which ->
+                        mBack = true
+                        mParent?.onBackPressed()
+                    }
+                    .setNegativeButton(R.string.justkid,null)
+        }
         return true
     }
 

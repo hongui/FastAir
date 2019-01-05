@@ -49,6 +49,7 @@ class ContainerActivity : AppActivity() {
                 false ->{
                     AlertDialog.Builder(this)
                             .setTitle(R.string.title_error)
+                            .setCancelable(false)
                             .setMessage(R.string.msg_disconnect_or_exit)
                             .setPositiveButton(R.string.reconnect) { dialog, which ->
                                 P2PManager.connected.value=null

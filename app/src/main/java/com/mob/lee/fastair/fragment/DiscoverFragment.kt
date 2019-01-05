@@ -9,6 +9,7 @@ import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.base.OnBackpressEvent
 import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.successToast
 import kotlinx.android.synthetic.main.fragment_discover.*
 
@@ -26,7 +27,7 @@ class DiscoverFragment : AppFragment(), OnBackpressEvent {
         toolbar(R.string.discoverDevice, false)
 
         P2PManager.devices.observe({ lifecycle }) {
-            if (null == discoverView) {
+            if (null == discoverView || null == it) {
                 return@observe
             }
             if (stopDiscover) {
@@ -54,8 +55,10 @@ class DiscoverFragment : AppFragment(), OnBackpressEvent {
 
     override fun onOptionsItemSelected(item : MenuItem?) : Boolean {
         if (R.id.menu_discover_help == item?.itemId) {
-            showDialog(getString(R.string.discover_help), { dialog, which ->
-            }, positive = getString(R.string.knowIt), negative = "")
+            mParent?.dialog {
+                it.setMessage(R.string.discover_help)
+                        .setPositiveButton(R.string.knowIt, null)
+            }
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -73,11 +76,16 @@ class DiscoverFragment : AppFragment(), OnBackpressEvent {
 
     override fun onPressed() : Boolean {
         if (! backIt) {
-            showDialog(getString(R.string.disconverBackInfo), { dialog, which ->
-                backIt = true
-                P2PManager.stopDiscovery(context !!)
-                mParent?.onBackPressed()
-            }, getString(R.string.stop))
+            mParent?.dialog {
+                it.setMessage(R.string.disconverBackInfo)
+                        .setPositiveButton(R.string.stop){
+                            dialog, which ->
+                            backIt = true
+                            P2PManager.stopDiscovery(context !!)
+                            mParent?.onBackPressed()
+                        }
+                        .setNegativeButton(R.string.justkid,null)
+            }
             return true
         }
         return false

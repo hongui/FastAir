@@ -1,25 +1,25 @@
 package com.mob.lee.fastair.fragment
 
 import android.os.Environment
-import com.mob.lee.fastair.R
-import com.mob.lee.fastair.base.AppFragment
-import kotlinx.android.synthetic.main.fragment_path_pick.*
 import android.view.Menu
-import java.io.File
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
-import android.widget.TabHost
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.MultiDataHolder
-import com.mob.lee.fastair.adapter.ViewHolder
+import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.display
+import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.getPaths
 import com.mob.lee.fastair.utils.readDownloadPath
+import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.utils.writeDownloadPath
+import kotlinx.android.synthetic.main.fragment_path_pick.*
+import java.io.File
 
 
 /**
@@ -69,7 +69,7 @@ class PathPickFragment:AppFragment(){
 
             })
         } else {
-            toast("外部存储设备未准备好")
+            mParent?.errorToast(R.string.storage_not_ready)
             mParent?.onBackPressed()
         }
     }
@@ -85,7 +85,7 @@ class PathPickFragment:AppFragment(){
             }
             mCurrentPath?.let {
                 context?.writeDownloadPath(it.getAbsolutePath())
-                toast("路径修改成功，新文件将保存在${it.getAbsolutePath()}")
+                mParent?.successToast(getString(R.string.path_setting_success,it.getAbsolutePath()))
                 mParent?.onBackPressed()
                 return true
             }

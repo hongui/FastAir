@@ -77,6 +77,9 @@ class CircleProgress : View {
         mRectF.top = half
         mRectF.right = w - half
         mRectF.bottom = h - half
+        if((state== SUCCESS||state== FAILED)&&max==0f){
+            updateState(state)
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -93,7 +96,7 @@ class CircleProgress : View {
                 canvas.drawCircle(half.toFloat(), half.toFloat(), half - mRectF.left, mPaint)
                 canvas.drawPath(mTempPath, mPaint)
                 if ((SUCCESS == state && progress <= max) || (FAILED==state&&!reverse)||(FAILED==state&&reverse&&progress<=max)) {
-                    postInvalidateDelayed(15)
+                    postInvalidateDelayed(13)
                 }
             }
         }
@@ -125,7 +128,7 @@ class CircleProgress : View {
                 max = mPathMeasure.length
             }
         }
-        invalidate()
+        postInvalidate()
     }
 
     fun progress(progress: Float) {
