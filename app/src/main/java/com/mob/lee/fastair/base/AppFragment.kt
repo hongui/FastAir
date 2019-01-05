@@ -1,13 +1,10 @@
 package com.mob.lee.fastair.base
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.mob.lee.fastair.R
@@ -62,48 +59,5 @@ abstract class AppFragment : Fragment() {
             appActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
             toolbar?.setNavigationOnClickListener { appActivity?.onBackPressed() }
         }
-    }
-
-    fun showDialog(content : Int,
-                   positiveListener : ((dialog : DialogInterface, which : Int) -> Unit)? = null,
-                   positive : Int = R.string.knowIt,
-                   title : Int = R.string.wramTips,
-                   negative : Int = R.string.justkid,
-                   negativeListener : ((dialog : DialogInterface, which : Int) -> Unit)? = null) {
-        showDialog(getString(content),positiveListener, positive, title, negative, negativeListener)
-    }
-
-    fun showDialog(content : CharSequence?,
-                   positiveListener : ((dialog : DialogInterface, which : Int) -> Unit)? = null,
-                   positive : Int = R.string.knowIt,
-                   title : Int = R.string.wramTips,
-                   negative : Int = R.string.justkid,
-                   negativeListener : ((dialog : DialogInterface, which : Int) -> Unit)? = null) {
-        content?:return
-        context?.let {
-            AlertDialog.Builder(it)
-                    .setTitle(title)
-                    .setMessage(content)
-                    .setPositiveButton(positive, positiveListener)
-                    .setNegativeButton(negative, negativeListener)
-                    .show()
-        }
-    }
-
-    fun showDialog(content : CharSequence, positiveListener : (dialog : DialogInterface, which : Int) -> Unit, positive : CharSequence = getString(R.string.ok), title : CharSequence = getString(R.string.wramTips), negative : CharSequence = getString(R.string.justkid), negativeListener : ((dialog : DialogInterface, which : Int) -> Unit)? = null) {
-        AlertDialog.Builder(context !!)
-                .setTitle(title)
-                .setMessage(content)
-                .setPositiveButton(positive, positiveListener)
-                .setNegativeButton(negative, negativeListener)
-                .show()
-    }
-
-    fun toast(content : Int, duration : Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(context, content, duration).show()
-    }
-
-    fun toast(content : CharSequence, duration : Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(context, content, duration).show()
     }
 }

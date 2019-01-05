@@ -18,6 +18,7 @@ import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.database
+import com.mob.lee.fastair.utils.errorToast
 import kotlinx.android.synthetic.main.fragment_history.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -81,8 +82,8 @@ class HistoryFragment : AppFragment() {
                         }
                         parseFile(state)?.let { record ->
                             adapter.change(History(record, state), index)
-                        }?:let {
-                            toast(R.string.msg_disconnect_toast)
+                        } ?: let {
+                            mParent?.errorToast(R.string.msg_disconnect_toast)
                         }
                     }
                 }
@@ -98,7 +99,7 @@ class HistoryFragment : AppFragment() {
             if (null != mConntect) {
                 mParent?.unbindService(mConntect)
             }
-        }catch (e:Exception){
+        } catch (e : Exception) {
             e.printStackTrace()
         }
 

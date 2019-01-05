@@ -25,6 +25,8 @@ import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.repository.RecordRep
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.database
+import com.mob.lee.fastair.utils.dialog
+import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.viewmodel.FileViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -123,12 +125,15 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         }
         toolDelete.setOnClickListener {
             if (viewmodel.hasSelect.value != true) {
-                toast(R.string.dontSelect)
+                mParent?.successToast(R.string.dontSelect)
                 return@setOnClickListener
             }
-            showDialog(getString(R.string.deleteTips), positive = getString(R.string.delete), positiveListener = { dialog, which ->
-                viewmodel.delete(mParent !!, mScope)
-            })
+            mParent?.dialog {
+                it.setMessage(R.string.deleteTips)
+                        .setPositiveButton(R.string.delete) { dialog, which ->
+                            viewmodel.delete(mParent !!, mScope)
+                        }
+            }
         }
         permisionCheck()
     }
@@ -138,18 +143,18 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.isConnected()) {
-                    showDialog(R.string.msg_disconnect,
-                            { dialog, which ->
-                                P2PManager.stopConnect(context !!)
-                                mParent?.stopService(Intent(mParent, FileService::class.java))
-                                mParent?.supportFinishAfterTransition()
-                            },
-                            R.string.stopAndDisconnect,
-                            negative = R.string.onlyDisconnect,
-                            negativeListener = { dialog, which ->
-                                mParent?.stopService(Intent(mParent, FileService::class.java))
-                            })
-
+                    mParent?.dialog {
+                        it.setMessage(R.string.msg_disconnect)
+                                .setPositiveButton(R.string.stopAndDisconnect) { dialog, which ->
+                                    P2PManager.stopConnect(context !!)
+                                    P2PManager.connected.value = null
+                                    mParent?.stopService(Intent(mParent, FileService::class.java))
+                                    mParent?.supportFinishAfterTransition()
+                                }
+                                .setNegativeButton(R.string.onlyDisconnect) { dialog, which ->
+                                    mParent?.stopService(Intent(mParent, FileService::class.java))
+                                }
+                    }
                 } else {
                     mParent?.fragment(DiscoverFragment::class, addToIt = false)
                 }
@@ -204,12 +209,20 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
         viewmodel.load(mScope, context !!)
 
-        /*context?.database(mScope, { dao ->
+        context?.database(mScope) { dao ->
             val datas = dao.waitRecords()
             if (datas.isNotEmpty()) {
-                mParent?.fragment(HistoryFragment::class, P2PManager.bundle(), false)
+                mParent?.runOnUiThread {
+                    mParent?.dialog {
+                        it.setMessage(R.string.detect_unfinished_task)
+                                .setPositiveButton(R.string.send) { dialog, which ->
+                                    mParent?.fragment(HistoryFragment::class, P2PManager.bundle())
+                                }.setNegativeButton(R.string.later, null)
+
+                    }
+                }
             }
-        })*/
+        }
     }
 
     fun openSetting() {
@@ -223,11 +236,12 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (PERMISSION_CODE == requestCode && ! grantResults.isEmpty()) {
             if (shouldShowRequestPermissionRationale(permissions[0])) {
-                showDialog(getString(R.string.viewTips),
-                        { dialog, which ->
-                            openSetting()
-                        },
-                        getString(R.string.goTurnOn))
+                mParent?.dialog {
+                    it.setMessage(R.string.viewTips)
+                            .setPositiveButton(R.string.goTurnOn) { dialog, which ->
+                                openSetting()
+                            }
+                }
             }
         }
     }

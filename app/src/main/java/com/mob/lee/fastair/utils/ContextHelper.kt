@@ -10,6 +10,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.room.Room
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.db.AppDatabase
@@ -84,9 +85,9 @@ fun Context.toast(message : String?, bg : Int) {
     toast.show()
 }
 
-fun Context.errorToast(message : Int){
-    val msg=getString(message)
-    msg?:return
+fun Context.errorToast(message : Int) {
+    val msg = getString(message)
+    msg ?: return
     errorToast(msg)
 }
 
@@ -94,14 +95,22 @@ fun Context.errorToast(message : String) {
     toast(message, R.drawable.bg_toast_failed)
 }
 
-fun Context.successToast(message : Int){
-    val msg=getString(message)
-    msg?:return
+fun Context.successToast(message : Int) {
+    val msg = getString(message)
+    msg ?: return
     successToast(msg)
 }
 
 fun Context.successToast(message : String) {
     toast(message, R.drawable.bg_toast_success)
+}
+
+fun Context.dialog(wrap : (AlertDialog.Builder) -> Unit) {
+    val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.wramTips)
+            .setPositiveButton(R.string.knowIt,null)
+    wrap(builder)
+    builder.show()
 }
 
 fun Context.database(scope : CoroutineScope, action : suspend (RecordDao) -> Unit) {

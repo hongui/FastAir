@@ -75,7 +75,7 @@ object P2PManager {
     }
 
     fun bundle():Bundle{
-        val info= p2pInfo?.value
+        val info= p2pInfo.value
         val bundle = Bundle()
         bundle.putString(ADDRESS, info?.groupOwnerAddress?.hostAddress)
         bundle.putBoolean(IS_HOST, info?.isGroupOwner?:false)
