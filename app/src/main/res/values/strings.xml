@@ -95,4 +95,6 @@
     <string name="later">稍后再发</string>
 
     <string name="dropbehavior">com.mob.lee.fastair.view.TranslationBehavior</string>
+
+    <string name="help_content"><b>Q:怎么发送文件？\n</b></string>
 </resources>

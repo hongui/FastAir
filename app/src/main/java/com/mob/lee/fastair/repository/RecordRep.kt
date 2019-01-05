@@ -8,7 +8,6 @@ import com.mob.lee.fastair.model.Category
 import com.mob.lee.fastair.model.ExcelCategory
 import com.mob.lee.fastair.model.ImageCategory
 import com.mob.lee.fastair.model.MusicCategory
-import com.mob.lee.fastair.model.OtherCategory
 import com.mob.lee.fastair.model.PDFCategory
 import com.mob.lee.fastair.model.PowerPointCategory
 import com.mob.lee.fastair.model.Record
@@ -29,23 +28,23 @@ import java.io.File
 object RecordRep {
     val records = SparseArray<List<Record>>()
     /**
-    * HashSet在移除的时候会重新计算hash，导致移除失败，所以只能使用ArrayList
-    * */
+     * HashSet在移除的时候会重新计算hash，导致移除失败，所以只能使用ArrayList
+     * */
     val selectRecords = ArrayList<Record>()
     val states = SparseArray<Boolean>()
     var total = 0
 
     const val DELAY = 8L
 
-    var order:String="DESC"
-    set(value) {
-        field=when(field){
-            "ASC"->"DESC"
-            else->"DESC"
+    var order : String = "DESC"
+        set(value) {
+            field = when (field) {
+                "ASC" -> "DESC"
+                else -> "DESC"
+            }
         }
-    }
 
-    fun load(context: Context?, position: Int): Channel<Record> {
+    fun load(context : Context?, position : Int) : Channel<Record> {
         val list = records.get(position)
 
         //有缓存，不查库
@@ -90,21 +89,21 @@ object RecordRep {
         return channel
     }
 
-    fun sortBy(position: Int, selector: (Record) -> Comparable<*>): Channel<Record>? {
+    fun sortBy(position : Int, selector : (Record) -> Comparable<*>) : Channel<Record>? {
         return operator(position, {
             it.sortedWith(compareByDescending(selector))
         })
     }
 
-    fun reverse(position: Int): Channel<Record>? {
-        order=""
+    fun reverse(position : Int) : Channel<Record>? {
+        order = ""
         return operator(position, { it.reversed() })
     }
 
-    fun states(position: Int, state: Int, start: Int, count: Int): Channel<Pair<Int, Record?>>? {
+    fun states(position : Int, state : Int, start : Int, count : Int) : Channel<Pair<Int, Record?>>? {
         var temp = 0
         return update(position, { index, record, iter ->
-            if (0 == index - start - temp && (temp < count || -1 == count)) {
+            if (0 == index - start - temp && (temp < count || - 1 == count)) {
                 record.state = state
                 temp += 1
                 true
@@ -114,7 +113,7 @@ object RecordRep {
         })
     }
 
-    fun toggleState(position: Int): Channel<Record>? {
+    fun toggleState(position : Int) : Channel<Record>? {
         val isChecked = states.get(position, false)
         val state = if (isChecked) {
             states.remove(position)
@@ -136,7 +135,7 @@ object RecordRep {
         })
     }
 
-    fun delete(context: Context, position: Int): Channel<Pair<Int, Record?>>? {
+    fun delete(context : Context, position : Int) : Channel<Pair<Int, Record?>>? {
         return update(position, { index, record, iter ->
             if (STATE_CHECK == record.state) {
                 val file = File(record.path)
@@ -153,7 +152,7 @@ object RecordRep {
         })
     }
 
-    fun operator(position: Int, op: (List<Record>) -> List<Record>): Channel<Record>? {
+    fun operator(position : Int, op : (List<Record>) -> List<Record>) : Channel<Record>? {
         val datas = records.get(position)
         datas?.let {
             val target = op(it)
@@ -163,7 +162,7 @@ object RecordRep {
         return null
     }
 
-    fun update(position: Int, action: (index: Int, data: Record, MutableIterator<Record>) -> Boolean): Channel<Pair<Int, Record?>>? {
+    fun update(position : Int, action : (index : Int, data : Record, MutableIterator<Record>) -> Boolean) : Channel<Pair<Int, Record?>>? {
         val datas = records.get(position)
         datas?.let {
             if (it.isEmpty()) {
@@ -182,7 +181,7 @@ object RecordRep {
                         //如果操作更新了记录，则对应需要更新
                         val result = if (size == it.size) {
                             if (record.state == STATE_CHECK) {
-                                if (!selectRecords.contains(record)) {
+                                if (! selectRecords.contains(record)) {
                                     selectRecords.add(record)
                                 }
                             } else {
@@ -207,7 +206,7 @@ object RecordRep {
         return null
     }
 
-    fun send(datas: List<Record?>?): Channel<Record> {
+    fun send(datas : List<Record?>?) : Channel<Record> {
         val channel = Channel<Record>()
         GlobalScope.launch(Dispatchers.IO) {
             datas?.let {
@@ -223,7 +222,7 @@ object RecordRep {
         return channel
     }
 
-    fun categories(): Array<Category> {
+    fun categories() : Array<Category> {
         return arrayOf(ImageCategory(),
                 MusicCategory(),
                 VideoCategory(),
@@ -233,7 +232,6 @@ object RecordRep {
                 TextCategory(),
                 PDFCategory(),
                 ApplicationCategory(),
-                ZipCategory(),
-                OtherCategory())
+                ZipCategory())
     }
 }
