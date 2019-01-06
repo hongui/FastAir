@@ -20,8 +20,6 @@ class FileViewModel : ViewModel() {
     val state = MutableLiveData<Int>()
     val update = MutableLiveData<Pair<Int,Record?>>()
     val hasSelect=MutableLiveData<Boolean>()
-    var mCheckAll = false
-    var mIsDes = true
     var position : Int = 0
     var mCurrentChannel:Channel<Record>?=null
 

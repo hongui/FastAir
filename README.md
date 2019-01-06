@@ -11,7 +11,7 @@ A Android APP design to transferring files and IM between two Android device.Usi
 7. Other interesting
 
 # APK
-[just a debug apk.(release sign file had lost)](https://github.com/hongui/FastAir/releases)
+[Just a pre package.](https://github.com/hongui/FastAir/releases)
 
 # Preview
 ## Discover Device
