@@ -8,6 +8,8 @@ open class MultiDataHolder<D>(override val layout: Int, val bindAction: ((positi
 
     override fun size() = datas.size
 
+    override var adapter : Adapter?=null
+
     override fun bind(position: Int, viewHolder: ViewHolder) {
         val originPos = position - startPosition
         val data = datas.getOrNull(originPos)

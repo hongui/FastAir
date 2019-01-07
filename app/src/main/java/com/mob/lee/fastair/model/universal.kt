@@ -60,7 +60,8 @@ const val STATE_SUCCESS=4
 const val STATE_FAILED=5
 
 fun Long.formatDate(parttern:String="MM/dd/yyyy HH:mm"):String{
-    val formater=SimpleDateFormat(parttern)
+    val formater=SimpleDateFormat.getDateInstance() as SimpleDateFormat
+    formater.applyPattern(parttern)
     return formater.format(this)
 }
 

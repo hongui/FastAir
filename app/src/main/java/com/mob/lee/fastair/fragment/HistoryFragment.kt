@@ -46,6 +46,7 @@ class HistoryFragment : AppFragment() {
         }
         if (arguments?.getBoolean("isHistory") ?: false) {
             val adapter = fragment_history.adapter as Adapter
+            adapter.clearAll()
             mScope.launch {
                 val channel = Channel<List<Record>?>()
                 mParent?.database(mScope, { dao ->

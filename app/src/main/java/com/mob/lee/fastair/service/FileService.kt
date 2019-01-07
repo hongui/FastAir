@@ -24,6 +24,7 @@ import com.mob.lee.fastair.model.PORT_FILE
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.STATE_SUCCESS
 import com.mob.lee.fastair.utils.database
+import com.mob.lee.fastair.utils.updateStorage
 import java.io.File
 
 /**
@@ -130,6 +131,7 @@ class FileService : Service() {
         val file = state.obj as? File
         file ?: return
         val target = if (null == record) {
+            updateStorage(file.absolutePath)
             Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
         } else {
             record.state= STATE_SUCCESS
