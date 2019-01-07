@@ -29,7 +29,7 @@ class ContentPickFragment : AppFragment() {
     override fun setting() {
         val viewModel = ViewModelProviders.of(mParent!!).get(FileViewModel::class.java)
 
-        val contentDataHolder = MultiDataHolder<Record>(R.layout.item_file, { position, record, viewHolder ->
+        val contentDataHolder = MultiDataHolder<Record>(R.layout.item_file) { position, record, viewHolder ->
             record ?: return@MultiDataHolder
             viewHolder.text(R.id.item_file_name, record.name)
             viewHolder.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(viewHolder.itemView.context))
@@ -55,7 +55,7 @@ class ContentPickFragment : AppFragment() {
                 Color.WHITE
             }
             viewHolder.itemView.setBackgroundColor(color)
-        })
+        }
         val adapter = Adapter(contentDataHolder)
 
         pickContent.layoutManager = LinearLayoutManager(context)

@@ -93,8 +93,16 @@
     <string name="path_setting_success">路径修改成功，新接收的文件将保存在：%s</string>
     <string name="storage_not_ready">外部存储设备未准备好</string>
     <string name="later">稍后再发</string>
+    <string name="file_operation">文件操作</string>
 
     <string name="dropbehavior">com.mob.lee.fastair.view.TranslationBehavior</string>
 
     <string name="help_content"><b>Q:怎么发送文件？\n</b></string>
+
+    <string name="file_detail">文件详情</string>
+    <string name="file_rename">重命名</string>
+    <string name="file_size">大小</string>
+    <string name="file_type">类型</string>
+    <string name="file_date">时间</string>
+    <string name="file_path">路径</string>
 </resources>

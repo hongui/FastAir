@@ -12,6 +12,7 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
     init {
         for (d in dataHolder) {
             add(d)
+            d.adapter=this
         }
     }
 
@@ -48,6 +49,7 @@ class Adapter(vararg dataHolder: DataHolder<out Any>) : RecyclerView.Adapter<Vie
         }
         data.startPosition = itemCount
         datas.add(position, data)
+        data.adapter=this
         notifyItemRangeInserted(position, data.size())
     }
 

@@ -141,7 +141,7 @@ object RecordRep {
                 val file = File(record.path)
                 if (file.delete()) {
                     iter.remove()
-                    updateStorage(context, record)
+                    context.updateStorage(record.path)
                     true
                 } else {
                     false

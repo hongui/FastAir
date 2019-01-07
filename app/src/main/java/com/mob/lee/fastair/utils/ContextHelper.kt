@@ -15,7 +15,6 @@ import androidx.room.Room
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.db.AppDatabase
 import com.mob.lee.fastair.db.RecordDao
-import com.mob.lee.fastair.model.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -46,17 +45,18 @@ fun Context.getPaths(file : File?) : List<File> {
     return list
 }
 
-fun updateStorage(context : Context, record : Record) {
+fun Context.updateStorage(path : String?) {
+    path?:return
     val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-    intent.data = Uri.fromFile(File(record.path))
-    context.sendBroadcast(intent)
+    intent.data = Uri.fromFile(File(path))
+    this.sendBroadcast(intent)
 }
 
-fun openFile(context : Context, record : Record) {
+fun Context.openFile(file : String) {
     val intent = Intent(Intent.ACTION_VIEW)
-    intent.data = Uri.fromFile(File(record.path))
-    intent.resolveActivity(context.packageManager)?.let {
-        context.startActivity(intent)
+    intent.data = Uri.fromFile(File(file))
+    intent.resolveActivity(this.packageManager)?.let {
+        this.startActivity(intent)
     }
 }
 
@@ -108,7 +108,6 @@ fun Context.successToast(message : String) {
 fun Context.dialog(wrap : (AlertDialog.Builder) -> Unit) {
     val builder = AlertDialog.Builder(this)
             .setTitle(R.string.wramTips)
-            .setPositiveButton(R.string.knowIt,null)
     wrap(builder)
     builder.show()
 }

@@ -8,6 +8,7 @@ interface DataHolder<D>{
     val layout:Int
     var startPosition:Int
     val datas:MutableList<D>?
+    var adapter:Adapter?
 
     fun targetView(parent: ViewGroup?): View?{
         return LayoutInflater.from(parent?.context)?.inflate(layout,parent,false)
