@@ -1,9 +1,11 @@
 package com.mob.lee.fastair.utils
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,6 +13,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.room.Room
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.db.AppDatabase
@@ -46,7 +49,7 @@ fun Context.getPaths(file : File?) : List<File> {
 }
 
 fun Context.updateStorage(path : String?) {
-    path?:return
+    path ?: return
     val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
     intent.data = Uri.fromFile(File(path))
     this.sendBroadcast(intent)
@@ -54,9 +57,22 @@ fun Context.updateStorage(path : String?) {
 
 fun Context.openFile(file : String) {
     val intent = Intent(Intent.ACTION_VIEW)
-    intent.data = Uri.fromFile(File(file))
-    intent.resolveActivity(this.packageManager)?.let {
+    intent.data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val uri=FileProvider.getUriForFile(
+                this,
+                "${this.getPackageName()}.FileProvider",
+                File(file))
+        this.grantUriPermission(this.packageName,uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        uri
+    } else {
+        Uri.fromFile(File(file))
+    }
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
         this.startActivity(intent)
+    } catch (e : ActivityNotFoundException) {
+        errorToast(R.string.no_application_find)
     }
 }
 
