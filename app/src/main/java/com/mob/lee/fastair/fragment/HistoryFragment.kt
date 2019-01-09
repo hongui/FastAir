@@ -37,16 +37,12 @@ class HistoryFragment : AppFragment() {
 
         fragment_history?.layoutManager = LinearLayoutManager(context)
         fragment_history?.adapter = Adapter(HistoryAdapter())
-    }
 
-    override fun onResume() {
-        super.onResume()
         if (null != mConntect) {
             return
         }
         if (arguments?.getBoolean("isHistory") ?: false) {
             val adapter = fragment_history.adapter as Adapter
-            adapter.clearAll()
             mScope.launch {
                 val channel = Channel<List<Record>?>()
                 mParent?.database(mScope, { dao ->

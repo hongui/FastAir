@@ -62,7 +62,13 @@ class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer
                         ProtocolByte.empty()
                     } else {
                         alreadyFinished += tempLength
-                        listener?.invoke(ProcessState(alreadyFinished, file.length(), obj = file))
+                        val total=if(0L==file.length()){
+                            //文件长度为0，导致除0错误
+                            1
+                        }else{
+                            file.length()
+                        }
+                        listener?.invoke(ProcessState(alreadyFinished, total, obj = file))
                         ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
                     }
                 }

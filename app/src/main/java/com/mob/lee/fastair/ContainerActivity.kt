@@ -1,7 +1,6 @@
 package com.mob.lee.fastair
 
 import android.content.ClipData
-import android.content.ContentUris
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -22,7 +21,7 @@ class ContainerActivity : AppActivity() {
 
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
-        val data = supportParentActivityIntent?.clipData
+        val data = intent?.clipData
         if (null != data) {
             parseClipData(data)
         }
@@ -78,7 +77,7 @@ class ContainerActivity : AppActivity() {
             if (null != uri && "file".equals(uri.scheme)) {
                 val file = File(uri.path)
                 val record = Record(
-                        ContentUris.parseId(uri),
+                        System.currentTimeMillis(),
                         file.length(),
                         file.lastModified(),
                         file.absolutePath,

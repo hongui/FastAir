@@ -138,7 +138,11 @@ class FileService : Service() {
             record
         }
         database(mScope) { dao ->
-            dao.update(target)
+            if(null==record){
+                dao.insert(target)
+            }else {
+                dao.update(target)
+            }
         }
     }
 
