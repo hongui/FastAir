@@ -29,7 +29,7 @@ interface RecordDao{
     @Query("SELECT * FROM record WHERE state=${STATE_CHECK}")
     fun checkedRecords():List<Record>
 
-    @Query("SELECT * FROM record WHERE state=${STATE_SUCCESS} OR state=${STATE_FAILED}")
+    @Query("SELECT * FROM record WHERE state=${STATE_SUCCESS} OR state=${STATE_FAILED} order by date desc")
     fun completedRecords():List<Record>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
