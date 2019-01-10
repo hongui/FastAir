@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -49,6 +51,18 @@ android {
 
             //signingConfig signingConfigs.release
         }
+    }
+
+    applicationVariants.all{
+        variant->
+            if("release"!=variant.getName()){
+                return
+            }
+            variant.outputs.all{
+                output->
+                    def name="${variant.applicationId}_${variant.getVersionName()}_${new SimpleDateFormat('yyyy_MM_dd_HH_mm').format(System.currentTimeMillis())}.apk"
+                    outputFileName=name
+            }
     }
 }
 
