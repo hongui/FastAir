@@ -17,20 +17,15 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
     lateinit var stream: FileOutputStream
     override fun invoke(data: ProtocolByte) {
         when (data.type) {
-            ProtocolType.E -> {
-                try {
-                    stream.close()
-                    listener?.invoke(SuccessState(System.currentTimeMillis()-startTime,obj = file))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    listener?.invoke(FaildState(obj = file))
-                }
-            }
+            ProtocolType.E -> receiveOver()
 
             ProtocolType.L -> {
                 length = data.getLong()
                 alreadyFinished=0
                 startTime=System.currentTimeMillis()
+                if(0L==length){
+                    receiveOver()
+                }
             }
 
             ProtocolType.C -> {
@@ -53,6 +48,16 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
                 alreadyFinished += data.bytes().size
                 listener?.invoke(ProcessState(alreadyFinished, length, obj = file))
             }
+        }
+    }
+
+    fun receiveOver(){
+        try {
+            stream.close()
+            listener?.invoke(SuccessState(System.currentTimeMillis()-startTime,obj = file))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            listener?.invoke(FaildState(obj = file))
         }
     }
 }
