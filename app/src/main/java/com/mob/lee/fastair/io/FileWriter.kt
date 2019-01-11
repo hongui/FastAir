@@ -52,25 +52,28 @@ class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer
                         e.printStackTrace()
                     }
                     if (-1 == tempLength) {
-                        state = -1
-                        try {
-                            stream.close()
-                            listener?.invoke(SuccessState(obj = file))
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                        ProtocolByte.empty()
+                        sucess()
                     } else {
                         alreadyFinished += tempLength
-                        val total=if(0L==file.length()){
-                            //文件长度为0，导致除0错误
-                            1
+                        if(0L==file.length()){
+                            //没内容
+                            sucess()
                         }else{
-                            file.length()
+                            listener?.invoke(ProcessState(alreadyFinished, file.length(), obj = file))
+                            ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
                         }
-                        listener?.invoke(ProcessState(alreadyFinished, total, obj = file))
-                        ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
                     }
                 }
             }
+
+    fun sucess():ProtocolByte{
+        state = -1
+        try {
+            stream.close()
+            listener?.invoke(SuccessState(obj = file))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return ProtocolByte.empty()
+    }
 }
