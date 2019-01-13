@@ -1,7 +1,10 @@
 package com.mob.lee.fastair.service
 
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
@@ -40,6 +43,9 @@ class FileService : Service() {
         AndroidScope()
     }
 
+    val channelId="fileservice"
+    val channelName="文件收发"
+
     override fun onCreate() {
         super.onCreate()
         mHandler = Handler {
@@ -69,10 +75,17 @@ class FileService : Service() {
             true
         }
         mScope.create()
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            val channel=NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_DEFAULT)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        socket?.close()
         mScope.destory()
     }
 
@@ -147,8 +160,8 @@ class FileService : Service() {
     }
 
     fun notification(progress : Int, title : String) {
-        val builder = if (26 <= Build.VERSION.SDK_INT) {
-            Notification.Builder(this, "FastAir")
+        val builder = if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
+            Notification.Builder(this, channelId)
         } else {
             Notification.Builder(this)
         }
