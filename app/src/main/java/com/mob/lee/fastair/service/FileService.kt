@@ -34,6 +34,8 @@ import java.io.File
  * Created by Andy on 2017/12/28.
  */
 class FileService : Service() {
+
+    var oldState = 0F
     var socket : SocketService? = null
     var writing = false
     var mHandler : Handler? = null
@@ -43,8 +45,8 @@ class FileService : Service() {
         AndroidScope()
     }
 
-    val channelId="fileservice"
-    val channelName="文件收发"
+    val channelId = "fileservice"
+    val channelName = "文件收发"
 
     override fun onCreate() {
         super.onCreate()
@@ -76,8 +78,8 @@ class FileService : Service() {
         }
         mScope.create()
 
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-            val channel=NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_DEFAULT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
@@ -101,18 +103,16 @@ class FileService : Service() {
         val host = intent?.getStringExtra(ADDRESS)
         val isHost = intent?.getBooleanExtra(IS_HOST, false) ?: false
         socket = SocketService(mScope)
-        socket?.addListener{
-            state,info->
-            when(state){
-                STATE_DISCONNECTED->{
+        socket?.addListener { state, info ->
+            when (state) {
+                STATE_DISCONNECTED -> {
                     mFileChangeListener?.invoke(FaildState())
                     stopSelf()
                 }
             }
         }
         socket?.open(PORT_FILE, if (isHost) null else host)
-        socket?.read(FileReader(this@FileService) {
-            it.sendMessage(mHandler)
+        socket?.read(FileReader(this) {
             updateRecord(it)
         })
         startSendNew()
@@ -131,13 +131,22 @@ class FileService : Service() {
             }
             writing = true
             socket?.write(FileWriter(record.path) {
-                it.sendMessage(mHandler)
                 updateRecord(it, record)
             })
         }
     }
 
     fun updateRecord(state : State?, record : Record? = null) {
+        when (state) {
+            is ProcessState -> {
+                if (Math.abs(oldState - state.percentage()) > 8) {
+                    oldState = state.percentage()
+                    state.sendMessage(mHandler)
+                }
+            }
+            else -> state?.sendMessage(mHandler)
+        }
+
         if (state !is SuccessState) {
             return
         }
@@ -147,20 +156,20 @@ class FileService : Service() {
             updateStorage(file.absolutePath)
             Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
         } else {
-            record.state= STATE_SUCCESS
+            record.state = STATE_SUCCESS
             record
         }
         database(mScope) { dao ->
-            if(null==record){
+            if (null == record) {
                 dao.insert(target)
-            }else {
+            } else {
                 dao.update(target)
             }
         }
     }
 
     fun notification(progress : Int, title : String) {
-        val builder = if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, channelId)
         } else {
             Notification.Builder(this)
