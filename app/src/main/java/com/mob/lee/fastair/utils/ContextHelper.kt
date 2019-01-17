@@ -14,6 +14,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.db.AppDatabase
@@ -77,12 +78,25 @@ fun Context.openFile(file : String) {
 }
 
 fun Context.createFile(name : String) : File {
-    return File(readDownloadPath() + File.separator + name)
+    val path=readDownloadPath()
+    var file = File(path, name)
+    val key=resources.getString(R.string.key_default_rewrite)
+    val overrite=PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key,true)
+    if(file.exists()&&!overrite){
+        var i=0
+        val tempName=file.nameWithoutExtension
+        val suf=file.extension
+        while (file.exists()){
+            file= File(path,"$tempName($i).$suf")
+            i++
+        }
+    }
+    return file
 }
 
 fun Context.readDownloadPath() : String {
-    val infos = getSharedPreferences("infos", Context.MODE_PRIVATE)
-    return infos.getString("downloadPath", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+    val key=resources.getString(R.string.key_default_download)
+    return PreferenceManager.getDefaultSharedPreferences(this).getString(key,Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
 }
 
 fun Context.writeDownloadPath(path : String) {

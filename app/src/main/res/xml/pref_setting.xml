@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="@string/key_default_clear"
+        app:summary="@string/pref_default_clear_des"
+        app:title="@string/pref_default_clear_title"
+        app:icon="@drawable/ic_action_clean"/>
+    <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="@string/key_default_rewrite"
+        app:summary="@string/pref_default_rewrite_des"
+        app:title="@string/pref_default_rewrite_title"
+        app:icon="@drawable/ic_action_rewrite"/>
+    <Preference
+        app:fragment="com.mob.lee.fastair.fragment.PathPickFragment"
+        app:key="@string/key_default_download"
+        app:title="@string/pref_default_download"
+        app:icon="@drawable/ic_action_download"/>
+
+</androidx.preference.PreferenceScreen>

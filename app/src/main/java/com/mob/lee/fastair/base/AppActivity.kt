@@ -52,7 +52,7 @@ open class AppActivity : AppCompatActivity() {
         return false
     }
 
-    fun fragment(cls: KClass<out AppFragment>, bundle: Bundle = Bundle(), addToIt: Boolean = true) {
+    fun fragment(cls: KClass<*>, bundle: Bundle = Bundle(), content:Int=android.R.id.content,addToIt: Boolean = true) {
         val manager = supportFragmentManager
         var fragment=manager.findFragmentByTag(cls.simpleName)
         val alreadyAdd=null!=fragment
@@ -68,7 +68,7 @@ open class AppActivity : AppCompatActivity() {
         }
         val transaction = manager.beginTransaction()
 
-        transaction.replace(android.R.id.content, fragment,cls.simpleName)
+        transaction.replace(content, fragment,cls.simpleName)
         if (addToIt && !alreadyAdd) {
             transaction.addToBackStack(null)
         }

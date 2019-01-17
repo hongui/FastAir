@@ -1,6 +1,7 @@
 package com.mob.lee.fastair.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -43,4 +44,7 @@ interface RecordDao{
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(records:List<Record>)
+
+    @Delete()
+    fun clearWait(records : List<Record>)
 }
