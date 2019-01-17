@@ -9,6 +9,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
+import androidx.preference.PreferenceManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AndroidScope
 import com.mob.lee.fastair.io.FileReader
@@ -87,6 +88,14 @@ class FileService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        val key=getString(R.string.key_default_clear)
+        val clear=PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key,true)
+        if(clear) {
+            database(mScope) {
+                val records = it.waitRecords()
+                it.clearWait(records)
+            }
+        }
         socket?.close()
         mScope.destory()
     }
@@ -100,8 +109,8 @@ class FileService : Service() {
             startSendNew()
             return super.onStartCommand(intent, flags, startId)
         }
-        val host = intent?.getStringExtra(ADDRESS)
-        val isHost = intent?.getBooleanExtra(IS_HOST, false) ?: false
+        val host = intent.getStringExtra(ADDRESS)
+        val isHost = intent.getBooleanExtra(IS_HOST, false) ?: false
         socket = SocketService(mScope)
         socket?.addListener { state, info ->
             when (state) {

@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.R
@@ -17,7 +18,6 @@ import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.getPaths
 import com.mob.lee.fastair.utils.readDownloadPath
 import com.mob.lee.fastair.utils.successToast
-import com.mob.lee.fastair.utils.writeDownloadPath
 import kotlinx.android.synthetic.main.fragment_path_pick.*
 import java.io.File
 
@@ -32,13 +32,12 @@ class PathPickFragment:AppFragment(){
     override fun layout()= R.layout.fragment_path_pick
 
     override fun setting() {
-        toolbar(R.string.chooseDownloadPath)
         setHasOptionsMenu(true)
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             mCurrentPath = File(context?.readDownloadPath())
-            pathPickContent.setLayoutManager(LinearLayoutManager(context))
-            pathPickContent.setAdapter(Adapter(MultiDataHolder<File>(R.layout.item_path,{position, data, viewHolder ->
+            pathPickContent.layoutManager=LinearLayoutManager(context)
+            pathPickContent.adapter=(Adapter(MultiDataHolder<File>(R.layout.item_path){position, data, viewHolder ->
                 data?:return@MultiDataHolder
                 val icon=viewHolder.view<ImageView>(R.id.item_path_icon)
                 icon?.let {
@@ -49,7 +48,7 @@ class PathPickFragment:AppFragment(){
                 viewHolder.itemView.setOnClickListener {
                     updateContent(data)
                 }
-            })))
+            }))
             updateContent(null)
             pathPickTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -84,7 +83,9 @@ class PathPickFragment:AppFragment(){
                 mCurrentPath = File(context?.readDownloadPath())
             }
             mCurrentPath?.let {
-                context?.writeDownloadPath(it.getAbsolutePath())
+                val key=getString(R.string.key_default_download)
+                PreferenceManager.getDefaultSharedPreferences(context)
+                        .edit()?.putString(key,it.absolutePath)?.apply()
                 mParent?.successToast(getString(R.string.path_setting_success,it.getAbsolutePath()))
                 mParent?.onBackPressed()
                 return true

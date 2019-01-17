@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.SettingActivity
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.STATE_WAIT
@@ -168,8 +169,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
             R.id.menu_connect_chat -> mParent?.fragment(ChatFragment::class, P2PManager.bundle())
 
-            R.id.menu_change_path -> mParent?.fragment(PathPickFragment::class)
-
             R.id.menu_payment -> mParent?.fragment(PayFragment::class)
 
             R.id.menu_help -> {
@@ -183,6 +182,8 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 data.putInt("type", 1)
                 mParent?.fragment(TextFragment::class, data)
             }
+
+            R.id.menu_setting -> startActivity(Intent(mParent, SettingActivity::class.java))
         }
         return true
     }

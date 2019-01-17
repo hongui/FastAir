@@ -3,36 +3,36 @@
 
     <item
         android:id="@+id/menu_disconnet"
-        android:title="断开连接"
+        android:title="@string/menu_disconnect"
         android:icon="@drawable/ic_action_off"/>
 
     <item
         android:id="@+id/menu_history"
-        android:title="传输历史"
+        android:title="@string/menu_history"
         android:icon="@drawable/ic_action_history"/>
 
     <item
         android:id="@+id/menu_connect_chat"
-        android:title="立即聊天"
+        android:title="@string/menu_chat"
         android:icon="@drawable/ic_action_chat"/>
 
     <item
-        android:id="@+id/menu_change_path"
-        android:title="保存路径"
-        android:icon="@drawable/ic_file_folder"/>
-
-    <item
         android:id="@+id/menu_payment"
-        android:title="扫码支持"
+        android:title="@string/menu_support"
         android:icon="@drawable/ic_action_payment"/>
 
     <item
         android:id="@+id/menu_help"
-        android:title="使用帮助"
+        android:title="@string/menu_help"
         android:icon="@drawable/ic_action_help"/>
 
     <item
         android:id="@+id/menu_about"
-        android:title="关于"
+        android:title="@string/menu_about"
         android:icon="@drawable/ic_action_info"/>
+
+    <item
+        android:id="@+id/menu_setting"
+        android:title="@string/menu_setting"
+        android:icon="@drawable/ic_action_setting"/>
 </menu>

@@ -74,6 +74,7 @@ dependencies {
     implementation support.design
     implementation support.cardview
     implementation support.constaint
+    implementation preference
 
     implementation coreKotlin.kdk
     implementation coreKotlin.reflect

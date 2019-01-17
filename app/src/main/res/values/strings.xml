@@ -106,4 +106,21 @@
     <string name="file_date">时间</string>
     <string name="file_path">路径</string>
     <string name="no_application_find">没有找到合适的应用来打开文件</string>
+
+    <string name="pref_default_clear_title">自动清除</string>
+    <string name="pref_default_clear_des">退出应用后，清除为完成的任务，避免文件错传</string>
+    <string name="pref_default_rewrite_title">文件覆盖</string>
+    <string name="pref_default_rewrite_des">收到和本机重名的文件时，覆盖本机重名的文件</string>
+    <string name="pref_default_download">文件保存地址</string>
+    <string name="key_default_clear">autoclear</string>
+    <string name="key_default_rewrite">rewrite</string>
+    <string name="key_default_download">download</string>
+
+    <string name="menu_disconnect">断开连接</string>
+    <string name="menu_history">传输历史</string>
+    <string name="menu_chat">立即聊天</string>
+    <string name="menu_support">扫码支持</string>
+    <string name="menu_help">使用帮助</string>
+    <string name="menu_about">关于</string>
+    <string name="menu_setting">设置</string>
 </resources>
