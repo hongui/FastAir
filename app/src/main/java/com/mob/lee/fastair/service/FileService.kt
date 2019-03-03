@@ -186,6 +186,11 @@ class FileService : Service() {
         builder.setContentTitle(title)
         builder.setSmallIcon(R.mipmap.ic_launcher)
         builder.setProgress(100, progress, false)
-        startForeground(9727, builder.build())
+        builder.setAutoCancel(true)
+        val notification=builder.build()
+
+        val manager=getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        manager?.notify(9727,notification)
+        startForeground(9727, notification)
     }
 }

@@ -2,7 +2,6 @@ package com.mob.lee.fastair.fragment
 
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.imageloader.ImageLoader
 import com.mob.lee.fastair.utils.display
 import kotlinx.android.synthetic.main.fragment_payment.*
 

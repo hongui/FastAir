@@ -16,7 +16,7 @@ android {
         versionName appVersion.name
     }
 
-    /*signingConfigs{
+    signingConfigs{
         release{
             Properties properties = new Properties()
             InputStream stream = project.rootProject.file('local.properties').newDataInputStream()
@@ -27,7 +27,7 @@ android {
             keyAlias properties.getProperty('alias.name')
             keyPassword properties.getProperty('alias.password')
         }
-    }*/
+    }
     buildTypes {
         debug {
             buildConfigField "boolean", "LOG_DEBUG", "true"

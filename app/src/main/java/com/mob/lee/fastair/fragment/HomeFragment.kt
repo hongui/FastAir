@@ -224,6 +224,10 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 }
             }
         }
+
+        val intent = Intent(mParent, FileService::class.java)
+        intent.putExtras(P2PManager.bundle())
+        context?.startService(intent)
     }
 
     fun openSetting() {
