@@ -14,6 +14,7 @@ android {
         targetSdkVersion sdk.target
         versionCode appVersion.code
         versionName appVersion.name
+        multiDexEnabled true
     }
 
     signingConfigs{
@@ -30,26 +31,12 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "boolean", "LOG_DEBUG", "true"
-            // VersionName后缀
             versionNameSuffix "-debug"
-            minifyEnabled false
-            zipAlignEnabled false
-            shrinkResources false
         }
         release {
-            // 不显示log
-            buildConfigField "boolean", "LOG_DEBUG", "false"
-            // 混淆
             minifyEnabled true
-            // Zipalign优化
-            zipAlignEnabled true
-            // 移除无用的resource
-            shrinkResources true
-            // 混淆配置
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            //signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
     }
 
@@ -64,26 +51,36 @@ android {
                     outputFileName=name
             }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        pickFirst 'META-INF/*'
+    }
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    implementation support.compat
-    implementation support.recyclerview
-    implementation support.design
-    implementation support.cardview
-    implementation support.constaint
-    implementation preference
+    dependencyList.activity
+    implementation dependencyList.activity
+    implementation dependencyList.cardview
+    implementation dependencyList.constraintlayout
+    implementation dependencyList.fragment
+    implementation dependencyList.kdt
+    implementation dependencyList.kotlincoroutine
+    implementation dependencyList.kotlinreflect
+    implementation dependencyList.lifecycle
+    implementation dependencyList.lifecycleruntime
+    implementation dependencyList.multidex
+    implementation dependencyList.navigation
+    implementation dependencyList.navigationui
+    implementation dependencyList.paging
+    implementation dependencyList.preference
+    implementation dependencyList.recyclerview
+    implementation dependencyList.room
+    implementation dependencyList.roomkapt
+    implementation dependencyList.roomextension
+    implementation dependencyList.viewpager
 
-    implementation coreKotlin.kdk
-    implementation coreKotlin.reflect
-    implementation coreKotlin.coroutines
-    implementation coreKotlin.coroutinesAndroid
-
-    implementation lifecycle
-    implementation okio
-    implementation room.runtime
-
-    kapt room.compiler
+    kapt dependencyList.roomkapt
 }

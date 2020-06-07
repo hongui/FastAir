@@ -27,10 +27,10 @@ import java.io.File
  * Created by Andy on 2017/6/20.
  */
 class ContentPickFragment : AppFragment() {
-    override fun layout() : Int = R.layout.fragment_content_pick
+    override val layout: Int = R.layout.fragment_content_pick
 
     override fun setting() {
-        val viewModel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
+        val viewModel = viewModel<FileViewModel>()
 
         val contentDataHolder = MultiDataHolder<Record>(R.layout.item_file) { position, record, viewHolder ->
             record ?: return@MultiDataHolder
@@ -48,12 +48,12 @@ class ContentPickFragment : AppFragment() {
                 } else {
                     STATE_CHECK
                 }
-                viewModel.updateState(mScope, state, viewHolder.adapterPosition, 1)
+                viewModel.updateState(state, viewHolder.adapterPosition, 1)
             }
             viewHolder.itemView.setOnLongClickListener {
                 context?.dialog {
-                    it.setTitle(record.path.substringAfterLast(File.separator))
-                            .setAdapter(FileDetailAdapter(context !!, record.path), null)
+                    setTitle(record.path.substringAfterLast(File.separator))
+                            .setAdapter(FileDetailAdapter(mParent !!, record.path), null)
                 }
                 true
             }

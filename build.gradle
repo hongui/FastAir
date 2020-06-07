@@ -8,8 +8,8 @@ buildscript {
     }
 
     dependencies {
-        classpath androidPlugin
-        classpath coreKotlin.compiler
+        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kdt"
     }
 }
 

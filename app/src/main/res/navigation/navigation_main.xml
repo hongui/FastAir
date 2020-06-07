@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/navigation_main"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.mob.lee.fastair.fragment.HomeFragment"
+        android:label="HomeFragment" />
+    <fragment
+        android:id="@+id/contentPickFragment"
+        android:name="com.mob.lee.fastair.fragment.ContentPickFragment"
+        android:label="ContentPickFragment" />
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.mob.lee.fastair.fragment.HistoryFragment"
+        android:label="HistoryFragment" />
+    <fragment
+        android:id="@+id/discoverFragment"
+        android:name="com.mob.lee.fastair.fragment.DiscoverFragment"
+        android:label="DiscoverFragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.mob.lee.fastair.fragment.ChatFragment"
+        android:label="ChatFragment" />
+    <fragment
+        android:id="@+id/pathPickFragment"
+        android:name="com.mob.lee.fastair.fragment.PathPickFragment"
+        android:label="PathPickFragment" />
+    <fragment
+        android:id="@+id/payFragment"
+        android:name="com.mob.lee.fastair.fragment.PayFragment"
+        android:label="PayFragment" />
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.mob.lee.fastair.fragment.SettingFragment"
+        android:label="SettingFragment" />
+    <fragment
+        android:id="@+id/textFragment"
+        android:name="com.mob.lee.fastair.fragment.TextFragment"
+        android:label="TextFragment" />
+</navigation>

@@ -54,7 +54,7 @@ class MessageAdapter : RecyclerView.Adapter<ViewHolder>() {
             if (R.id.menu_popup_copy == item.itemId) {
                 val clip = ClipData.newPlainText("fastAir", content)
                 val manager = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                manager.primaryClip = clip
+                manager.setPrimaryClip(clip)
                 Toast.makeText(view.context, R.string.toast_alreadyCopy, Toast.LENGTH_SHORT).show()
                 popupMenu.dismiss()
             }

@@ -29,7 +29,7 @@ class PathPickFragment:AppFragment(){
 
     private var mCurrentPath: File? = null
 
-    override fun layout()= R.layout.fragment_path_pick
+    override val layout: Int= R.layout.fragment_path_pick
 
     override fun setting() {
         setHasOptionsMenu(true)

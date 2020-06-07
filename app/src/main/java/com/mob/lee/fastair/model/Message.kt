@@ -33,7 +33,7 @@ data class Message(var content: String = "",
     }
 
     constructor(source:Parcel):this(){
-        content=source.readString()
+        content=source.readString()?:""
         from=source.readInt()
         type=source.readInt()
         contentLength=source.readInt()

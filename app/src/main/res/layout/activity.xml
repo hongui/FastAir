@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_content"
-    android:orientation="vertical"
+    android:id="@+id/hostFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <!--<android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:theme="@style/AppTheme.AppBarOverlay"
-        app:elevation="@dimen/common_8dp"
-        android:fitsSystemWindows="true">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:theme="@style/AppTheme.Toolbar"
-            app:background="@color/colorPrimary"/>
-    </android.support.design.widget.AppBarLayout>
-
-    <FrameLayout
-        android:id="@+id/activity_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
-
-</FrameLayout>
+    android:name="androidx.navigation.fragment.NavHostFragment"
+    app:defaultNavHost="true"
+    app:navGraph="@navigation/navigation_main">
+</fragment>

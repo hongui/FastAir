@@ -3,7 +3,7 @@ package com.mob.lee.fastair.viewmodel
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.mob.lee.fastair.base.AndroidScope
+import androidx.lifecycle.viewModelScope
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.RecordRep
 import kotlinx.coroutines.Dispatchers
@@ -11,11 +11,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.consumeEachIndexed
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Created by Andy on 2017/11/13.
  */
-class FileViewModel : ViewModel() {
+class FileViewModel : AppViewModel() {
     val record = MutableLiveData<Record>()
     val state = MutableLiveData<Int>()
     val update = MutableLiveData<Pair<Int,Record?>>()
@@ -30,11 +31,11 @@ class FileViewModel : ViewModel() {
         const val STATE_SUCCESS = 3
     }
 
-    fun register(scope : AndroidScope, channel : Channel<Record>?) {
+    fun register(channel : Channel<Record>?) {
         channel ?: return
         mCurrentChannel?.close()
         mCurrentChannel=channel
-        scope.launch(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main) {
             var size = 0
             state.value= STATE_PRE
             channel.consumeEachIndexed {
@@ -56,9 +57,9 @@ class FileViewModel : ViewModel() {
         }
     }
 
-    fun update(scope : AndroidScope, channel : Channel<Pair<Int,Record?>>?){
+    fun update(channel : Channel<Pair<Int,Record?>>?){
         channel?:return
-        scope.launch (Dispatchers.Main){
+        viewModelScope.launch (Dispatchers.Main){
             channel.consumeEach {
                 update.value=it
             }
@@ -66,28 +67,28 @@ class FileViewModel : ViewModel() {
         }
     }
 
-    fun load(scope : AndroidScope, context : Context) {
-        register(scope, RecordRep.load(context, position))
+    fun load(context : Context) {
+        register(RecordRep.load(context, position))
     }
 
-    fun sortBy(scope : AndroidScope, selector : (Record) -> Comparable<*>) {
-        register(scope, RecordRep.sortBy(position, selector))
+    fun sortBy(selector : (Record) -> Comparable<*>) {
+        register(RecordRep.sortBy(position, selector))
     }
 
-    fun reverse(scope : AndroidScope) {
-        register(scope, RecordRep.reverse(position))
+    fun reverse() {
+        register(RecordRep.reverse(position))
     }
 
-    fun updateState(scope : AndroidScope,state:Int,start:Int,count:Int=1){
-        update(scope, RecordRep.states(position,state,start, count))
+    fun updateState(state:Int,start:Int,count:Int=1){
+        update(RecordRep.states(position,state,start, count))
     }
 
-    fun toggleState(scope : AndroidScope){
-        register(scope, RecordRep.toggleState(position))
+    fun toggleState(){
+        register(RecordRep.toggleState(position))
     }
 
-    fun delete(context : Context,scope : AndroidScope){
-        update(scope, RecordRep.delete(context,position))
+    fun delete(context : Context){
+        update(RecordRep.delete(context,position))
     }
 
     fun checkedrecords() : List<Record> {

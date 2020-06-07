@@ -12,27 +12,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.MessageAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.base.OnBackpressEvent
 import com.mob.lee.fastair.model.Message
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
-import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import kotlinx.android.synthetic.main.fragment_chat.*
 
 /**
  * Created by Andy on 2017/6/7.
  */
-class ChatFragment : AppFragment(), OnBackpressEvent {
+class ChatFragment : AppFragment() {
     var mBack = false
     var mConnect : ServiceConnection? = null
     var mService : MessageService? = null
     lateinit var mAdapter : MessageAdapter
-
-    override fun layout() : Int = R.layout.fragment_chat
+    override val layout: Int = R.layout.fragment_chat
 
     override fun setting() {
-        toolbar(R.string.base_chat)
+        title(R.string.base_chat)
 
         mAdapter = MessageAdapter()
         chatContent?.layoutManager = LinearLayoutManager(mParent)
@@ -68,7 +65,9 @@ class ChatFragment : AppFragment(), OnBackpressEvent {
         }
 
         val intent = Intent(context, MessageService::class.java)
-        intent.putExtras(arguments)
+        arguments?.let {
+            intent.putExtras(it)
+        }
         mConnect = object : ServiceConnection {
             override fun onServiceDisconnected(name : ComponentName?) {
                 context?.errorToast("连接断开")
@@ -89,30 +88,15 @@ class ChatFragment : AppFragment(), OnBackpressEvent {
                 }
             }
         }
-        context?.bindService(intent, mConnect, Context.BIND_AUTO_CREATE)
+        context?.bindService(intent, mConnect!!, Context.BIND_AUTO_CREATE)
         context?.startService(intent)
-    }
-
-    override fun onPressed() : Boolean {
-        if (mBack) {
-            return false
-        }
-        mParent?.dialog {
-            it.setMessage(R.string.chatOverInfo)
-                    .setPositiveButton(R.string.disconnect) { dialog, which ->
-                        mBack = true
-                        mParent?.onBackPressed()
-                    }
-                    .setNegativeButton(R.string.justkid,null)
-        }
-        return true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mParent?.stopService(Intent(context, MessageService::class.java))
-        if (null != mConnect) {
-            context?.unbindService(mConnect)
+        mConnect?.let {
+            context?.unbindService(it)
         }
     }
 }

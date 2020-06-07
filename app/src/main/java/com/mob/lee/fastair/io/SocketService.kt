@@ -1,21 +1,9 @@
 package com.mob.lee.fastair.io
 
-import com.mob.lee.fastair.io.state.STATE_CONNECTED
-import com.mob.lee.fastair.io.state.STATE_DISCONNECTED
-import com.mob.lee.fastair.io.state.STATE_READ_FAILD
-import com.mob.lee.fastair.io.state.STATE_READ_FINISH
-import com.mob.lee.fastair.io.state.STATE_READ_START
-import com.mob.lee.fastair.io.state.STATE_WRITE_FAILD
-import com.mob.lee.fastair.io.state.STATE_WRITE_FINISH
-import com.mob.lee.fastair.io.state.STATE_WRITE_START
-import com.mob.lee.fastair.io.state.SocketState
-import com.mob.lee.fastair.io.state.SocketStateListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.mob.lee.fastair.io.state.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.nio.BufferUnderflowException
@@ -28,7 +16,7 @@ import java.nio.channels.SocketChannel
 /**
  * Created by Andy on 2017/11/29.
  */
-class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false) {
+class SocketService(var keepAlive : Boolean = false) {
     /**
      * 读取监听器，消息到来会通知
      * @see read
@@ -56,11 +44,10 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
      * @param port 端口号
      * @param host 主机地址，当该参数为null时，则开启一个socket监听
      **/
-    fun open(port : Int, host : String? = null) = scope.launch(Dispatchers.IO) {
+    suspend fun open(port : Int, host : String? = null) {
         if (isOpen) {
-            return@launch
+            return
         }
-        isOpen = true
         try {
             if (null != host) {
                 var time=0
@@ -82,11 +69,13 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
                 server?.socket()?.bind(InetSocketAddress(port))
                 channel = server?.accept()
             }
+            isOpen = true
             updateState(STATE_CONNECTED)
             handleRead()
             handleWrite()
         } catch (e : Exception) {
             e.printStackTrace()
+            isOpen = false
             channel?.let {
                 it.close()
             }
@@ -97,14 +86,14 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
     /**
      * 添加收到数据的监听
      **/
-    fun read(reader : Reader) {
+    suspend fun read(reader : Reader) {
         readers.add(reader)
     }
 
     /**
      * 添加写入数据的监听
      */
-    fun write(writer : Writer) = scope.launch {
+    suspend fun write(writer : Writer) {
         writers.send(writer)
     }
 
@@ -140,7 +129,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
      * @see ProtocolType
      * @see ProtocolByte
      */
-    private fun handleRead() = scope.launch(Dispatchers.IO) {
+    private suspend fun handleRead()  {
         while (isOpen || keepAlive) {
             try {
                 updateState(STATE_READ_START)
@@ -170,7 +159,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
     /**
      * 发送数据
      */
-    private fun handleWrite() = scope.launch(Dispatchers.Default) {
+    private suspend fun handleWrite() {
         while (isOpen || keepAlive) {
             try {
                 val data = writers.receive()
@@ -196,7 +185,7 @@ class SocketService(val scope : CoroutineScope, var keepAlive : Boolean = false)
     /**
      * 读取特定长度的字节，可能会阻塞
      */
-    private fun readFix(targetSize : Int) : ByteBuffer {
+    private suspend fun readFix(targetSize : Int) : ByteBuffer {
         val buffer = ByteBuffer.allocate(targetSize)
         while (buffer.hasRemaining() && isOpen) {
             channel?.read(buffer)

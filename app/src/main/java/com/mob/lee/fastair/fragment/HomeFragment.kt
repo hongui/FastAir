@@ -1,7 +1,6 @@
 package com.mob.lee.fastair.fragment
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -14,21 +13,16 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.SettingActivity
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.model.STATE_WAIT
 import com.mob.lee.fastair.p2p.P2PManager
-import com.mob.lee.fastair.repository.RecordRep
 import com.mob.lee.fastair.service.FileService
-import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.successToast
-import com.mob.lee.fastair.viewmodel.FileViewModel
+import com.mob.lee.fastair.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
 /**
@@ -38,20 +32,27 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     val PERMISSION_CODE = 12
     val INTENT_CODE = 123
 
-    override fun layout() : Int = R.layout.fragment_home
+    val viewModel by lazy {
+        viewModel<HomeViewModel>()
+    }
+
+    override val layout: Int = R.layout.fragment_home
+
+
 
     override fun setting() {
-        homeContent?.adapter = PageAdapter(mParent !!, childFragmentManager)
+        homeContent?.adapter = PageAdapter(this)
+        homeContent.
         homeTabs.setupWithViewPager(homeContent)
 
-        val toggle = ActionBarDrawerToggle(mParent !!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
+        val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
         toolbar?.title = getString(R.string.app_description)
         toggle.syncState()
 
         homeDrawer?.addDrawerListener(toggle)
         homeNavgation?.setNavigationItemSelectedListener(this)
         homeDrawer?.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
-            override fun onDrawerOpened(drawerView : View) {
+            override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
                 val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
                 val title = if (P2PManager.isConnected()) {
@@ -63,39 +64,25 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         })
 
-        val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
         homeContent.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
-            override fun onPageSelected(position : Int) {
-                viewmodel.position = position
-                permisionCheck()
+            override fun onPageSelected(position: Int) {
+                viewModel.updateLocation(position)
+                permissionCheck()
             }
         })
 
-        toolOperation.setImageDrawable(ContextCompat.getDrawable(context !!, R.drawable.ic_action_receive))
-        viewmodel.hasSelect.observe({ lifecycle }) {
+        observe(viewModel.hasSelectedLiveData){
             val id = if (true == it) {
                 R.drawable.ic_action_send
             } else {
                 R.drawable.ic_action_receive
             }
-            toolOperation.setImageDrawable(ContextCompat.getDrawable(context !!, id))
+            toolOperation.setImageDrawable(ContextCompat.getDrawable(mParent!!, id))
         }
-        toolOperation.setOnClickListener {
-            mParent?.database(mScope, { dao ->
-                val records = RecordRep.selectRecords
-                records.forEach {
-                    it.state = STATE_WAIT
-                }
-                dao.insert(records)
-                //不清除会造成下次重复发送
-                RecordRep.selectRecords.clear()
-            })
-            val bundle = P2PManager.bundle()
-            mParent?.fragment(HistoryFragment::class, bundle)
-        }
+        toolOperation.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_receive))
+
         toolSwap.setOnClickListener {
-            viewmodel.reverse(mScope)
-            val textId = if (toolSwap.text == getString(R.string.des)) {
+            val textId = if (viewModel.reverse()) {
                 R.string.aes
             } else {
                 R.string.des
@@ -103,8 +90,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             toolSwap.setText(textId)
         }
         toolAll.setOnClickListener {
-            viewmodel.toggleState(mScope)
-            val textId = if (toolAll.text == getString(R.string.selectAll)) {
+            val textId = if (viewModel.select()) {
                 R.string.unSelectAll
             } else {
                 R.string.selectAll
@@ -112,42 +98,42 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             toolAll.setText(textId)
         }
         toolSort.setOnClickListener {
-            val menus = PopupMenu(context !!, toolSort)
+            val menus = PopupMenu(mParent!!, toolSort)
             menus.inflate(R.menu.menu_sort)
             menus.setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.menu_content_sort_byname -> viewmodel.sortBy(mScope, { it.name })
-                    R.id.menu_content_sort_bysize -> viewmodel.sortBy(mScope, { it.size })
-                    R.id.menu_content_sort_bytime -> viewmodel.sortBy(mScope, { it.date })
+                    R.id.menu_content_sort_byname -> viewModel.sortByName()
+                    R.id.menu_content_sort_bysize -> viewModel.sortBySize()
+                    R.id.menu_content_sort_bytime -> viewModel.sortByDate()
                 }
                 true
             }
             menus.show()
         }
         toolDelete.setOnClickListener {
-            if (viewmodel.hasSelect.value != true) {
+            if (viewModel.hasSelectedLiveData.value != true) {
                 mParent?.successToast(R.string.dontSelect)
                 return@setOnClickListener
             }
             mParent?.dialog {
-                it.setMessage(R.string.deleteTips)
+                setMessage(R.string.deleteTips)
                         .setPositiveButton(R.string.delete) { dialog, which ->
-                            viewmodel.delete(mParent !!, mScope)
+                            viewModel.deleteSelected()
                         }
             }
         }
-        permisionCheck()
+        permissionCheck()
     }
 
-    override fun onNavigationItemSelected(item : MenuItem) : Boolean {
-        var data : Bundle? = null
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        var data: Bundle? = null
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.isConnected()) {
                     mParent?.dialog {
-                        it.setMessage(R.string.msg_disconnect)
-                                .setPositiveButton(R.string.stopAndDisconnect) { dialog, which ->
-                                    P2PManager.stopConnect(context !!)
+                        setMessage(R.string.msg_disconnect)
+                                .setPositiveButton(R.string.stopAndDisconnect) { _, _ ->
+                                    P2PManager.stopConnect(mParent!!)
                                     P2PManager.connected.value = null
                                     mParent?.stopService(Intent(mParent, FileService::class.java))
                                     mParent?.supportFinishAfterTransition()
@@ -157,97 +143,71 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                                 }
                     }
                 } else {
-                    mParent?.fragment(DiscoverFragment::class, addToIt = false)
+                    navigation(R.id.discoverFragment)
                 }
             }
 
             R.id.menu_history -> {
-                data = Bundle()
-                data.putBoolean("isHistory", true)
-                mParent?.fragment(HistoryFragment::class, data)
+                navigation(R.id.historyFragment) {
+                    putBoolean("isHistory", true)
+                }
             }
 
-            R.id.menu_connect_chat -> mParent?.fragment(ChatFragment::class, P2PManager.bundle())
-
-            R.id.menu_payment -> mParent?.fragment(PayFragment::class)
-
-            R.id.menu_help -> {
-                data = Bundle()
-                data.putInt("type", 0)
-                mParent?.fragment(TextFragment::class, data)
+            R.id.menu_connect_chat -> navigation(R.id.chatFragment) {
+                putAll(P2PManager.bundle())
             }
 
-            R.id.menu_about -> {
-                data = Bundle()
-                data.putInt("type", 1)
-                mParent?.fragment(TextFragment::class, data)
+            R.id.menu_payment -> navigation(R.id.payFragment)
+
+            R.id.menu_help -> navigation(R.id.textFragment) {
+                putInt("type", 0)
             }
 
-            R.id.menu_setting -> startActivity(Intent(mParent, SettingActivity::class.java))
+            R.id.menu_about -> navigation(R.id.textFragment) {
+                putInt("type", 1)
+            }
+
+            R.id.menu_setting -> navigation(R.id.settingFragment)
         }
         return true
     }
 
-    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (INTENT_CODE == requestCode) {
-            permisionCheck()
+            permissionCheck()
         }
     }
 
-    fun permisionCheck() {
+    fun permissionCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val permission = ContextCompat.checkSelfPermission(mParent as Context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val permission = ContextCompat.checkSelfPermission(mParent!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permission == PackageManager.PERMISSION_DENIED) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
             } else {
-                load()
+                viewModel.updateLocation(0)
             }
         }
     }
 
-    fun load() {
-        val viewmodel = ViewModelProviders.of(mParent !!).get(FileViewModel::class.java)
-        viewmodel.load(mScope, context !!)
-
-        context?.database(mScope) { dao ->
-            val datas = dao.waitRecords()
-            if (datas.isNotEmpty()) {
-                mParent?.runOnUiThread {
-                    mParent?.dialog {
-                        it.setMessage(R.string.detect_unfinished_task)
-                                .setPositiveButton(R.string.send) { dialog, which ->
-                                    mParent?.fragment(HistoryFragment::class, P2PManager.bundle())
-                                }.setNegativeButton(R.string.later, null)
-
-                    }
-                }
-            }
-        }
-
-        val intent = Intent(mParent, FileService::class.java)
-        intent.putExtras(P2PManager.bundle())
-        context?.startService(intent)
-    }
-
-    fun openSetting() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", (mParent as Context).packageName, null)
-        intent.data = uri
-        startActivityForResult(intent, INTENT_CODE)
-    }
-
-    override fun onRequestPermissionsResult(requestCode : Int, permissions : Array<out String>, grantResults : IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (PERMISSION_CODE == requestCode && ! grantResults.isEmpty()) {
+        if (PERMISSION_CODE == requestCode && grantResults.isNotEmpty()) {
             if (shouldShowRequestPermissionRationale(permissions[0])) {
                 mParent?.dialog {
-                    it.setMessage(R.string.viewTips)
-                            .setPositiveButton(R.string.goTurnOn) { dialog, which ->
+                    setMessage(R.string.viewTips)
+                            .setPositiveButton(R.string.goTurnOn) { _, _ ->
                                 openSetting()
                             }
                 }
             }
         }
+    }
+
+    fun openSetting() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", mParent?.packageName, null)
+        intent.data = uri
+        startActivityForResult(intent, INTENT_CODE)
     }
 }
