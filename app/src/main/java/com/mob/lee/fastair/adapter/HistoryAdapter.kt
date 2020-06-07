@@ -65,16 +65,12 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
         holder.itemView.setOnLongClickListener {
             if (state is SuccessState) {
                 holder.itemView.context.dialog {
-                    it.setTitle(R.string.file_operation)
-                            .setItems(R.array.array_file_operation) { dialog, which ->
+                    setTitle(R.string.file_operation)
+                            .setItems(R.array.array_file_operation) { _, which ->
                                 when (which) {
-                                    0 -> {
-                                        fileDetail(it.context, record.path)
-                                    }
+                                    0 ->fileDetail(it.context, record.path)
 
-                                    1 -> {
-                                        rename(it.context, position, record)
-                                    }
+                                    1 -> rename(it.context, position, record)
                                 }
                             }
                 }
@@ -87,7 +83,7 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
 
     fun fileDetail(context : Context, path : String) {
         context.dialog {
-            it.setTitle(path.substringAfterLast(File.separator))
+            setTitle(path.substringAfterLast(File.separator))
                     .setAdapter(FileDetailAdapter(context, path), null)
         }
     }
@@ -98,7 +94,7 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
         val et = container.findViewById<EditText>(R.id.item_et_file_rename_content)
         et.setText(record.name.substringBeforeLast("."))
         context.dialog {
-            it.setTitle(path.substringAfterLast(File.separator))
+            setTitle(path.substringAfterLast(File.separator))
                     .setView(container)
                     .setPositiveButton(R.string.file_rename) { dialog, which ->
                         val input = et.text.toString()

@@ -1,50 +1,55 @@
-def versions = [:]
-versions.appcompat = '1.0.0'
-versions.material = '1.0.0-rc01'
-versions.kotlin = '1.3.11'
-versions.constaint = '1.1.2'
-versions.lifecycle = '2.0.0'
-versions.room = '2.1.0-alpha02'
-versions.okio = '1.13.0'
-versions.preference = '1.0.0'
-versions.coroutines = '1.0.1'
-
-ext.buildTool = '28.0.3'
-
 def appVersion = [:]
-appVersion.code = 5
-appVersion.name = '1.3.0'
+appVersion.code = 6
+appVersion.name = '1.4.0'
 ext.appVersion = appVersion
 
 def sdk = [:]
 sdk.mins = 16
 sdk.target = 29
-sdk.compile = 28
+sdk.compile = 29
 ext.sdk = sdk
 
-def support = [:]
-support.compat = "androidx.appcompat:appcompat:$versions.appcompat"
-support.recyclerview = "androidx.recyclerview:recyclerview:$versions.appcompat"
-support.cardview = "androidx.cardview:cardview:$versions.appcompat"
-support.design = "com.google.android.material:material:$versions.material"
-support.constaint = "androidx.constraintlayout:constraintlayout:$versions.constaint"
-ext.support = support
+ext.buildTool = '29.0.2'
 
-def kotlin = [:]
-kotlin.kdk = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
-kotlin.compiler = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
-kotlin.reflect = "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
-kotlin.coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
-kotlin.coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
-ext.coreKotlin = kotlin
+def versions = [:]
+versions.activity = '1.1.0'
+versions.cardview = '1.0.0'
+versions.constraintlayout = '1.1.2'
+versions.coordinatorlayout = '1.1.0'
+versions.coroutines = '1.1.3'
+versions.drawerlayout = '1.0.0'
+versions.kdt = '1.3.72'
+versions.lifecycle = '2.0.0'
+versions.multidex = '2.0.1'
+versions.okio = '1.13.0'
+versions.navigation = '2.2.2'
+versions.paging = '2.1.2'
+versions.preference = '1.1.1'
+versions.recyclerview = '1.1.0'
+versions.room = '2.2.5'
+versions.viewpager = '1.0.0'
+ext.versions=versions
 
-def room = [:]
-room.runtime = "androidx.room:room-runtime:$versions.room"
-room.compiler = "androidx.room:room-compiler:$versions.room"
-ext.room = room
-
-ext.lifecycle = "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
-ext.okio = "com.squareup.okio:okio:$versions.okio"
-ext.preference = "androidx.preference:preference:$versions.preference"
-
-ext.androidPlugin = 'com.android.tools.build:gradle:3.2.1'
+def dependencyList=[:]
+dependencyList.activity="androidx.activity:activity-ktx:$versions.activity"
+dependencyList.cardview="androidx.cardview:cardview:$versions.cardview"
+dependencyList.constraintlayout="androidx.constraintlayout:constraintlayout:$versions.constraintlayout"
+dependencyList.fragment="androidx.fragment:fragment-ktx:$versions.fragment"
+dependencyList.kdt="org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kdt"
+dependencyList.kotlincoroutine="org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.kotlinCorooutine"
+dependencyList.kotlinreflect="org.jetbrains.kotlin:kotlin-reflect:$versions.kdt"
+dependencyList.lifecycle="androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
+dependencyList.lifecycleruntime="androidx.lifecycle:lifecycle-runtime:$versions.lifecycle"
+dependencyList.lifecyclekapt = "androidx.lifecycle:lifecycle-compiler:$versions.lifecycle"
+dependencyList.multidex ="androidx.multidex:multidex:$versions.multidex"
+dependencyList.navigation="androidx.navigation:navigation-fragment-ktx:$versions.navigation"
+dependencyList.navigationui = "androidx.navigation:navigation-ui-ktx:$versions.navigation"
+dependencyList.okio = "com.squareup.okio:okio:$versions.okio"
+dependencyList.paging="androidx.paging:paging-runtime:$versions.paging"
+dependencyList.preference="androidx.preference:preference-ktx:$versions.preference"
+dependencyList.recyclerview="androidx.recyclerview:recyclerview:$versions.recyclerview"
+dependencyList.room="androidx.room:room-runtime:$versions.room"
+dependencyList.roomkapt="androidx.room:room-compiler:$versions.room"
+dependencyList.roomextension="androidx.room:room-ktx:$versions.room"
+dependencyList.viewpager="androidx.viewpager2:viewpager2:$versions.viewpager"
+ext.dependencyList=dependencyList

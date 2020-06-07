@@ -10,17 +10,17 @@ import kotlinx.android.synthetic.main.fragment_text.*
  */
 class TextFragment : AppFragment() {
 
-    override fun layout() = R.layout.fragment_text
+    override val layout: Int = R.layout.fragment_text
 
 
     override fun setting() {
         val type = arguments?.getInt("type") ?: 0
 
         val name = if (0 == type) {
-            toolbar("使用帮助")
+            title("使用帮助")
             "help.html"
         } else {
-            toolbar("关于")
+            title("关于")
             "about.html"
         }
         val url = "file:///android_asset/$name"

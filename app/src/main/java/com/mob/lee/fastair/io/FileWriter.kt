@@ -25,7 +25,7 @@ class FileWriter(val file : File, val listener : ProcessListener? = null) : Writ
 
     constructor(path : String) : this(File(path))
 
-    constructor(path : String, listener : ProcessListener? = null) : this(File(path), listener)
+    constructor(path : String?, listener : ProcessListener? = null) : this(File(path), listener)
 
     override fun hasNext() : Boolean{
         //不发送文件夹

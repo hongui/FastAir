@@ -1,23 +1,38 @@
 package com.mob.lee.fastair.adapter
 
+import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
-import com.mob.lee.fastair.base.AppActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.fragment.ContentPickFragment
 import com.mob.lee.fastair.repository.RecordRep
 
-class PageAdapter(val activity : AppActivity,fm:FragmentManager):FragmentStatePagerAdapter(fm){
-    val pagers= RecordRep.categories()
+class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    val pagers = RecordRep.categories()
+    val map = HashMap<Int, Fragment>()
 
-    override fun getItem(position : Int) : Fragment {
-       return ContentPickFragment()
+    override fun getItemCount() = pagers.size
+
+    override fun createFragment(position: Int): Fragment {
+        return map.getOrPut(position, {
+            ContentPickFragment().apply {
+                arguments = Bundle().apply {
+                    putInt("position", position)
+                }
+            }
+        })
     }
 
-    override fun getCount() =pagers.size
+    companion object {
+        fun bind(fragment: Fragment, viewPager: ViewPager2, tab: TabLayout) {
+            val adapter = PageAdapter(fragment)
+            viewPager.adapter = adapter
 
-    override fun getPageTitle(position : Int) : CharSequence? {
-        val category=pagers[position]
-        return activity.getString(category.title)
+            val mediator = TabLayoutMediator(tab, viewPager) { _, position ->
+                tab.text = adapter.pagers[position]
+            }
+            mediator.attach()
+        }
     }
 }
