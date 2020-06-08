@@ -38,7 +38,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
     override val layout: Int = R.layout.fragment_home
 
-    override val defaultContainer: Int=R.layout.container_notoolbar
+    override val defaultContainer: Int=-1
 
     override fun setting() {
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
