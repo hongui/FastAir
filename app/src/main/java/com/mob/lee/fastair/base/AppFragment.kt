@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.TextView
-import android.widget.ViewSwitcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -16,9 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.model.StatusError
-import com.mob.lee.fastair.model.StatusLoading
-import com.mob.lee.fastair.model.StatusSuccess
 import com.mob.lee.fastair.viewmodel.AppViewModel
 
 /**
@@ -27,14 +22,8 @@ import com.mob.lee.fastair.viewmodel.AppViewModel
 
 abstract class AppFragment : Fragment() {
     protected abstract val layout: Int
-    protected open val defaultContainer:Int=R.layout.container
+    protected open val defaultContainer: Int = R.layout.container
     var mParent: ContainerActivity? = null
-    val mViewSwitcher by lazy {
-        view?.findViewById<ViewSwitcher>(R.id.vsRoot)
-    }
-    val mViewSwitcherContent by lazy {
-        view?.findViewById<ViewSwitcher>(R.id.vsContent)
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,10 +31,14 @@ abstract class AppFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(defaultContainer, container, false)
-        val flContent = root?.findViewById<FrameLayout>(R.id.flContainer)
-        inflater.inflate(layout, flContent, true)
-        return root
+        return if (-1 == defaultContainer) {
+            inflater.inflate(layout, container, false)
+        } else {
+            val root = inflater.inflate(defaultContainer, container, false)
+            val flContent = root?.findViewById<FrameLayout>(R.id.flContainer)
+            inflater.inflate(layout, flContent, true)
+            root
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,38 +63,6 @@ abstract class AppFragment : Fragment() {
         }
     }
 
-    fun startLoading(msg: CharSequence? = getString(R.string.loading)) {
-        if (R.id.clLoading != mViewSwitcher?.currentView?.id) {
-            mViewSwitcher?.showNext()
-        }
-        mViewSwitcher?.findViewById<TextView>(R.id.tvLoading)?.setText(msg)
-    }
-
-
-    fun error(msg: CharSequence? = getString(R.string.tips_error), action: (() -> Unit)? = null) {
-        stopLoading()
-        if (R.id.clError != mViewSwitcherContent?.currentView?.id) {
-            mViewSwitcher?.showNext()
-        }
-        mViewSwitcherContent?.findViewById<TextView>(R.id.tvErrorMsg)?.text = msg
-        mViewSwitcherContent?.findViewById<TextView>(R.id.btnErrorRetry)?.setOnClickListener {
-            action?.invoke()
-        }
-    }
-
-    fun stopLoading() {
-        if (R.id.vsContent != mViewSwitcher?.currentView?.id) {
-            mViewSwitcher?.showNext()
-        }
-    }
-
-    fun content() {
-        stopLoading()
-        if (R.id.flContainer != mViewSwitcherContent?.currentView?.id) {
-            mViewSwitcher?.showNext()
-        }
-    }
-
     fun <D> observe(liveData: LiveData<D>, action: (D) -> Unit) {
         liveData.observe(this, Observer { action(it) })
     }
@@ -116,13 +77,6 @@ abstract class AppFragment : Fragment() {
 
     inline fun <reified D : AppViewModel> viewModel(): D {
         val viewModel = ViewModelProviders.of(this).get(D::class.java)
-        observe(viewModel.stateLiveData) {
-            when (it) {
-                is StatusLoading -> startLoading(it.msg)
-                is StatusSuccess -> content()
-                is StatusError -> error(it.msg)
-            }
-        }
         return viewModel
     }
 

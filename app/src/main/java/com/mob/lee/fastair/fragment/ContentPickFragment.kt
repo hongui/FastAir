@@ -11,9 +11,7 @@ import com.mob.lee.fastair.adapter.FileDetailAdapter
 import com.mob.lee.fastair.adapter.MultiDataHolder
 import com.mob.lee.fastair.adapter.SimgleDataHolder
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.model.Record
-import com.mob.lee.fastair.model.formatDate
-import com.mob.lee.fastair.model.formatSize
+import com.mob.lee.fastair.model.*
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.display
 import com.mob.lee.fastair.viewmodel.HomeViewModel
@@ -25,7 +23,7 @@ import java.io.File
  */
 class ContentPickFragment : AppFragment() {
     override val layout: Int = R.layout.fragment_content_pick
-    override val defaultContainer: Int = R.layout.container_notoolbar
+    override val defaultContainer: Int = -1
     override fun setting() {
         val viewModel = (parentFragment as AppFragment).viewModel<HomeViewModel>()
 
@@ -68,8 +66,24 @@ class ContentPickFragment : AppFragment() {
         pickContent.layoutManager = LinearLayoutManager(context)
         pickContent.adapter = adapter
 
+        observe(viewModel.stateLiveData) {
+            when (it) {
+                is StatusLoading -> {
+                    adapter.add(SimgleDataHolder(layout = R.layout.loading))
+                }
+
+                is StatusEmpty -> {
+                    adapter.remove(R.layout.loading)
+                    adapter.add(SimgleDataHolder(layout = R.layout.empty))
+                }
+
+                is StatusSuccess -> {
+                    adapter.remove(R.layout.loading)
+                    adapter.add(contentDataHolder)
+                }
+            }
+        }
         observe(viewModel.recordLiveData) {
-            adapter.remove(R.layout.loading)
             adapter.change(it)
         }
     }

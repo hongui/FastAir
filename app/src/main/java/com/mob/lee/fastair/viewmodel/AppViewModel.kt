@@ -36,7 +36,7 @@ open class AppViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.Main) {
             stateLiveData.value = try {
                 action(targetLiveData)
-                StatusSuccess()
+                StatusComplete()
             } catch (e: Exception) {
                 StatusError(e.message)
             }
