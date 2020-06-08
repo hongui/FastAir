@@ -27,6 +27,7 @@ import com.mob.lee.fastair.viewmodel.AppViewModel
 
 abstract class AppFragment : Fragment() {
     protected abstract val layout: Int
+    protected open val defaultContainer:Int=R.layout.container
     var mParent: ContainerActivity? = null
     val mViewSwitcher by lazy {
         view?.findViewById<ViewSwitcher>(R.id.vsRoot)
@@ -41,7 +42,7 @@ abstract class AppFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.container, container, false)
+        val root = inflater.inflate(defaultContainer, container, false)
         val flContent = root?.findViewById<FrameLayout>(R.id.flContainer)
         inflater.inflate(layout, flContent, true)
         return root
@@ -122,6 +123,11 @@ abstract class AppFragment : Fragment() {
                 is StatusError -> error(it.msg)
             }
         }
+        return viewModel
+    }
+
+    inline fun <reified D : AppViewModel> activityViewModel(): D {
+        val viewModel = ViewModelProviders.of(mParent!!).get(D::class.java)
         return viewModel
     }
 }

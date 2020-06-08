@@ -40,25 +40,6 @@ val PORT_FILE=65515
 const val TEXT=1
 const val BINNARY= 2
 
-/*文件状态*/
-/*原始状态，即本机文件*/
-const val STATE_ORIGIN=0
-
-/*选中状态*/
-const val STATE_CHECK=1
-
-/*准备传输状态*/
-const val STATE_WAIT=2
-
-/*传输中*/
-const val STATE_TRANSPORT=3
-
-/*传输成功状态*/
-const val STATE_SUCCESS=4
-
-/*传输失败状态*/
-const val STATE_FAILED=5
-
 fun Long.formatDate(parttern:String="MM/dd/yyyy HH:mm"):String{
     val formater=SimpleDateFormat.getDateInstance() as SimpleDateFormat
     formater.applyPattern(parttern)

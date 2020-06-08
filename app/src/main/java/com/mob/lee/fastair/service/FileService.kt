@@ -15,7 +15,6 @@ import com.mob.lee.fastair.io.SocketService
 import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
-import com.mob.lee.fastair.model.STATE_SUCCESS
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.async
@@ -138,9 +137,9 @@ class FileService : SocketSerice() {
         file ?: return
         val target = if (null == record) {
             updateStorage(file.absolutePath)
-            Record(file.lastModified(), file.length(), file.lastModified(), file.path, STATE_SUCCESS, state.duration)
+            Record(file.lastModified(), file.length(), file.lastModified(), file.path, Record.STATE_SUCCESS, state.duration)
         } else {
-            record.state = STATE_SUCCESS
+            record.state =  Record.STATE_SUCCESS
             record
         }
         mScope.async {
