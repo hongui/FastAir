@@ -5,11 +5,12 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.mob.lee.fastair.fragment.ContentPickFragment
-import com.mob.lee.fastair.repository.RecordRep
+import com.mob.lee.fastair.repository.StorageDataSource
 
 class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    val pagers = RecordRep.categories()
+    val pagers = StorageDataSource.categories()
     val map = HashMap<Int, Fragment>()
 
     override fun getItemCount() = pagers.size
@@ -25,12 +26,12 @@ class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     }
 
     companion object {
-        fun bind(fragment: Fragment, viewPager: ViewPager2, tab: TabLayout) {
+        fun bind(fragment: Fragment, viewPager: ViewPager2, tabs: TabLayout) {
             val adapter = PageAdapter(fragment)
             viewPager.adapter = adapter
 
-            val mediator = TabLayoutMediator(tab, viewPager) { _, position ->
-                tab.text = adapter.pagers[position]
+            val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
+                tab.text = fragment.getString(adapter.pagers[position].title)
             }
             mediator.attach()
         }

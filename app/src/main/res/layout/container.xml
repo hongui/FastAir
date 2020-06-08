@@ -8,12 +8,16 @@
     <ViewSwitcher
         android:id="@+id/vsRoot"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:inAnimation="@anim/fade_in"
+        android:outAnimation="@anim/fade_out">
 
         <ViewSwitcher
             android:id="@+id/vsContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:inAnimation="@anim/fade_in"
+            android:outAnimation="@anim/fade_out">
 
             <FrameLayout
                 android:id="@+id/flContainer"

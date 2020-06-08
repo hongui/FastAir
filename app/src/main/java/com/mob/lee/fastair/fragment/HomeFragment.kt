@@ -13,7 +13,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.PageAdapter
@@ -38,13 +38,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
     override val layout: Int = R.layout.fragment_home
 
-
+    override val defaultContainer: Int=R.layout.container_notoolbar
 
     override fun setting() {
-        homeContent?.adapter = PageAdapter(this)
-        homeContent.
-        homeTabs.setupWithViewPager(homeContent)
-
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
         toolbar?.title = getString(R.string.app_description)
         toggle.syncState()
@@ -64,10 +60,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         })
 
-        homeContent.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+        homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(position)
-                permissionCheck()
+                viewModel.updateLocation(mParent,position)
             }
         })
 
@@ -82,15 +77,17 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         toolOperation.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_receive))
 
         toolSwap.setOnClickListener {
-            val textId = if (viewModel.reverse()) {
-                R.string.aes
-            } else {
+            viewModel.reverse()
+            val textId = if (viewModel.isDes) {
                 R.string.des
+            } else {
+                R.string.aes
             }
             toolSwap.setText(textId)
         }
         toolAll.setOnClickListener {
-            val textId = if (viewModel.select()) {
+            viewModel.selectAll()
+            val textId = if (viewModel.checkedRecords().isNotEmpty()) {
                 R.string.unSelectAll
             } else {
                 R.string.selectAll
@@ -118,10 +115,13 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             mParent?.dialog {
                 setMessage(R.string.deleteTips)
                         .setPositiveButton(R.string.delete) { dialog, which ->
-                            viewModel.deleteSelected()
+                            viewModel.delete(mParent)
                         }
             }
         }
+
+        PageAdapter.bind(this,homeContent,homeTabs)
+
         permissionCheck()
     }
 
@@ -185,7 +185,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             if (permission == PackageManager.PERMISSION_DENIED) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
             } else {
-                viewModel.updateLocation(0)
+                viewModel.updateLocation(mParent,0)
             }
         }
     }

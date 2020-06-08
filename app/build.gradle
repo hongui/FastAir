@@ -71,6 +71,7 @@ dependencies {
     implementation dependencyList.kotlinreflect
     implementation dependencyList.lifecycle
     implementation dependencyList.lifecycleruntime
+    implementation dependencyList.material
     implementation dependencyList.multidex
     implementation dependencyList.navigation
     implementation dependencyList.navigationui
