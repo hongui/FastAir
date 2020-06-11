@@ -184,8 +184,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             val permission = ContextCompat.checkSelfPermission(mParent!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permission == PackageManager.PERMISSION_DENIED) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
-            } else {
-                viewModel.updateLocation(mParent,0)
             }
         }
     }

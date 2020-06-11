@@ -5,70 +5,61 @@ import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.StorageDataSource
 import kotlinx.coroutines.channels.Channel
-import java.io.File
 
-class HomeViewModel :AppViewModel(){
-    var isDes=true
-    val recordLiveData=MutableLiveData<Record>()
-    val hasSelectedLiveData=MutableLiveData<Boolean>()
-    var position: Int = 0
+class HomeViewModel : AppViewModel() {
+    var isDes = true
+    val recordLiveData = MutableLiveData<Record>()
+    val hasSelectedLiveData = MutableLiveData<Boolean>()
+    var position: Int = -1
     val records = ArrayList<Record>()
 
     val dataSource by lazy {
         StorageDataSource()
     }
 
-    var currentChannel: Channel<Record>?=null
+    var currentChannel: Channel<Record>? = null
 
-    fun parseClip(){
+    fun parseClip() {
 
     }
 
-    fun updateLocation(context:Context?,location:Int){
-        position=location
-        fetch(context)
+    fun updateLocation(context: Context?, location: Int) {
+        if (position != location) {
+            position = location
+            fetch(context)
+        }
     }
 
     fun fetch(context: Context?) = async(recordLiveData) {
-        recordLiveData.value=null
         currentChannel?.cancel()
         records.clear()
 
         val channel = dataSource.fetch(context, position)
-        currentChannel=channel
+        currentChannel = channel
         for (r in channel) {
-            value=r
+            next(r)
             records.add(r)
         }
     }
 
 
-    inline fun <D:Comparable<D>>sortBy(crossinline selector: (Record) -> D) = async(recordLiveData) {
-        if(isDes) {
+    inline fun <D : Comparable<D>> sortBy(crossinline selector: (Record) -> D) = async(recordLiveData) {
+        if (isDes) {
             records.sortByDescending(selector)
-        }else{
+        } else {
             records.sortBy(selector)
         }
         for (r in records) {
-            value=r
+            next(r)
         }
     }
 
 
     fun reverse() = async(recordLiveData) {
-        isDes=!isDes
+        isDes = !isDes
         records.reverse()
         for (r in records) {
-            value=r
-        }
-    }
-
-    fun toggleState(position:Int) {
-        val record= records.getOrNull(position)
-        record?.state=if(Record.STATE_CHECK==record?.state){
-            Record.STATE_ORIGIN
-        }else{
-            Record.STATE_CHECK
+            next(r)
         }
     }
 
@@ -76,37 +67,37 @@ class HomeViewModel :AppViewModel(){
         val checkedRecords = checkedRecords()
         for (r in checkedRecords) {
             val removed = dataSource.delete(context, r)
-            if(removed){
+            if (removed) {
                 records.remove(r)
             }
         }
     }
 
-    fun selectAll()=async(recordLiveData){
-        val hasChecked=checkedRecords().isNotEmpty()
+    fun selectAll() = async(recordLiveData) {
+        val hasChecked = checkedRecords().isNotEmpty()
         records.forEach {
-            it.state=if(hasChecked){
+            it.state = if (hasChecked) {
                 Record.STATE_ORIGIN
-            }else{
+            } else {
                 Record.STATE_CHECK
             }
-            value=it
+            next(it)
         }
     }
 
     fun checkedRecords(): List<Record> {
-        return records.filter { Record.STATE_CHECK==it.state }
+        return records.filter { Record.STATE_CHECK == it.state }
     }
 
-    fun sortByName(){
+    fun sortByName() {
         sortBy { it.name }
     }
 
-    fun sortBySize(){
+    fun sortBySize() {
         sortBy { it.size }
     }
 
-    fun sortByDate(){
+    fun sortByDate() {
         sortBy { it.date }
     }
 }

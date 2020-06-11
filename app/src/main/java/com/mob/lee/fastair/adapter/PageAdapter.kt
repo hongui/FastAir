@@ -11,23 +11,20 @@ import com.mob.lee.fastair.repository.StorageDataSource
 
 class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     val pagers = StorageDataSource.categories()
-    val map = HashMap<Int, Fragment>()
-
     override fun getItemCount() = pagers.size
 
     override fun createFragment(position: Int): Fragment {
-        return map.getOrPut(position, {
-            ContentPickFragment().apply {
-                arguments = Bundle().apply {
-                    putInt("position", position)
-                }
+        return ContentPickFragment().apply {
+            arguments = Bundle().apply {
+                putInt("position", position)
             }
-        })
+        }
     }
 
     companion object {
         fun bind(fragment: Fragment, viewPager: ViewPager2, tabs: TabLayout) {
             val adapter = PageAdapter(fragment)
+            viewPager.offscreenPageLimit = 1
             viewPager.adapter = adapter
 
             val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->

@@ -7,9 +7,7 @@ data class DataWrap<D>(var code:Int= SUCCESS, var data:D?=null, var msg:String?=
     companion object{
         const val SUCCESS=0
         const val ERROR=1
-        const val LOADING=2
         fun <D> success(data:D?)=DataWrap(SUCCESS, data)
         fun <D> error(msg: String?=null,code: Int= ERROR)=DataWrap<D>(ERROR, msg=msg)
-        fun <D> loading(msg: String?)=DataWrap<D>(LOADING, msg=msg)
     }
 }

@@ -103,6 +103,7 @@ class StorageDataSource : DataSource {
                     d?.let {
                         channel.send(it)
                     }
+                    delay(DELAY)
                 }
             }
             channel.close()
