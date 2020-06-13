@@ -19,7 +19,7 @@ class ContentPickFragment : AppFragment() {
     override fun setting() {
         val viewModel = (parentFragment as AppFragment).viewModel<HomeViewModel>()
 
-        val adapter=FileAdapter()
+        val adapter=FileAdapter(viewModel)
         pickContent.layoutManager = LinearLayoutManager(context)
 
         viewModel.stateLiveData.observe(this, Observer {

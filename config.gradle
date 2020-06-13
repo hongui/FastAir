@@ -5,7 +5,7 @@ ext.appVersion = appVersion
 
 def sdk = [:]
 sdk.mins = 16
-sdk.target = 29
+sdk.target = 28
 sdk.compile = 29
 ext.sdk = sdk
 

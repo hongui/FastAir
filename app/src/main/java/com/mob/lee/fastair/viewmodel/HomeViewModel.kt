@@ -12,6 +12,7 @@ class HomeViewModel : AppViewModel() {
     val hasSelectedLiveData = MutableLiveData<Boolean>()
     var position: Int = -1
     val records = ArrayList<Record>()
+    val selectedRecords = HashSet<Record>()
 
     val dataSource by lazy {
         StorageDataSource()
@@ -71,6 +72,11 @@ class HomeViewModel : AppViewModel() {
                 records.remove(r)
             }
         }
+        update()
+    }
+
+    fun update()=async(recordLiveData){
+        records.forEach { next(it) }
     }
 
     fun selectAll() = async(recordLiveData) {
@@ -85,8 +91,19 @@ class HomeViewModel : AppViewModel() {
         }
     }
 
-    fun checkedRecords(): List<Record> {
-        return records.filter { Record.STATE_CHECK == it.state }
+    fun toggleState(record: Record){
+        record.state=if(Record.STATE_CHECK==record.state){
+            selectedRecords.remove(record)
+            Record.STATE_ORIGIN
+        }else{
+            selectedRecords.add(record)
+            Record.STATE_CHECK
+        }
+        hasSelectedLiveData.value=selectedRecords.isNotEmpty()
+    }
+
+    fun checkedRecords(): Set<Record> {
+        return selectedRecords
     }
 
     fun sortByName() {

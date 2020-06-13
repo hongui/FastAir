@@ -1,7 +1,9 @@
 package com.mob.lee.fastair.adapter
 
 import android.util.SparseArray
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
@@ -87,5 +89,9 @@ class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             views.put(id, v)
         }
         return v as V
+    }
+
+    companion object{
+        fun create(parent: ViewGroup, layout: Int)=AppViewHolder(LayoutInflater.from(parent.context).inflate(layout,parent,false))
     }
 }
