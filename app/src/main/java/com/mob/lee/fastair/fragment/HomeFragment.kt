@@ -10,12 +10,16 @@ import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.navigation.NavigationView
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
@@ -38,7 +42,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
     override val layout: Int = R.layout.fragment_home
 
-    override val defaultContainer: Int=-1
+    override val defaultContainer: Int = -1
 
     override fun setting() {
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
@@ -60,13 +64,13 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         })
 
-        homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+        homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(mParent,position)
+                viewModel.updateLocation(mParent, position)
             }
         })
 
-        observe(viewModel.hasSelectedLiveData){
+        observe(viewModel.hasSelectedLiveData) {
             val id = if (true == it) {
                 R.drawable.ic_action_send
             } else {
@@ -113,14 +117,22 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 return@setOnClickListener
             }
             mParent?.dialog {
-                setMessage(R.string.deleteTips)
-                        .setPositiveButton(R.string.delete) { dialog, which ->
+                setTitle(R.string.deleteFileList)
+                val rv = layoutInflater.inflate(R.layout.recyclerview, null) as RecyclerView
+                rv.layoutManager = LinearLayoutManager(mParent)
+                rv.adapter = DeleteAdapter(viewModel)
+                setView(rv)
+                        .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.delete(mParent)
+                            viewModel.update()
+                        }
+                        .setNegativeButton(R.string.cancel) { _, _ ->
+                            viewModel.update()
                         }
             }
         }
 
-        PageAdapter.bind(this,homeContent,homeTabs)
+        PageAdapter.bind(this, homeContent, homeTabs)
 
         permissionCheck()
     }

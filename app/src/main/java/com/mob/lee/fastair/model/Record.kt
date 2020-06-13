@@ -16,6 +16,7 @@ data class Record(@PrimaryKey var id: Long, @ColumnInfo var size: Long, @ColumnI
             return path.substringAfterLast(File.separator)
         }
 
+
     companion object{
         /*文件状态*/
         /*原始状态，即本机文件*/
@@ -36,4 +37,25 @@ data class Record(@PrimaryKey var id: Long, @ColumnInfo var size: Long, @ColumnI
         /*传输失败状态*/
         const val STATE_FAILED=5
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Record
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return path
+    }
+
+
 }
