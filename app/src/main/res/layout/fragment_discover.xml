@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <include
-        layout="@layout/toolbar"/>
-
-    <com.mob.lee.fastair.view.DiscoverView
+<com.mob.lee.fastair.view.DiscoverView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/discoverView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/dp56"/>
-</RelativeLayout>
+        android:layout_height="match_parent"/>
