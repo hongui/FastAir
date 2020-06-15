@@ -2,7 +2,11 @@ package com.mob.lee.fastair.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import com.mob.lee.fastair.R
+import com.mob.lee.fastair.model.DataLoad
+import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
+import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
 import kotlinx.coroutines.channels.Channel
 
@@ -17,7 +21,9 @@ class HomeViewModel : AppViewModel() {
     val dataSource by lazy {
         StorageDataSource()
     }
-
+    val database by lazy {
+        DataBaseDataSource()
+    }
     var currentChannel: Channel<Record>? = null
 
     fun parseClip() {
@@ -116,5 +122,18 @@ class HomeViewModel : AppViewModel() {
 
     fun sortByDate() {
         sortBy { it.date }
+    }
+
+    fun write(context: Context?)=asyncWithWrap<String>{
+
+        database.recordDao(context){
+            val list=checkedRecords()
+            if(list.isEmpty()){
+                DataWrap.error(context?.getString(R.string.tip_have_no_file))
+            }else {
+                insert(list)
+                DataWrap.success("")
+            }
+        }
     }
 }
