@@ -39,4 +39,8 @@
         android:id="@+id/textFragment"
         android:name="com.mob.lee.fastair.fragment.TextFragment"
         android:label="TextFragment" />
+    <fragment
+        android:id="@+id/beforeFragment"
+        android:name="com.mob.lee.fastair.fragment.BeforeFragment"
+        android:label="BeforeFragment" />
 </navigation>

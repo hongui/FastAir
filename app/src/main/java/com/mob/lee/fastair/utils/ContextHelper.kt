@@ -37,7 +37,7 @@ fun Context.errorToast(message : Int) {
     errorToast(msg)
 }
 
-fun Context.errorToast(message : String) {
+fun Context.errorToast(message : String?) {
     toast(message, R.drawable.bg_toast_failed)
 }
 

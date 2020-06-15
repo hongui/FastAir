@@ -19,7 +19,7 @@ import java.io.File
  * @CreateDate:     2020/6/11 16:54
  * @Description:    无
  */
-class FileAdapter(val viewModel: HomeViewModel) : AppListAdapter<Record>(R.layout.item_file,RecordDiff()) {
+class FileAdapter(val viewModel: HomeViewModel?=null) : AppListAdapter<Record>(R.layout.item_file,RecordDiff()) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, record: Record) {
         holder.text(R.id.item_file_name, record.name)
         holder.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(holder.itemView.context))
@@ -29,7 +29,7 @@ class FileAdapter(val viewModel: HomeViewModel) : AppListAdapter<Record>(R.layou
         }
 
         holder.itemView.setOnClickListener {
-            viewModel.toggleState(record)
+            viewModel?.toggleState(record)
             notifyItemChanged(position)
         }
         holder.itemView.setOnLongClickListener {

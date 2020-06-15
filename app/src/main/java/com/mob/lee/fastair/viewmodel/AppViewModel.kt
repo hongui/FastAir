@@ -2,8 +2,10 @@ package com.mob.lee.fastair.viewmodel
 
 import androidx.lifecycle.*
 import com.mob.lee.fastair.model.DataLoad
+import com.mob.lee.fastair.model.DataWrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 open class AppViewModel : ViewModel() {
     val stateLiveData = DataLoad<Any>()
@@ -27,8 +29,7 @@ open class AppViewModel : ViewModel() {
     }*/
 
     fun <D> async(liveData: MutableLiveData<D>? = null, action: suspend DataLoad<D>.() -> Unit): LiveData<D> {
-        val targetLiveData = liveData ?: MutableLiveData<D>()
-        targetLiveData.value = null
+        val targetLiveData = liveData.apply { this?.value=null } ?: MutableLiveData<D>()
 
         val dataLoad = DataLoad<D>()
 
@@ -43,20 +44,28 @@ open class AppViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                action(dataLoad)
-                when (dataLoad.code) {
-                    DataLoad.ERROR -> dataLoad.error(null)
-                    DataLoad.LOADING -> dataLoad.empty()
-                    DataLoad.NEXT -> dataLoad.complete()
+                val job=launch(Dispatchers.IO) { action(dataLoad) }
+                job.join()
+                withContext(this.coroutineContext){
+                    when (dataLoad.code) {
+                        DataLoad.LOADING -> dataLoad.empty()
+                        DataLoad.NEXT -> dataLoad.complete()
+                    }
+                    dataLoad.removeObserver(observer)
                 }
-
-                dataLoad.removeObserver(observer)
             } catch (e: Exception) {
-                dataLoad.error(e.message)
+                withContext(coroutineContext) {
+                    dataLoad.error(e.message)
+                }
             } finally {
                 stateLiveData.value = null
             }
         }
         return targetLiveData
+    }
+
+    fun <D> asyncWithWrap(liveData: MutableLiveData<DataWrap<D>>? = null, action: suspend () -> DataWrap<D>): LiveData<DataWrap<D>> =async(liveData){
+        val data = action()
+        next(data)
     }
 }

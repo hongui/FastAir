@@ -36,10 +36,10 @@ interface RecordDao{
     fun update(record:Record)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg records:Record)
+    fun insert(record:Record)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(records:List<Record>)
+    fun insert(records:Collection<Record>)
 
     @Delete()
     fun clearWait(records : List<Record>)

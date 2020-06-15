@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:local="zh-cn">
     <string name="app_name">快传</string>
     <string name="app_description">体验飞起来的速度</string>
+    <string name="wait_for_transport_file">待传输列表</string>
     <string name="trans_ing">正在传送</string>
     <string name="file_trans">文件收发</string>
     <string name="scan_tips">正在扫描周围设备，请稍等...</string>
@@ -26,6 +27,7 @@
     <string name="toast.connectSuccess">连接成功,正在跳转，请稍等...</string>
     <string name="toast.failedOpen">找不到合适的程序处理文件，文件打开失败</string>
     <string name="toast.failedFinder">查找出错</string>
+    <string name="tip_have_no_file">没有选择文件，无法发送</string>
     <string name="tip_error_p2p_unsupport">很抱歉，该设备不支持Wi-Fi P2P服务，暂不能使用！</string>
     <string name="tip_error_p2p_busy">设备正在处理请求，请稍等</string>
     <string name="tip_error_p2p_inter">服务暂不可用,正在重启...</string>

@@ -25,7 +25,9 @@ import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
+import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
+import com.mob.lee.fastair.utils.toast
 import com.mob.lee.fastair.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -132,6 +134,16 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         }
 
+        toolOperation.setOnClickListener {
+            observe(viewModel.write(context)) {
+                it?:return@observe
+                if (it.isSuccess()) {
+                    navigation(R.id.beforeFragment)
+                } else {
+                    mParent?.errorToast(it.msg)
+                }
+            }
+        }
         PageAdapter.bind(this, homeContent, homeTabs)
 
         permissionCheck()
