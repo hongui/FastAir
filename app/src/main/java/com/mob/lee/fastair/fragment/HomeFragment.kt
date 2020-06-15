@@ -29,8 +29,6 @@ import kotlinx.android.synthetic.main.fragment_home.*
  * Created by Andy on 2017/6/7.
  */
 class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListener {
-    val PERMISSION_CODE = 12
-    val INTENT_CODE = 123
 
     val viewModel by lazy {
         viewModel<HomeViewModel>()
@@ -62,7 +60,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(mParent,position)
+                viewModel.updateLocation(this@HomeFragment,position)
             }
         })
 
@@ -121,8 +119,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         }
 
         PageAdapter.bind(this,homeContent,homeTabs)
-
-        permissionCheck()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -172,40 +168,4 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (INTENT_CODE == requestCode) {
-            permissionCheck()
-        }
-    }
-
-    fun permissionCheck() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val permission = ContextCompat.checkSelfPermission(mParent!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            if (permission == PackageManager.PERMISSION_DENIED) {
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_CODE)
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (PERMISSION_CODE == requestCode && grantResults.isNotEmpty()) {
-            if (shouldShowRequestPermissionRationale(permissions[0])) {
-                mParent?.dialog {
-                    setMessage(R.string.viewTips)
-                            .setPositiveButton(R.string.goTurnOn) { _, _ ->
-                                openSetting()
-                            }
-                }
-            }
-        }
-    }
-
-    fun openSetting() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", mParent?.packageName, null)
-        intent.data = uri
-        startActivityForResult(intent, INTENT_CODE)
-    }
 }

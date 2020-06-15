@@ -12,7 +12,7 @@ import com.mob.lee.fastair.R
 import java.io.File
 import java.util.ArrayList
 
-fun Context.getPaths(file : File?) : List<File> {
+fun Context.getPaths(file: File?): List<File> {
     var path = file
     val list = ArrayList<File>()
     if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
@@ -20,7 +20,7 @@ fun Context.getPaths(file : File?) : List<File> {
             path = Environment.getExternalStorageDirectory()
         }
         val files = path?.listFiles { dir, name ->
-            dir.isDirectory && ! name.startsWith(".")
+            dir.isDirectory && !name.startsWith(".")
         }
         files?.sortBy { it.name.toLowerCase() }
         files?.let {
@@ -32,22 +32,22 @@ fun Context.getPaths(file : File?) : List<File> {
     return list
 }
 
-fun Context.updateStorage(path : String?) {
+fun Context.updateStorage(path: String?) {
     path ?: return
     val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
     intent.data = Uri.fromFile(File(path))
     this.sendBroadcast(intent)
 }
 
-fun Context.openFile(file : String) {
+fun Context.openFile(file: String) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        val uri= FileProvider.getUriForFile(
+        val uri = FileProvider.getUriForFile(
                 this,
                 "${this.getPackageName()}.FileProvider",
                 File(file))
-        this.grantUriPermission(this.packageName,uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        this.grantUriPermission(this.packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         uri
     } else {
         Uri.fromFile(File(file))
@@ -55,34 +55,35 @@ fun Context.openFile(file : String) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     try {
         this.startActivity(intent)
-    } catch (e : ActivityNotFoundException) {
+    } catch (e: ActivityNotFoundException) {
         errorToast(R.string.no_application_find)
     }
 }
 
-fun Context.createFile(name : String) : File {
-    val path=readDownloadPath()
+fun Context.createFile(name: String): File {
+    val path = readDownloadPath()
     var file = File(path, name)
-    val key=resources.getString(R.string.key_default_rewrite)
-    val overrite= PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key,true)
-    if(file.exists()&&!overrite){
-        var i=0
-        val tempName=file.nameWithoutExtension
-        val suf=file.extension
-        while (file.exists()){
-            file= File(path,"$tempName($i).$suf")
+    val key = resources.getString(R.string.key_default_rewrite)
+    val overrite = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key, true)
+    if (file.exists() && !overrite) {
+        var i = 0
+        val tempName = file.nameWithoutExtension
+        val suf = file.extension
+        while (file.exists()) {
+            file = File(path, "$tempName($i).$suf")
             i++
         }
     }
     return file
 }
 
-fun Context.readDownloadPath() : String {
-    val key=resources.getString(R.string.key_default_download)
-    return PreferenceManager.getDefaultSharedPreferences(this).getString(key, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)?:""
+fun Context.readDownloadPath(): String {
+    val key = resources.getString(R.string.key_default_download)
+    return PreferenceManager.getDefaultSharedPreferences(this).getString(key, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+            ?: ""
 }
 
-fun Context.writeDownloadPath(path : String) {
+fun Context.writeDownloadPath(path: String) {
     val infos = getSharedPreferences("infos", Context.MODE_PRIVATE)
     infos.edit().putString("downloadPath", path).apply()
 }
