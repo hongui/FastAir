@@ -56,7 +56,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
-        pickFirst 'META-INF/*'
+        exclude 'META-INF/*'
     }
 }
 

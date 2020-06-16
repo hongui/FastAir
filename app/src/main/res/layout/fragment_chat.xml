@@ -6,9 +6,6 @@
     android:background="@color/material_blue_grey_50"
     android:orientation="vertical">
 
-    <include
-        layout="@layout/toolbar"/>
-
     <LinearLayout
         android:id="@+id/fragment_chat_edit"
         android:layout_width="match_parent"
