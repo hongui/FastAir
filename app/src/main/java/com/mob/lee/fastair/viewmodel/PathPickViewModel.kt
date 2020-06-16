@@ -15,39 +15,54 @@ import java.io.File
  * @Description:    无
  */
 class PathPickViewModel : SharedPreferenceViewModel() {
-    private val sharedPreferenceName="info"
-    protected val sharedPreferenceKey="DownloadPath"
-    private var currentPath: File? = null
-    var mCurrentPositionLiveData=MutableLiveData<Int>()
-    var pathLiveData=MutableLiveData<File>()
+    private val sharedPreferenceName = "info"
+    var currentPath: File? = null
+    var currentPositionLiveData = MutableLiveData<Int>()
+    var pathLiveData = MutableLiveData<List<File>>()
 
-    fun updatePath(context: Context?,path:File?=null) {
-        readPreference(context,sharedPreferenceName){
-            currentPath = path?:File(getString(sharedPreferenceKey,""))
-            getPaths(currentPath)
+    fun updatePath(context: Context?, path: File? = null, pos: Int? = null) {
+        context ?: return
+
+        currentPath = path ?: if (null == currentPath) {
+            Environment.getExternalStorageDirectory()
+        } else {
+            var distance = (currentPositionLiveData.value ?: 0) - (pos ?: 0)
+            var file: File? = currentPath
+
+            while (distance > 0) {
+                file = file?.parentFile
+                distance--
+            }
+            file
         }
+
+        currentPositionLiveData.value = if (null != path && null == currentPositionLiveData.value) {
+            0
+        } else if (null != path && null != currentPositionLiveData.value) {
+            currentPositionLiveData.value!! + 1
+        } else {
+            currentPositionLiveData.value
+        }
+
+        getPaths()
     }
 
-    fun getPaths(path:File?=null)=async<File> {
+    fun getPaths() = async(pathLiveData) {
         if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-            var target=path
-            if (null == path) {
-                target = Environment.getExternalStorageDirectory()
-            }
-            val files = target?.listFiles { dir, name ->
-                dir.isDirectory && !name.startsWith(".")
+            val files = currentPath?.listFiles { dir, name ->
+                val file = File(dir, name)
+                file.isDirectory && !file.isHidden
             }
             files?.sortBy { it.name.toLowerCase() }
-            files?.forEach {
-                next(it)
-            }
+            next(files?.toList())
         }
     }
 
-    fun submit(fragment: AppFragment){
-        writePreference(fragment.requireContext(),sharedPreferenceName){
-            putString(sharedPreferenceKey,currentPath?.absolutePath)
-            fragment.mParent?.successToast(fragment.getString(R.string.path_setting_success,currentPath?.getAbsolutePath()))
+    fun submit(fragment: AppFragment) {
+        writePreference(fragment.requireContext(), sharedPreferenceName) {
+            val key = fragment.getString(R.string.key_default_download)
+            putString(key, currentPath?.absolutePath)
+            fragment.mParent?.successToast(fragment.getString(R.string.path_setting_success, currentPath?.getAbsolutePath()))
             fragment.mParent?.onBackPressed()
         }
     }

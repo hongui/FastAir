@@ -65,7 +65,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(this@HomeFragment,position)
+                viewModel.updateLocation(this@HomeFragment, position)
             }
         })
 
@@ -133,7 +133,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         toolOperation.setOnClickListener {
             observe(viewModel.write(context)) {
-                it?:return@observe
+                it ?: return@observe
                 if (it.isSuccess()) {
                     navigation(R.id.beforeFragment)
                 } else {
@@ -143,8 +143,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         }
         PageAdapter.bind(this, homeContent, homeTabs)
 
-        permissionCheck()
-        PageAdapter.bind(this,homeContent,homeTabs)
+        PageAdapter.bind(this, homeContent, homeTabs)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
