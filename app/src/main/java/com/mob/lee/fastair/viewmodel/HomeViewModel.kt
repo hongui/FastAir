@@ -1,13 +1,20 @@
 package com.mob.lee.fastair.viewmodel
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.model.DataWrap
+import com.mob.lee.fastair.R
+import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
+import com.mob.lee.fastair.utils.dialog
 import kotlinx.coroutines.channels.Channel
 
 class HomeViewModel : AppViewModel() {
@@ -30,10 +37,26 @@ class HomeViewModel : AppViewModel() {
 
     }
 
-    fun updateLocation(context: Context?, location: Int) {
+    fun updateLocation(fragment: AppFragment, location: Int) {
         if (position != location) {
             position = location
-            fetch(context)
+            withPermission(fragment, Manifest.permission.WRITE_EXTERNAL_STORAGE, action = { _, hasPermission ->
+                if (hasPermission) {
+                    fetch(fragment.context)
+                } else {
+                    fragment.mParent?.dialog {
+                        setMessage(R.string.no_permission_to_scan)
+                                .setPositiveButton(R.string.turn_on) { _, _ ->
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    val uri = Uri.fromParts("package", fragment.context?.packageName, null)
+                                    intent.data = uri
+                                    fragment.startActivityForResult(intent, 123)
+                                }.setNegativeButton(R.string.exit) { _, _ ->
+                                    fragment.mParent?.finish()
+                                }
+                    }
+                }
+            })
         }
     }
 

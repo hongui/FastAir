@@ -18,6 +18,7 @@ import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.getPaths
 import com.mob.lee.fastair.utils.readDownloadPath
 import com.mob.lee.fastair.utils.successToast
+import com.mob.lee.fastair.viewmodel.PathPickViewModel
 import kotlinx.android.synthetic.main.fragment_path_pick.*
 import java.io.File
 
@@ -27,15 +28,16 @@ import java.io.File
  */
 class PathPickFragment:AppFragment(){
 
-    private var mCurrentPath: File? = null
-
     override val layout: Int= R.layout.fragment_path_pick
 
+    val viewModel by lazy {
+        viewModel<PathPickViewModel>()
+    }
     override fun setting() {
         setHasOptionsMenu(true)
+        title(R.string.choose_save_path)
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            mCurrentPath = File(context?.readDownloadPath())
             pathPickContent.layoutManager=LinearLayoutManager(context)
             pathPickContent.adapter=(Adapter(MultiDataHolder<File>(R.layout.item_path){position, data, viewHolder ->
                 data?:return@MultiDataHolder
@@ -46,30 +48,43 @@ class PathPickFragment:AppFragment(){
                 viewHolder.text(R.id.item_path_name,data.name)
                 viewHolder.text(R.id.item_path_extra,data.lastModified().formatDate())
                 viewHolder.itemView.setOnClickListener {
-                    updateContent(data)
+                    viewModel.updatePath(mParent,data)
                 }
             }))
-            updateContent(null)
             pathPickTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabReselected(tab: TabLayout.Tab?) {
-                    tab?.let {
-                        updateContent(File(it.contentDescription.toString()),it.position)
-                    }
+                    tab?.position?.let { viewModel.mCurrentPositionLiveData.value=it }
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {
                 }
 
                 override fun onTabSelected(tab: TabLayout.Tab?) {
-                    tab?.let {
-                        updateContent(File(it.contentDescription.toString()),it.position)
-                    }
+                    tab?.position?.let { viewModel.mCurrentPositionLiveData.value=it }
                 }
 
             })
+            viewModel.updatePath(mParent)
         } else {
             mParent?.errorToast(R.string.storage_not_ready)
             mParent?.onBackPressed()
+        }
+
+        observe(viewModel.mCurrentPositionLiveData){
+            if(it==pathPickTab.tabCount) {
+                val path=viewModel.
+                pathPickTab.addTab(pathPickTab.newTab().setText(mCurrentPath?.getName() ?: "主目录").setContentDescription(mCurrentPath?.getAbsolutePath()?:Environment.getExternalStorageDirectory().absolutePath))
+            }else{
+                for (i in pathPickTab.getTabCount() - 1 downTo position + 1) {
+                    pathPickTab.removeTabAt(i)
+                }
+            }
+            pathPickTab.setScrollPosition(pathPickTab.tabCount-1, 0F, true)
+        }
+
+        observe(viewModel.pathLiveData){
+            val adapter=pathPickContent.adapter as Adapter
+            adapter.clearAndAdd(listOf(it))
         }
     }
 
@@ -79,33 +94,9 @@ class PathPickFragment:AppFragment(){
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.getItemId() == R.id.menu_ok) {
-            if (null == mCurrentPath) {
-                mCurrentPath = File(context?.readDownloadPath())
-            }
-            mCurrentPath?.let {
-                val key=getString(R.string.key_default_download)
-                PreferenceManager.getDefaultSharedPreferences(context)
-                        .edit()?.putString(key,it.absolutePath)?.apply()
-                mParent?.successToast(getString(R.string.path_setting_success,it.getAbsolutePath()))
-                mParent?.onBackPressed()
-                return true
-            }
+            viewModel.submit(this)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun updateContent(newFile: File?,position:Int=pathPickTab.tabCount) {
-        mCurrentPath = newFile
-        val paths = context?.getPaths(mCurrentPath)?: emptyList()
-        val adapter=pathPickContent.adapter as Adapter
-        adapter.clearAndAdd(paths)
-        if(position==pathPickTab.tabCount) {
-            pathPickTab.addTab(pathPickTab.newTab().setText(mCurrentPath?.getName() ?: "主目录").setContentDescription(mCurrentPath?.getAbsolutePath()?:Environment.getExternalStorageDirectory().absolutePath))
-        }else{
-            for (i in pathPickTab.getTabCount() - 1 downTo position + 1) {
-                pathPickTab.removeTabAt(i)
-            }
-        }
-        pathPickTab.setScrollPosition(pathPickTab.tabCount-1, 0F, true)
-    }
 }
