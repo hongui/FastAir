@@ -67,6 +67,7 @@
     <string name="history">传输历史</string>
     <string name="setting">设置</string>
     <string name="choose_save_path">选择保存路径</string>
+    <string name="home_dir">主目录</string>
 
     <!--dialog-->
     <string name="deleteTips">该操作将会删除目前所选的全部文件，删除后不可恢复</string>

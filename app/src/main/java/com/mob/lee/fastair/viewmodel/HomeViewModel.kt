@@ -7,9 +7,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.model.DataWrap
-import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource

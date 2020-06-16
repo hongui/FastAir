@@ -1,17 +1,14 @@
 package com.mob.lee.fastair.viewmodel
 
-import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.mob.lee.fastair.PermissionFragment
-import com.mob.lee.fastair.R
 import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.model.DataWrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 open class AppViewModel : ViewModel() {
     val stateLiveData = DataLoad<Any>()
@@ -35,7 +32,7 @@ open class AppViewModel : ViewModel() {
     }*/
 
     fun <D> async(liveData: MutableLiveData<D>? = null, action: suspend DataLoad<D>.() -> Unit): LiveData<D> {
-        val targetLiveData = liveData.apply { this?.value=null } ?: MutableLiveData<D>()
+        val targetLiveData = liveData.apply { this?.value = null } ?: MutableLiveData<D>()
 
         val dataLoad = DataLoad<D>()
 
@@ -50,19 +47,16 @@ open class AppViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                val job=launch(Dispatchers.IO) { action(dataLoad) }
-                job.join()
-                withContext(this.coroutineContext){
-                    when (dataLoad.code) {
-                        DataLoad.LOADING -> dataLoad.empty()
-                        DataLoad.NEXT -> dataLoad.complete()
-                    }
-                    dataLoad.removeObserver(observer)
+                action(dataLoad)
+
+                when (dataLoad.code) {
+                    DataLoad.LOADING -> dataLoad.empty()
+                    DataLoad.NEXT -> dataLoad.complete()
                 }
+                dataLoad.removeObserver(observer)
             } catch (e: Exception) {
-                withContext(coroutineContext) {
-                    dataLoad.error(e.message)
-                }
+                dataLoad.error(e.message)
+
             } finally {
                 stateLiveData.value = null
             }
@@ -70,7 +64,7 @@ open class AppViewModel : ViewModel() {
         return targetLiveData
     }
 
-    fun <D> asyncWithWrap(liveData: MutableLiveData<DataWrap<D>>? = null, action: suspend () -> DataWrap<D>): LiveData<DataWrap<D>> =async(liveData){
+    fun <D> asyncWithWrap(liveData: MutableLiveData<DataWrap<D>>? = null, action: suspend () -> DataWrap<D>): LiveData<DataWrap<D>> = async(liveData) {
         val data = action()
         next(data)
     }
