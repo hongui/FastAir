@@ -62,8 +62,11 @@ class PathPickFragment : AppFragment() {
             it ?: return@observe
             if (it == pathPickTab.tabCount) {
                 val path = viewModel.currentPath
-                pathPickTab.addTab(pathPickTab.newTab().setText(path?.getName()
-                        ?: getString(R.string.home_dir)))
+                pathPickTab.addTab(pathPickTab.newTab().setText(if (0 == it) {
+                    getString(R.string.home_dir)
+                } else {
+                    path?.getName() ?: getString(R.string.home_dir)
+                }))
             } else {
                 for (i in pathPickTab.getTabCount() - 1 downTo it + 1) {
                     pathPickTab.removeTabAt(i)
@@ -101,10 +104,6 @@ class PathPickFragment : AppFragment() {
 
     }) {
         override fun onBindViewHolder(holder: AppViewHolder, position: Int, data: File) {
-            val icon = holder.view<ImageView>(R.id.item_path_icon)
-            icon.let {
-                display(icon.context, data.path, it)
-            }
             holder.text(R.id.item_path_name, data.name)
             holder.text(R.id.item_path_extra, data.lastModified().formatDate())
             holder.itemView.setOnClickListener {
