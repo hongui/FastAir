@@ -16,7 +16,11 @@ open class SharedPreferenceViewModel : AppViewModel() {
     }
 
     fun writePreference(context: Context?, name: String, action: SharedPreferences.Editor.() -> Unit) {
-        context?.getSharedPreferences(name, Context.MODE_PRIVATE)?.edit()?.let {
+        writePreference(context?.getSharedPreferences(name, Context.MODE_PRIVATE),action)
+    }
+
+    fun writePreference(shared:SharedPreferences?, action: SharedPreferences.Editor.() -> Unit) {
+        shared?.edit()?.let {
             action(it)
             it.commit()
         }

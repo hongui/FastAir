@@ -3,6 +3,7 @@ package com.mob.lee.fastair.viewmodel
 import android.content.Context
 import android.os.Environment
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.utils.successToast
@@ -36,10 +37,12 @@ class PathPickViewModel : SharedPreferenceViewModel() {
             file
         }
 
-        currentPositionLiveData.value = if (null != path && null == currentPositionLiveData.value) {
-            0
+        currentPositionLiveData.value = if (null != pos) {
+            pos
         } else if (null != path && null != currentPositionLiveData.value) {
             currentPositionLiveData.value!! + 1
+        } else if (null == path && null == currentPositionLiveData.value) {
+            0
         } else {
             currentPositionLiveData.value
         }
@@ -59,11 +62,14 @@ class PathPickViewModel : SharedPreferenceViewModel() {
     }
 
     fun submit(fragment: AppFragment) {
-        writePreference(fragment.requireContext(), sharedPreferenceName) {
-            val key = fragment.getString(R.string.key_default_download)
-            putString(key, currentPath?.absolutePath)
-            fragment.mParent?.successToast(fragment.getString(R.string.path_setting_success, currentPath?.getAbsolutePath()))
-            fragment.mParent?.onBackPressed()
+        val key = fragment.getString(R.string.key_default_download)
+        val defaultDownloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val manager = PreferenceManager.getDefaultSharedPreferences(fragment.requireContext())
+        val value = manager.getString(key, defaultDownloadPath?.absolutePath)
+        writePreference(manager) {
+            putString(key, currentPath?.absolutePath ?: value)
         }
+        fragment.mParent?.successToast(fragment.getString(R.string.path_setting_success, currentPath?.getAbsolutePath()))
+        fragment.mParent?.onBackPressed()
     }
 }
