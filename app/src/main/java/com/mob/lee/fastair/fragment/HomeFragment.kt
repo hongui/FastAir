@@ -1,12 +1,7 @@
 package com.mob.lee.fastair.fragment
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -26,7 +21,6 @@ import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
-import com.mob.lee.fastair.utils.toast
 import com.mob.lee.fastair.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -133,7 +127,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         toolOperation.setOnClickListener {
             observe(viewModel.write(context)) {
-                it ?: return@observe
                 if (it.isSuccess()) {
                     navigation(R.id.beforeFragment)
                 } else {
@@ -141,8 +134,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 }
             }
         }
-        PageAdapter.bind(this, homeContent, homeTabs)
-
         PageAdapter.bind(this, homeContent, homeTabs)
     }
 

@@ -14,9 +14,9 @@ class DataLoad<D> : MutableLiveData<Pair<Int, D?>>() {
     var msg: String? = null
 
     fun emit(code: Int = NEXT, data: D? = null, msg: String? = null) {
-        this.value = code to data
         this.code = code
         this.msg = msg
+        this.value=code to data
     }
 
     fun next(data: D?) {

@@ -6,6 +6,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonStyle">@style/AppButton</item>
+        <item name="colorControlHighlight">@color/colorPrimaryDark</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AppDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AppDialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/AppDialogButton</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -19,8 +24,7 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
-    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"></style>
 
     <style name="TablayoutTheme" parent="Widget.Design.TabLayout">
         <!--tab指示标的颜色-->
@@ -32,6 +36,7 @@
         <!--tab 选中时的颜色-->
         <item name="tabSelectedTextColor">@color/colorAccent</item>
     </style>
+
     <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textColor">@android:color/white</item>
     </style>
@@ -40,5 +45,13 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/sp10</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppButton" parent="Widget.AppCompat.Button">
+        <item name="colorButtonNormal">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 </resources>

@@ -56,7 +56,6 @@ open class AppViewModel : ViewModel() {
                 dataLoad.removeObserver(observer)
             } catch (e: Exception) {
                 dataLoad.error(e.message)
-
             } finally {
                 stateLiveData.value = null
             }

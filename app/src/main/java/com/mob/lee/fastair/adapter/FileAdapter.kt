@@ -19,7 +19,7 @@ import java.io.File
  * @CreateDate:     2020/6/11 16:54
  * @Description:    无
  */
-class FileAdapter(val viewModel: HomeViewModel?=null) : AppListAdapter<Record>(R.layout.item_file,RecordDiff()) {
+class FileAdapter(val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.item_file, RecordDiff()) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, record: Record) {
         holder.text(R.id.item_file_name, record.name)
         holder.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(holder.itemView.context))
@@ -29,7 +29,7 @@ class FileAdapter(val viewModel: HomeViewModel?=null) : AppListAdapter<Record>(R
         }
 
         holder.itemView.setOnClickListener {
-            viewModel?.toggleState(record)
+           action(record)
             notifyItemChanged(position)
         }
         holder.itemView.setOnLongClickListener {
@@ -40,7 +40,7 @@ class FileAdapter(val viewModel: HomeViewModel?=null) : AppListAdapter<Record>(R
             }
             true
         }
-        holder.check(R.id.item_file_selector, Record.STATE_CHECK == record.state)
+        holder.check(R.id.item_file_selector, Record.STATE_ORIGIN != record.state)
         val isChecked = holder.view<CheckBox>(R.id.item_file_selector)?.isChecked ?: false
         val color = if (isChecked) {
             ContextCompat.getColor(holder.itemView.context, R.color.material_grey_300)

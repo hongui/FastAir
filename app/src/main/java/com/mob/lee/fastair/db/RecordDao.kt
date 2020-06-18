@@ -15,32 +15,32 @@ import com.mob.lee.fastair.model.Record
 interface RecordDao{
 
     @Query("SELECT * FROM record")
-    fun records():List<Record>
+    suspend fun records():List<Record>
 
     @Query("SELECT * FROM record WHERE state=${Record.STATE_WAIT}")
-    fun waitRecords():List<Record>
+    suspend fun waitRecords():List<Record>
 
     @Query("SELECT * FROM record WHERE state=${Record.STATE_WAIT} limit 1")
-    fun waitRecord():Record?
+    suspend fun waitRecord():Record?
 
     @Query("SELECT * FROM record WHERE state=${Record.STATE_CHECK}")
-    fun checkedRecords():List<Record>
+    suspend fun checkedRecords():List<Record>
 
     @Query("SELECT * FROM record WHERE state=${Record.STATE_SUCCESS} OR state=${Record.STATE_FAILED} order by date desc")
-    fun completedRecords():List<Record>
+    suspend fun completedRecords():List<Record>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updates(records:List<Record>)
+    suspend fun updates(records:List<Record>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(record:Record)
+    suspend fun update(record:Record)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(record:Record)
+    suspend fun insert(record:Record)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(records:Collection<Record>)
+    suspend fun insert(records:Collection<Record>)
 
     @Delete()
-    fun clearWait(records : List<Record>)
+    suspend fun clearRecord(records : List<Record>)
 }
