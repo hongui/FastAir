@@ -12,12 +12,12 @@ class DataBaseDataSource : DataSource {
     suspend fun <D> recordDao(context: Context?, action: suspend RecordDao.() -> DataWrap<D>): DataWrap<D> {
         context ?: return DataWrap(DataWrap.ERROR, msg = "context is null")
         var db: AppDatabase? = null
-        return try {
+        try {
             db = Room.databaseBuilder(context, AppDatabase::class.java, database).build()
             val dao = db.recordDao()
-            action(dao)
+            return action(dao)
         } catch (e: Exception) {
-            DataWrap(DataWrap.ERROR, msg = e.message)
+            return DataWrap(DataWrap.ERROR, msg = e.message)
         } finally {
             db?.close()
         }

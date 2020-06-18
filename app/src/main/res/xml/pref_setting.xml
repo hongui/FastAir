@@ -5,7 +5,7 @@
         app:key="@string/key_default_clear"
         app:summary="@string/pref_default_clear_des"
         app:title="@string/pref_default_clear_title"
-        app:icon="@drawable/ic_action_clean"/>
+        app:icon="@drawable/ic_action_clean" />
     <SwitchPreferenceCompat
         app:defaultValue="true"
         app:key="@string/key_default_rewrite"

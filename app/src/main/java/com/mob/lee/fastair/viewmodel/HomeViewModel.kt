@@ -7,8 +7,8 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.base.AppFragment
+import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
@@ -36,26 +36,24 @@ class HomeViewModel : AppViewModel() {
     }
 
     fun updateLocation(fragment: AppFragment, location: Int) {
-        if (position != location) {
-            position = location
-            withPermission(fragment, Manifest.permission.WRITE_EXTERNAL_STORAGE, action = { _, hasPermission ->
-                if (hasPermission) {
-                    fetch(fragment.context)
-                } else {
-                    fragment.mParent?.dialog {
-                        setMessage(R.string.no_permission_to_scan)
-                                .setPositiveButton(R.string.turn_on) { _, _ ->
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                    val uri = Uri.fromParts("package", fragment.context?.packageName, null)
-                                    intent.data = uri
-                                    fragment.startActivityForResult(intent, 123)
-                                }.setNegativeButton(R.string.exit) { _, _ ->
-                                    fragment.mParent?.finish()
-                                }
-                    }
+        position = location
+        withPermission(fragment, Manifest.permission.WRITE_EXTERNAL_STORAGE, action = { _, hasPermission ->
+            if (hasPermission) {
+                fetch(fragment.context)
+            } else {
+                fragment.mParent?.dialog {
+                    setMessage(R.string.no_permission_to_scan)
+                            .setPositiveButton(R.string.turn_on) { _, _ ->
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val uri = Uri.fromParts("package", fragment.context?.packageName, null)
+                                intent.data = uri
+                                fragment.startActivityForResult(intent, 123)
+                            }.setNegativeButton(R.string.exit) { _, _ ->
+                                fragment.mParent?.finish()
+                            }
                 }
-            })
-        }
+            }
+        })
     }
 
     fun fetch(context: Context?) = async(recordLiveData) {
@@ -102,7 +100,7 @@ class HomeViewModel : AppViewModel() {
         update()
     }
 
-    fun update()=async(recordLiveData){
+    fun update() = async(recordLiveData) {
         records.forEach { next(it) }
     }
 
@@ -118,15 +116,15 @@ class HomeViewModel : AppViewModel() {
         }
     }
 
-    fun toggleState(record: Record){
-        record.state=if(Record.STATE_CHECK==record.state){
+    fun toggleState(record: Record) {
+        record.state = if (Record.STATE_CHECK == record.state) {
             selectedRecords.remove(record)
             Record.STATE_ORIGIN
-        }else{
+        } else {
             selectedRecords.add(record)
             Record.STATE_CHECK
         }
-        hasSelectedLiveData.value=selectedRecords.isNotEmpty()
+        hasSelectedLiveData.value = selectedRecords.isNotEmpty()
     }
 
     fun checkedRecords(): Set<Record> {
@@ -145,13 +143,15 @@ class HomeViewModel : AppViewModel() {
         sortBy { it.date }
     }
 
-    fun write(context: Context?)=asyncWithWrap<String>{
-
-        database.recordDao(context){
-            val list=checkedRecords()
-            if(list.isEmpty()){
+    fun write(context: Context?) = asyncWithWrap<String> {
+        database.recordDao(context) {
+            val list = this@HomeViewModel.checkedRecords()
+            if (list.isEmpty()) {
                 DataWrap.error(context?.getString(R.string.tip_have_no_file))
-            }else {
+            } else {
+                list.forEach {
+                    it.state = Record.STATE_WAIT
+                }
                 insert(list)
                 DataWrap.success("")
             }

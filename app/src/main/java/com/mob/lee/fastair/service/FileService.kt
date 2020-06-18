@@ -54,13 +54,13 @@ class FileService : SocketSerice() {
         val key = getString(R.string.key_default_clear)
         val clear = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key, true)
         if (clear) {
-            mScope.launch {
+            /*mScope.launch {
                 database.recordDao(this@FileService) {
                     val records = waitRecords()
                     clearWait(records)
                     DataWrap.success("")
                 }
-            }
+            }*/
 
         }
     }
@@ -94,14 +94,14 @@ class FileService : SocketSerice() {
             return
         }
         writing = true
-        val record = database.recordDao(this@FileService) {
+        /*val record = database.recordDao(this@FileService) {
             DataWrap.success(waitRecord())
         }
         if (record.isSuccess()) {
             mSocket?.write(FileWriter(record.data?.path) {
                 updateRecord(it, record.data)
             })
-        }
+        }*/
         writing = false
     }
 
@@ -142,7 +142,7 @@ class FileService : SocketSerice() {
             record.state =  Record.STATE_SUCCESS
             record
         }
-        mScope.async {
+        /*mScope.async {
             database.recordDao(this@FileService) {
                 if (null == record) {
                     insert(target)
@@ -151,7 +151,7 @@ class FileService : SocketSerice() {
                 }
                 DataWrap.success(null)
             }
-        }
+        }*/
     }
 
     fun notification(progress: Int, title: String) {
