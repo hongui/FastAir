@@ -16,7 +16,6 @@ import java.io.File
  * @Description:    无
  */
 class PathPickViewModel : SharedPreferenceViewModel() {
-    private val sharedPreferenceName = "info"
     var currentPath: File? = null
     var currentPositionLiveData = MutableLiveData<Int>()
     var pathLiveData = MutableLiveData<List<File>>()
@@ -57,7 +56,11 @@ class PathPickViewModel : SharedPreferenceViewModel() {
                 file.isDirectory && !file.isHidden
             }
             files?.sortBy { it.name.toLowerCase() }
-            next(files?.toList())
+            if (files.isNullOrEmpty()) {
+                empty()
+            } else {
+                next(files?.toList())
+            }
         }
     }
 

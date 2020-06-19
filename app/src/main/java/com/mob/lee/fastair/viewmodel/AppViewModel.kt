@@ -4,9 +4,14 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.PermissionFragment
+import com.mob.lee.fastair.R
+import com.mob.lee.fastair.adapter.AppListAdapter
+import com.mob.lee.fastair.adapter.SingleAdapter
 import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.model.DataWrap
+import kotlinx.android.synthetic.main.fragment_content_pick.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -95,5 +100,25 @@ open class AppViewModel : ViewModel() {
                     ?.show(f)
                     ?.commit()
         }
+    }
+
+    fun <D> watchState(fragment: Fragment, rv: RecyclerView, contentAdapter: AppListAdapter<D>) {
+        stateLiveData.observe(fragment, Observer {
+            it ?: return@Observer
+            when (it.first) {
+                DataLoad.LOADING -> {
+                    rv.adapter = SingleAdapter(R.layout.loading)
+                }
+
+                DataLoad.EMPTY -> {
+                    rv.adapter = SingleAdapter(R.layout.empty)
+                }
+
+                DataLoad.STARTED -> {
+                    contentAdapter.clear()
+                    rv.adapter = contentAdapter
+                }
+            }
+        })
     }
 }

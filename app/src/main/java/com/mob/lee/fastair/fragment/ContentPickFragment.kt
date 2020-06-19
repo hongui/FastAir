@@ -1,12 +1,9 @@
 package com.mob.lee.fastair.fragment
 
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.FileAdapter
-import com.mob.lee.fastair.adapter.SingleAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_content_pick.*
 
@@ -25,23 +22,7 @@ class ContentPickFragment : AppFragment() {
 
         pickContent.layoutManager = LinearLayoutManager(context)
 
-        viewModel.stateLiveData.observe(this, Observer {
-            it ?: return@Observer
-            when (it.first) {
-                DataLoad.LOADING -> {
-                    pickContent.adapter = SingleAdapter(R.layout.loading)
-                }
-
-                DataLoad.EMPTY -> {
-                    pickContent.adapter = SingleAdapter(R.layout.empty)
-                }
-
-                DataLoad.STARTED -> {
-                    adapter.clear()
-                    pickContent.adapter = adapter
-                }
-            }
-        })
+        viewModel.watchState(this,pickContent,adapter)
 
         observe(viewModel.recordLiveData) {
             it ?: return@observe
