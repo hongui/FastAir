@@ -39,6 +39,7 @@
 
         <service android:name=".service.MessageService" />
         <service android:name=".service.FileService" />
+        <service android:name=".service.ScanService" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

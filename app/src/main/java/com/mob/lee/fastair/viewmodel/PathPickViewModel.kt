@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
+import com.mob.lee.fastair.repository.SharedPreferenceDataSource
 import com.mob.lee.fastair.utils.successToast
 import java.io.File
 
@@ -15,10 +16,14 @@ import java.io.File
  * @CreateDate:     2020/6/15 18:29
  * @Description:    无
  */
-class PathPickViewModel : SharedPreferenceViewModel() {
+class PathPickViewModel : AppViewModel() {
     var currentPath: File? = null
     var currentPositionLiveData = MutableLiveData<Int>()
     var pathLiveData = MutableLiveData<List<File>>()
+
+    val datasource by lazy {
+        SharedPreferenceDataSource()
+    }
 
     fun updatePath(context: Context?, path: File? = null, pos: Int? = null) {
         context ?: return
@@ -69,7 +74,7 @@ class PathPickViewModel : SharedPreferenceViewModel() {
         val defaultDownloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val manager = PreferenceManager.getDefaultSharedPreferences(fragment.requireContext())
         val value = manager.getString(key, defaultDownloadPath?.absolutePath)
-        writePreference(manager) {
+        datasource.writePreference(manager) {
             putString(key, currentPath?.absolutePath ?: value)
         }
         fragment.mParent?.successToast(fragment.getString(R.string.path_setting_success, currentPath?.getAbsolutePath()))

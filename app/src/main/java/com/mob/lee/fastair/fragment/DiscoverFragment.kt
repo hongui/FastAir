@@ -10,6 +10,7 @@ import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.successToast
+import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.android.synthetic.main.fragment_discover.*
 
 /**
@@ -17,14 +18,17 @@ import kotlinx.android.synthetic.main.fragment_discover.*
  */
 class DiscoverFragment : AppFragment() {
     var stopDiscover = false
-    var backIt = false
-    override val layout: Int= R.layout.fragment_discover
+    override val layout: Int = R.layout.fragment_discover
+
+    val viewModel by lazy {
+        viewModel<DeviceViewModel>()
+    }
 
     override fun setting() {
         setHasOptionsMenu(true)
         title(R.string.discoverDevice, false)
 
-        P2PManager.devices.observe({ lifecycle }) {
+        P2PManager.devicesLiveData.observe({ lifecycle }) {
             if (null == discoverView || null == it) {
                 return@observe
             }
@@ -38,8 +42,10 @@ class DiscoverFragment : AppFragment() {
                 name?.text = device.deviceName
                 view?.setOnClickListener {
                     stopDiscover = true
+
                     context?.successToast("正在建立连接，请稍后...")
                     P2PManager.connect(mParent!!, device)
+                    viewModel.saveDevice(context, device)
                 }
                 discoverView.addView(view)
             }
@@ -60,15 +66,5 @@ class DiscoverFragment : AppFragment() {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        P2PManager.discover(mParent !!)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        P2PManager.stopDiscovery(mParent !!)
     }
 }

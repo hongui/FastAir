@@ -17,20 +17,23 @@ import com.mob.lee.fastair.model.IS_HOST
  */
 object P2PManager {
     //设备信息列表
-    val devices = MutableLiveData<List<WifiP2pDevice>>()
+    val devicesLiveData = MutableLiveData<List<WifiP2pDevice>>()
+
     //连接状态
-    val connected=MutableLiveData<Boolean?>()
+    val connectLiveData = MutableLiveData<Boolean?>()
+
     //使能状态
-    val enable= MutableLiveData<Boolean>()
+    val enableLiveData = MutableLiveData<Boolean>()
+
     //连接信息
-    var p2pInfo=MutableLiveData<WifiP2pInfo?>()
+    var p2pInfoLiveData = MutableLiveData<WifiP2pInfo?>()
 
     var receiver: P2PReceiver? = null
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
 
     init {
-        connected.value=null
+        connectLiveData.value = null
     }
 
     fun register(context: Context) {
@@ -55,10 +58,10 @@ object P2PManager {
         })
     }
 
-    fun unregister(context : Context){
-        devices.value=null
-        connected.value= null
-        p2pInfo.value=null
+    fun unregister(context: Context) {
+        devicesLiveData.value = null
+        connectLiveData.value = null
+        p2pInfoLiveData.value = null
         stopReceiver(context)
         stopConnect(context)
     }
@@ -69,25 +72,25 @@ object P2PManager {
         }
     }
 
-    fun stopConnect(context: Context){
-        manager?.removeGroup(channel,null)
-        manager?.cancelConnect(channel,null)
+    fun stopConnect(context: Context) {
+        manager?.removeGroup(channel, null)
+        manager?.cancelConnect(channel, null)
     }
 
-    fun bundle():Bundle{
-        val info= p2pInfo.value
+    fun bundle(): Bundle {
+        val info = p2pInfoLiveData.value
         val bundle = Bundle()
         bundle.putString(ADDRESS, info?.groupOwnerAddress?.hostAddress)
-        bundle.putBoolean(IS_HOST, info?.isGroupOwner?:false)
+        bundle.putBoolean(IS_HOST, info?.isGroupOwner ?: false)
         return bundle
     }
 
-    fun unBundle(bundle : Bundle?):Pair<String?,Boolean>{
-        bundle?:return null to false
-        return bundle.getString(ADDRESS,null) to bundle.getBoolean(IS_HOST,false)
+    fun unBundle(bundle: Bundle?): Pair<String?, Boolean> {
+        bundle ?: return null to false
+        return bundle.getString(ADDRESS, null) to bundle.getBoolean(IS_HOST, false)
     }
 
-    fun discover(context : Context){
+    fun discover(context: Context) {
         manager!!.discoverPeers(channel, ActionListener(context))
     }
 
@@ -107,10 +110,10 @@ object P2PManager {
 
     fun stopDiscovery(context: Context) {
         if (null != channel) {
-            devices.value=null
+            devicesLiveData.value = null
             manager?.stopPeerDiscovery(channel, ActionListener(context))
         }
     }
 
-    fun isConnected()=true==P2PManager.connected.value
+    fun isConnected() = true == P2PManager.connectLiveData.value
 }
