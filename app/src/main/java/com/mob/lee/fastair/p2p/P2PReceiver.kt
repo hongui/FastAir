@@ -16,7 +16,7 @@ class P2PReceiver : BroadcastReceiver() {
         when (intent?.action) {
             WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
                 WifiP2pManager.EXTRA_WIFI_P2P_INFO
-                P2PManager.enable.value = WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, WifiP2pManager.WIFI_P2P_STATE_DISABLED)
+                P2PManager.enableLiveData.value = WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, WifiP2pManager.WIFI_P2P_STATE_DISABLED)
             }
 
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
@@ -31,7 +31,7 @@ class P2PReceiver : BroadcastReceiver() {
                             devices.add(d)
                         }
                     }
-                    P2PManager.devices.value = devices
+                    P2PManager.devicesLiveData.value = devices
                 }
             }
 
@@ -40,11 +40,11 @@ class P2PReceiver : BroadcastReceiver() {
                 val wifiP2pInfo = intent.getParcelableExtra<WifiP2pInfo>(WifiP2pManager.EXTRA_WIFI_P2P_INFO)
                 val connected = P2PManager.isConnected()
                 if (connected && ! networkInfo.isConnected) {
-                    P2PManager.connected.value = false
-                    P2PManager.p2pInfo.value = null
+                    P2PManager.connectLiveData.value = false
+                    P2PManager.p2pInfoLiveData.value = null
                 } else if (networkInfo.isConnected) {
-                    P2PManager.connected.value = true
-                    P2PManager.p2pInfo.value = wifiP2pInfo
+                    P2PManager.connectLiveData.value = true
+                    P2PManager.p2pInfoLiveData.value = wifiP2pInfo
                 }
             }
         }

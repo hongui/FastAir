@@ -146,7 +146,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                         setMessage(R.string.msg_disconnect)
                                 .setPositiveButton(R.string.stopAndDisconnect) { _, _ ->
                                     P2PManager.stopConnect(mParent!!)
-                                    P2PManager.connected.value = null
+                                    P2PManager.connectLiveData.value = null
                                     mParent?.stopService(Intent(mParent, FileService::class.java))
                                     mParent?.supportFinishAfterTransition()
                                 }

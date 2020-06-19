@@ -11,7 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.viewmodel.AppViewModel
@@ -76,12 +76,12 @@ abstract class AppFragment : Fragment() {
     }
 
     inline fun <reified D : AppViewModel> viewModel(): D {
-        val viewModel = ViewModelProviders.of(this).get(D::class.java)
+        val viewModel = ViewModelProvider(this).get(D::class.java)
         return viewModel
     }
 
     inline fun <reified D : AppViewModel> activityViewModel(): D {
-        val viewModel = ViewModelProviders.of(mParent!!).get(D::class.java)
+        val viewModel = ViewModelProvider(mParent!!).get(D::class.java)
         return viewModel
     }
 }

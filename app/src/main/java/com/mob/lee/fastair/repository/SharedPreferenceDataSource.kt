@@ -1,4 +1,4 @@
-package com.mob.lee.fastair.viewmodel
+package com.mob.lee.fastair.repository
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,11 +6,10 @@ import android.content.SharedPreferences
 /**
  *
  * @Author:         Andy（632518410）
- * @CreateDate:     2020/6/15 18:42
+ * @CreateDate:     2020/6/19 14:01
  * @Description:    无
  */
-open class SharedPreferenceViewModel : AppViewModel() {
-
+class SharedPreferenceDataSource :DataSource{
     fun readPreference(context: Context?, name: String, action: SharedPreferences.() -> Unit) {
         context?.getSharedPreferences(name, Context.MODE_PRIVATE)?.let { action(it) }
     }
@@ -19,7 +18,7 @@ open class SharedPreferenceViewModel : AppViewModel() {
         writePreference(context?.getSharedPreferences(name, Context.MODE_PRIVATE),action)
     }
 
-    fun writePreference(shared:SharedPreferences?, action: SharedPreferences.Editor.() -> Unit) {
+    fun writePreference(shared: SharedPreferences?, action: SharedPreferences.Editor.() -> Unit) {
         shared?.edit()?.let {
             action(it)
             it.commit()
