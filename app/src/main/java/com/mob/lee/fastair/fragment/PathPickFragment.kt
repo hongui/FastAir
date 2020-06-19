@@ -35,9 +35,10 @@ class PathPickFragment : AppFragment() {
         setHasOptionsMenu(true)
         title(R.string.choose_save_path)
 
+        val adapter = PathAdapter()
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             pathPickContent.layoutManager = LinearLayoutManager(context)
-            pathPickContent.adapter = PathAdapter()
+            pathPickContent.adapter = adapter
             viewModel.updatePath(mParent, pos = 0)
         } else {
             mParent?.errorToast(R.string.storage_not_ready)
@@ -58,6 +59,7 @@ class PathPickFragment : AppFragment() {
 
         })
 
+        viewModel.watchState(this, pathPickContent, adapter)
         observe(viewModel.currentPositionLiveData) {
             it ?: return@observe
             if (it == pathPickTab.tabCount) {
@@ -76,7 +78,6 @@ class PathPickFragment : AppFragment() {
         }
 
         observe(viewModel.pathLiveData) {
-            val adapter = pathPickContent.adapter as PathAdapter
             adapter.clear()
             adapter.add(it)
         }
@@ -93,16 +94,7 @@ class PathPickFragment : AppFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    inner class PathAdapter : AppListAdapter<File>(R.layout.item_path, object : DiffUtil.ItemCallback<File>() {
-        override fun areItemsTheSame(oldItem: File, newItem: File): Boolean {
-            return oldItem.absolutePath == newItem.absolutePath
-        }
-
-        override fun areContentsTheSame(oldItem: File, newItem: File): Boolean {
-            return oldItem.absolutePath == newItem.absolutePath
-        }
-
-    }) {
+    inner class PathAdapter : AppListAdapter<File>(R.layout.item_path) {
         override fun onBindViewHolder(holder: AppViewHolder, position: Int, data: File) {
             holder.text(R.id.item_path_name, data.name)
             holder.text(R.id.item_path_extra, data.lastModified().formatDate())

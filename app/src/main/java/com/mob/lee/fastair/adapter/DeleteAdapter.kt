@@ -5,14 +5,14 @@ import com.mob.lee.fastair.R
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.viewmodel.HomeViewModel
 
-class DeleteAdapter(val viewModel: HomeViewModel) : AppListAdapter<Record>(R.layout.item_delete, RecordDiff()) {
+class DeleteAdapter(val viewModel: HomeViewModel) : AppListAdapter<Record>(R.layout.item_delete) {
 
     init {
         add(viewModel.checkedRecords())
     }
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
-        val record = currentList[position]
+        val record = originData[position]
         holder.itemView.setOnClickListener {
             viewModel.toggleState(record)
             notifyItemChanged(position)

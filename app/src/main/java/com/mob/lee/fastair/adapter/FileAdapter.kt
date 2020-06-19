@@ -19,7 +19,7 @@ import java.io.File
  * @CreateDate:     2020/6/11 16:54
  * @Description:    无
  */
-class FileAdapter(val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.item_file, RecordDiff()) {
+class FileAdapter(val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.item_file) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, record: Record) {
         holder.text(R.id.item_file_name, record.name)
         holder.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(holder.itemView.context))
