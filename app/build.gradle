@@ -17,8 +17,8 @@ android {
         multiDexEnabled true
     }
 
-    signingConfigs{
-        release{
+    signingConfigs {
+        release {
             Properties properties = new Properties()
             InputStream stream = project.rootProject.file('local.properties').newDataInputStream()
             properties.load(stream)
@@ -40,15 +40,15 @@ android {
         }
     }
 
-    applicationVariants.all{
-        variant->
-            if("release"!=variant.getName()){
+    applicationVariants.all {
+        variant ->
+            if ("release" != variant.getName()) {
                 return
             }
-            variant.outputs.all{
-                output->
-                    def name="${variant.applicationId}_${variant.getVersionName()}_${new SimpleDateFormat('yyyy_MM_dd_HH_mm').format(System.currentTimeMillis())}.apk"
-                    outputFileName=name
+            variant.outputs.all {
+                output ->
+                    def name = "${variant.applicationId}_${variant.getVersionName()}_${new SimpleDateFormat('yyyy_MM_dd_HH_mm').format(System.currentTimeMillis())}.apk"
+                    outputFileName = name
             }
     }
     compileOptions {

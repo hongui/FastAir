@@ -53,11 +53,11 @@ data class ProtocolByte(val bytes:ByteBuffer, val type: ProtocolType){
         fun string(value:String):ProtocolByte{
             val temp=value.toByteArray()
             val buffer=ByteBuffer.allocate(size(temp))
-            buffer.put(ProtocolType.CC)
+            buffer.put(ProtocolType.CW)
             buffer.putInt(temp.size)
             buffer.put(temp)
             buffer.flip()
-            return ProtocolByte(buffer,ProtocolType.C)
+            return ProtocolByte(buffer,ProtocolType.W)
         }
 
         fun size(bytes: ByteArray)=bytes.size+ HEAD_LENGTH

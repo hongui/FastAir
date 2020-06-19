@@ -1,6 +1,6 @@
 package com.mob.lee.fastair.io
 
-class StringWriter(val value: String) : Writer() {
+class StringWriter(val value: String) : Writer {
     var writed = true
     override fun hasNext() = writed
 
