@@ -14,10 +14,10 @@ enum class ProtocolType(val type:Byte){
     L(ProtocolType.CL),
     /*浮点*/
     F(ProtocolType.CF),
-    /*浮点*/
+    /*高精度*/
     D(ProtocolType.CD),
     /*字符串*/
-    C(ProtocolType.CC),
+    W(ProtocolType.CW),
     /*分割符用*/
     E(ProtocolType.CE);
 
@@ -28,7 +28,7 @@ enum class ProtocolType(val type:Byte){
         const val CL:Byte=0x01 shl 3
         const val CF:Byte=0x01 shl 4
         const val CD:Byte=0x01 shl 5
-        const val CC:Byte=0x01 shl 6
+        const val CW:Byte=0x01 shl 6
         const val CE:Byte=0x0
 
         fun wrap(value:Byte):ProtocolType=when(value){
@@ -38,7 +38,7 @@ enum class ProtocolType(val type:Byte){
             CL->L
             CF->F
             CD->D
-            CC->C
+            CW->W
             else->E
         }
     }
