@@ -26,7 +26,7 @@ class BeforeFragment : AppFragment() {
 
         btn_before_action.setOnClickListener {
             observe(viewModel.submit(mParent)) {
-                mParent?.successToast(it.data.toString())
+                navigation(R.id.transferFragment)
             }
         }
     }

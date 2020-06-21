@@ -1,14 +1,19 @@
 package com.mob.lee.fastair.fragment
 
+import android.Manifest
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.service.ScanService
 import com.mob.lee.fastair.utils.dialog
+import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.android.synthetic.main.fragment_discover.*
@@ -50,6 +55,33 @@ class DiscoverFragment : AppFragment() {
                 discoverView.addView(view)
             }
         }
+        observe(P2PManager.connectLiveData) {
+            if (true == it) {
+                mParent?.successToast(R.string.toast_connect_success)
+                navigationBack()
+            }
+        }
+        viewModel.withPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, action = { _, hasPermission ->
+            if (hasPermission) {
+                ScanService.startScan(requireContext())
+            } else {
+                mParent?.dialog {
+                    setMessage(R.string.tip_need_location)
+                            .setPositiveButton(R.string.turn_on) { _, _ ->
+                                viewModel.openSetting(this@DiscoverFragment)
+                            }
+                            .setNegativeButton(R.string.cancel) { _, _ ->
+                                mParent?.errorToast(R.string.tip_rejected_location)
+                            }
+                }
+            }
+        })
+
+        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                navigationBack(R.id.homeFragment)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

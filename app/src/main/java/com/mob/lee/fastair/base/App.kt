@@ -1,6 +1,5 @@
 package com.mob.lee.fastair.base
 
-import android.content.Intent
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.mob.lee.fastair.service.ScanService
@@ -14,7 +13,6 @@ class App : MultiDexApplication() {
         super.onCreate()
         MultiDex.install(this)
 
-        val intent = Intent(this, ScanService::class.java)
-        startService(intent)
+        ScanService.startScan(this)
     }
 }

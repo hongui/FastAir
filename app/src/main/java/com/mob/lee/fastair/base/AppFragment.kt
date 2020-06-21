@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -73,6 +74,10 @@ abstract class AppFragment : Fragment() {
             it(bundle)
             bundle
         })
+    }
+
+    fun navigationBack(@IdRes destinationId:Int?=mParent?.mNavController?.currentDestination?.id, inclusive:Boolean=true) {
+        mParent?.mNavController?.popBackStack(destinationId?:-1,inclusive)
     }
 
     inline fun <reified D : AppViewModel> viewModel(): D {

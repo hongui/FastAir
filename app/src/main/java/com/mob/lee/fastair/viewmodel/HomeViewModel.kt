@@ -44,10 +44,7 @@ class HomeViewModel : AppViewModel() {
                 fragment.mParent?.dialog {
                     setMessage(R.string.no_permission_to_scan)
                             .setPositiveButton(R.string.turn_on) { _, _ ->
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                val uri = Uri.fromParts("package", fragment.context?.packageName, null)
-                                intent.data = uri
-                                fragment.startActivityForResult(intent, 123)
+                                openSetting(fragment)
                             }.setNegativeButton(R.string.exit) { _, _ ->
                                 fragment.mParent?.finish()
                             }
@@ -146,15 +143,11 @@ class HomeViewModel : AppViewModel() {
     fun write(context: Context?) = asyncWithWrap<String> {
         database.recordDao(context) {
             val list = this@HomeViewModel.checkedRecords()
-            if (list.isEmpty()) {
-                DataWrap.error(context?.getString(R.string.tip_have_no_file))
-            } else {
-                list.forEach {
-                    it.state = Record.STATE_WAIT
-                }
-                insert(list)
-                DataWrap.success("")
+            list.forEach {
+                it.state = Record.STATE_WAIT
             }
+            insert(list)
+            DataWrap.success("")
         }
     }
 }

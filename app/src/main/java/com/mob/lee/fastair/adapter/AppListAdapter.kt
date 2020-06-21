@@ -39,4 +39,10 @@ open class AppListAdapter<D>(val layout: Int) : RecyclerView.Adapter<AppViewHold
         originData.addAll(filter)
         notifyItemRangeInserted(originData.size - filter.size, filter.size)
     }
+
+    fun update(pos:Int,data:D?){
+        data?:return
+        originData[pos]=data
+        notifyItemChanged(pos)
+    }
 }

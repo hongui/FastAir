@@ -1,6 +1,9 @@
 package com.mob.lee.fastair.viewmodel
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
@@ -120,5 +123,12 @@ open class AppViewModel : ViewModel() {
                 }
             }
         })
+    }
+
+    fun openSetting(fragment:Fragment){
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", fragment.context?.packageName, null)
+        intent.data = uri
+        fragment.startActivityForResult(intent, 123)
     }
 }

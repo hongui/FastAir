@@ -14,15 +14,32 @@ sealed class State(val what: Int, val obj: Any? = null) {
     }
 }
 
-class StartState(obj: Any? = null) : State(START, obj)
+class StartState(obj: Any? = null) : State(START, obj){
+    override fun toString(): String {
+        return "StartState(obj=${obj.toString()})"
+    }
+}
 
 class ProcessState(val process: Long, val total: Long, obj: Any? = null) : State(PROCESS, obj) {
     fun percentage(): Float = (process.toFloat() / total * 100)
+    override fun toString(): String {
+        return "ProcessState(process=$process, total=$total,obj=${obj.toString()})"
+    }
+
+
 }
 
-class SuccessState(val duration:Long=0L,obj: Any? = null) : State(SUCCESS, obj)
+class SuccessState(val duration:Long=0L,obj: Any? = null) : State(SUCCESS, obj){
+    override fun toString(): String {
+        return "SuccessState(duration=$duration,obj=${obj.toString()})"
+    }
+}
 
-class FaildState(obj: Any? = null) : State(FAILD, obj)
+class FaildState(obj: Any? = null) : State(FAILD, obj){
+    override fun toString(): String {
+        return "FaildState(obj=${obj.toString()})"
+    }
+}
 
 fun parseFile(state: State): Record? {
     val file = state?.obj as? File

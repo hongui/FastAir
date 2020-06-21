@@ -11,18 +11,15 @@ import com.mob.lee.fastair.utils.errorToast
 /**
  * Created by Andy on 2017/8/17.
  */
-class ActionListener(val context : Context?) : WifiP2pManager.ActionListener {
+class ActionListener(val context: Context?) : WifiP2pManager.ActionListener {
     override fun onSuccess() {
-
     }
 
-    override fun onFailure(reason : Int) {
+    override fun onFailure(reason: Int) {
         when (reason) {
-
             WifiP2pManager.P2P_UNSUPPORTED -> {
                 context?.dialog {
-                            setTitle(R.string.wramTips)
-                            .setMessage(R.string.tip_error_p2p_unsupport)
+                    setMessage(R.string.tip_error_p2p_unsupport)
                             .setPositiveButton(R.string.knowIt) { _, _ ->
                                 (context as? ContainerActivity)?.onBackPressed()
                             }
@@ -34,13 +31,13 @@ class ActionListener(val context : Context?) : WifiP2pManager.ActionListener {
             WifiP2pManager.BUSY -> {
                 context?.let {
                     it.errorToast(R.string.tip_error_p2p_busy)
-                    P2PManager.stopConnect(it)
+                    P2PManager.stopConnect()
                 }
             }
 
             WifiP2pManager.ERROR -> context?.let {
                 it.errorToast(R.string.tip_error_p2p_inter)
-                P2PManager.stopConnect(it)
+                P2PManager.stopConnect()
             }
         }
     }

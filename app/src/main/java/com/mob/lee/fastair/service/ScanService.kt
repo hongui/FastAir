@@ -1,11 +1,14 @@
 package com.mob.lee.fastair.service
 
-import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.IBinder
 import androidx.lifecycle.Observer
+import com.mob.lee.fastair.R
+import com.mob.lee.fastair.base.AppService
 import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 
 /**
@@ -14,16 +17,19 @@ import com.mob.lee.fastair.viewmodel.DeviceViewModel
  * @CreateDate:     2020/6/19 10:44
  * @Description:    无
  */
-class ScanService : Service() {
-    private val viewModel by lazy { DeviceViewModel() }
+class ScanService : AppService() {
+    private val viewModel by lazy { viewModel<DeviceViewModel>() }
     private val observer by lazy {
         Observer<List<WifiP2pDevice>> { devices ->
-            if (true == P2PManager.connectLiveData.value) {
+            devices ?: return@Observer
+            if (P2PManager.isConnected()) {
                 return@Observer
             }
             viewModel.readDevice(this) { device ->
                 devices.find { it.deviceAddress == device }?.let {
-                    P2PManager.connect(this, it)
+                    if(!P2PManager.isConnected()) {
+                        P2PManager.connect(this, it)
+                    }
                 }
             }
         }
@@ -50,8 +56,7 @@ class ScanService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        P2PManager.discover(this)
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY_COMPATIBILITY
     }
 
     override fun onDestroy() {
@@ -59,7 +64,13 @@ class ScanService : Service() {
         P2PManager.devicesLiveData.removeObserver(observer)
         P2PManager.connectLiveData.removeObserver(connectObserver)
         P2PManager.unregister(this)
-        P2PManager.stopDiscovery(this)
-        P2PManager.stopConnect(this)
+    }
+
+    companion object {
+        fun startScan(context: Context?) {
+            val intent = Intent(context, ScanService::class.java)
+            context?.stopService(intent)
+            context?.startService(intent)
+        }
     }
 }

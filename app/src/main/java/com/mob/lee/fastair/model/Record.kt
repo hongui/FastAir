@@ -9,7 +9,12 @@ import java.io.File
  * Created by Andy on 2017/6/2.
  */
 @Entity
-data class Record(@PrimaryKey var id: Long, @ColumnInfo var size: Long, @ColumnInfo var date: Long, @ColumnInfo var path: String, @ColumnInfo var state: Int = 0, @ColumnInfo var duration: Long = 0) {
+data class Record(@PrimaryKey var id: Long,
+                  @ColumnInfo var size: Long,
+                  @ColumnInfo var date: Long,
+                  @ColumnInfo var path: String,
+                  @ColumnInfo var state: Int = 0,
+                  @ColumnInfo var duration: Long = 0) {
 
     val name: String
         get() {
