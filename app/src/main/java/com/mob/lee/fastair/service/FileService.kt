@@ -6,7 +6,8 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.preference.PreferenceManager
+import android.util.Log
+import androidx.room.ext.T
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.io.FileReader
 import com.mob.lee.fastair.io.FileWriter
@@ -18,13 +19,12 @@ import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.io.File
 
 /**
  * Created by Andy on 2017/12/28.
  */
-class FileService : SocketSerice() {
+class FileService : TransferService() {
 
     var oldState = 0F
     var writing = false
@@ -32,7 +32,7 @@ class FileService : SocketSerice() {
 
     val channelId = "fileservice"
     val channelName by lazy {
-        getString(R.string.file_trans)
+        getString(R.string.file_transfer)
     }
     val database by lazy {
         DataBaseDataSource()
@@ -49,23 +49,8 @@ class FileService : SocketSerice() {
         notification(0, getString(R.string.trans_ing))
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val key = getString(R.string.key_default_clear)
-        val clear = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key, true)
-        if (clear) {
-            /*mScope.launch {
-                database.recordDao(this@FileService) {
-                    val records = waitRecords()
-                    clearWait(records)
-                    DataWrap.success("")
-                }
-            }*/
-
-        }
-    }
-
     override fun onReceiveMessage(message: State) {
+        Log.d(TAG,"Receive file ${message}")
         message.let {
             mFileChangeListener?.invoke(it)
         }
@@ -82,7 +67,7 @@ class FileService : SocketSerice() {
             is SuccessState -> {
                 notification(100, file?.name ?: "")
                 writing = false
-                mScope.async {
+                async {
                     onNewTask(null)
                 }
             }
@@ -94,14 +79,15 @@ class FileService : SocketSerice() {
             return
         }
         writing = true
-        /*val record = database.recordDao(this@FileService) {
+        val record = database.recordDao(this@FileService) {
             DataWrap.success(waitRecord())
         }
+        Log.e(TAG,"Write File ${record}")
         if (record.isSuccess()) {
             mSocket?.write(FileWriter(record.data?.path) {
                 updateRecord(it, record.data)
             })
-        }*/
+        }
         writing = false
     }
 
@@ -142,7 +128,8 @@ class FileService : SocketSerice() {
             record.state =  Record.STATE_SUCCESS
             record
         }
-        /*mScope.async {
+
+        async {
             database.recordDao(this@FileService) {
                 if (null == record) {
                     insert(target)
@@ -151,7 +138,7 @@ class FileService : SocketSerice() {
                 }
                 DataWrap.success(null)
             }
-        }*/
+        }
     }
 
     fun notification(progress: Int, title: String) {
@@ -169,5 +156,9 @@ class FileService : SocketSerice() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
         manager?.notify(9727, notification)
         startForeground(9727, notification)
+    }
+
+    companion object{
+        const val TAG="File-Transfer"
     }
 }

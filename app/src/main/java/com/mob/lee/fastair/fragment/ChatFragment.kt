@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 /**
  * Created by Andy on 2017/6/7.
  */
-class ChatFragment : AppFragment() {
+class ChatFragment : ConnectFragment() {
     var mBack = false
     var mConnect : ServiceConnection? = null
     var mService : MessageService? = null

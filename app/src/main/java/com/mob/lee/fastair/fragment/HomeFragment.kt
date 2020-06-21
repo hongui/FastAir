@@ -1,7 +1,5 @@
 package com.mob.lee.fastair.fragment
 
-import android.content.Intent
-import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -17,7 +15,6 @@ import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
-import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
@@ -126,11 +123,15 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         }
 
         toolOperation.setOnClickListener {
-            observe(viewModel.write(context)) {
-                if (it.isSuccess()) {
-                    navigation(R.id.beforeFragment)
-                } else {
-                    mParent?.errorToast(it.msg)
+            if(viewModel.checkedRecords().isEmpty()){
+                navigation(R.id.transferFragment)
+            }else {
+                observe(viewModel.write(context)) {
+                    if (it.isSuccess()) {
+                        navigation(R.id.beforeFragment)
+                    } else {
+                        mParent?.errorToast(it.msg)
+                    }
                 }
             }
         }
@@ -138,21 +139,15 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        var data: Bundle? = null
         when (item.getItemId()) {
             R.id.menu_disconnet -> {
                 if (P2PManager.isConnected()) {
                     mParent?.dialog {
-                        setMessage(R.string.msg_disconnect)
+                        setMessage(R.string.msg_disconnect_now)
                                 .setPositiveButton(R.string.stopAndDisconnect) { _, _ ->
-                                    P2PManager.stopConnect(mParent!!)
-                                    P2PManager.connectLiveData.value = null
-                                    mParent?.stopService(Intent(mParent, FileService::class.java))
-                                    mParent?.supportFinishAfterTransition()
+                                    P2PManager.stopConnect()
                                 }
-                                .setNegativeButton(R.string.onlyDisconnect) { dialog, which ->
-                                    mParent?.stopService(Intent(mParent, FileService::class.java))
-                                }
+                                .setNegativeButton(R.string.cancel, null)
                     }
                 } else {
                     navigation(R.id.discoverFragment)

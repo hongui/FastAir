@@ -43,4 +43,8 @@
         android:id="@+id/beforeFragment"
         android:name="com.mob.lee.fastair.fragment.BeforeFragment"
         android:label="BeforeFragment" />
+    <fragment
+        android:id="@+id/transferFragment"
+        android:name="com.mob.lee.fastair.fragment.TransferFragment"
+        android:label="TransferFragment" />
 </navigation>

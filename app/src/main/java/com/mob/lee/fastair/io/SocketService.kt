@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.io
 
+import android.util.Log
 import com.mob.lee.fastair.io.state.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
@@ -45,6 +46,7 @@ class SocketService(var keepAlive : Boolean = false) {
      * @param host 主机地址，当该参数为null时，则开启一个socket监听
      **/
     suspend fun open(port : Int, host : String? = null) {
+        Log.d(TAG,"try to connect ${host}:${port}")
         if (isOpen) {
             return
         }
@@ -54,27 +56,32 @@ class SocketService(var keepAlive : Boolean = false) {
                 //等待10S
                 while (!(channel?.isConnected?:false)&&time<20) {
                     try {
-                        channel = SocketChannel.open()
-                        channel?.socket()?.reuseAddress = true
+                        if(null==channel) {
+                            channel = SocketChannel.open()
+                            channel?.socket()?.reuseAddress = true
+                        }
                         channel?.connect(InetSocketAddress(host, port))
-                    } catch (e : ConnectException) {
+                    } catch (e : Exception) {
+                        Log.d(TAG,"To Connect exception: ${e.message}")
                         delay(500)
                         time++
                         continue
                     }
                 }
+                Log.d(TAG,"Connect ${host} : ${port} success")
             } else {
                 server = ServerSocketChannel.open()
                 server?.socket()?.reuseAddress = true
                 server?.socket()?.bind(InetSocketAddress(port))
                 channel = server?.accept()
+                Log.d(TAG,"Accept connect ${port} success")
             }
             isOpen = true
             updateState(STATE_CONNECTED)
             handleRead()
             handleWrite()
         } catch (e : Exception) {
-            e.printStackTrace()
+            Log.d(TAG,"Connect exception: ${e.message}")
             isOpen = false
             channel?.let {
                 it.close()
@@ -142,6 +149,7 @@ class SocketService(var keepAlive : Boolean = false) {
                 }
                 updateState(STATE_READ_FINISH)
             } catch (e : Exception) {
+                Log.d(TAG,"Read exception: ${e.message}")
                 updateState(STATE_READ_FAILD,e.message)
                 for (reader in readers) {
                     reader.onError(e.message)
@@ -172,6 +180,7 @@ class SocketService(var keepAlive : Boolean = false) {
                 }
                 updateState(STATE_WRITE_FINISH)
             } catch (e : Exception) {
+                Log.d(TAG,"Write exception: ${e.message}")
                 updateState(STATE_WRITE_FAILD,e.message)
                 if (e is ClosedReceiveChannelException) {
                     close(e)
@@ -214,5 +223,9 @@ class SocketService(var keepAlive : Boolean = false) {
         if(index in 0 until listeners.size){
             listeners.removeAt(index)
         }
+    }
+
+    companion object{
+        const val TAG="SocketService"
     }
 }

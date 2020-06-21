@@ -11,12 +11,12 @@ import kotlinx.coroutines.async
 /**
  * Created by Andy on 2017/8/29.
  */
-class MessageService : SocketSerice() {
+class MessageService : TransferService() {
     var socket: SocketService? = null
     var mMessageListener: ProcessListener? = null
 
     fun write(content: String) {
-        mScope.async {
+        async {
             socket?.write(StringWriter(content))
         }
     }

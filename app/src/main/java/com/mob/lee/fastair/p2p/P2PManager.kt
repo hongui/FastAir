@@ -2,7 +2,6 @@ package com.mob.lee.fastair.p2p
 
 import android.content.Context
 import android.content.IntentFilter
-import android.net.wifi.WpsInfo
 import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pInfo
@@ -32,10 +31,6 @@ object P2PManager {
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
 
-    init {
-        connectLiveData.value = null
-    }
-
     fun register(context: Context) {
         val intentFilter = IntentFilter()
         /*指示Wi-Fi P2P是否开启*/
@@ -51,11 +46,7 @@ object P2PManager {
         context.registerReceiver(receiver, intentFilter)
 
         manager = context.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
-        channel = manager!!.initialize(context, context.mainLooper, object : WifiP2pManager.ChannelListener {
-            override fun onChannelDisconnected() {
-                unregister(context)
-            }
-        })
+        channel = manager?.initialize(context, context.mainLooper) { unregister(context) }
     }
 
     fun unregister(context: Context) {
@@ -63,7 +54,7 @@ object P2PManager {
         connectLiveData.value = null
         p2pInfoLiveData.value = null
         stopReceiver(context)
-        stopConnect(context)
+        stopConnect()
     }
 
     fun stopReceiver(context: Context) {
@@ -72,9 +63,12 @@ object P2PManager {
         }
     }
 
-    fun stopConnect(context: Context) {
-        manager?.removeGroup(channel, null)
-        manager?.cancelConnect(channel, null)
+    fun stopConnect() {
+        if (isConnected()) {
+            manager?.removeGroup(channel, null)
+            manager?.cancelConnect(channel, null)
+            connectLiveData.value = false
+        }
     }
 
     fun bundle(): Bundle {
@@ -90,18 +84,17 @@ object P2PManager {
         return bundle.getString(ADDRESS, null) to bundle.getBoolean(IS_HOST, false)
     }
 
-    fun discover(context: Context) {
-        manager!!.discoverPeers(channel, ActionListener(context))
+    fun discover(context: Context, listener: ActionListener? = ActionListener(context)) {
+        channel?.let {
+            manager?.discoverPeers(it, listener)
+        }
     }
 
-    fun connect(context: Context, device: WifiP2pDevice) {
-        val wps = WpsInfo()
-        wps.setup = WpsInfo.PBC
-
+    fun connect(context: Context, device: WifiP2pDevice, listener: ActionListener? = ActionListener(context)) {
         val config = WifiP2pConfig()
         config.deviceAddress = device.deviceAddress
-        config.wps = wps
-        manager?.connect(channel, config, ActionListener(context))
+
+        manager?.connect(channel, config, listener)
     }
 
     fun connectInfo(info: (info: WifiP2pInfo) -> Unit) {
@@ -109,11 +102,10 @@ object P2PManager {
     }
 
     fun stopDiscovery(context: Context) {
-        if (null != channel) {
-            devicesLiveData.value = null
-            manager?.stopPeerDiscovery(channel, ActionListener(context))
+        channel?.let {
+            manager?.stopPeerDiscovery(it, ActionListener(context))
         }
     }
 
-    fun isConnected() = true == P2PManager.connectLiveData.value
+    fun isConnected() = true == connectLiveData.value
 }

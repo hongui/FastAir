@@ -5,32 +5,19 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageView
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.io.state.FaildState
-import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.State
-import com.mob.lee.fastair.io.state.SuccessState
+import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.formatDate
-import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.display
 import com.mob.lee.fastair.utils.openFile
-import com.mob.lee.fastair.utils.updateStorage
 import com.mob.lee.fastair.view.CircleProgress
-import kotlinx.coroutines.GlobalScope
 import java.io.File
 
-/**
- * Created by Andy on 2017/9/19.
- */
 typealias History = Pair<Record, State>
 
-class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
-
-    override fun bind(position : Int, holder : ViewHolder) {
-        val originPos = position - startPosition
-        val data = datas.getOrNull(originPos)
-        data ?: return
+class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.layout.item_history) {
+    override fun onBindViewHolder(holder: AppViewHolder, position: Int, data: History) {
 
         val preview = holder.view<ImageView>(R.id.item_history_preview)
         val progress = holder.view<CircleProgress>(R.id.item_history_progress)
@@ -41,19 +28,19 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
         holder.text(R.id.item_history_date, record.date.formatDate("MM/dd/yy HH:mm"))
         when (state) {
             is ProcessState -> {
-                progress?.progress(state.percentage())
+                progress.progress(state.percentage())
             }
 
             is SuccessState -> {
-                progress?.updateState(CircleProgress.SUCCESS)
+                progress.updateState(CircleProgress.SUCCESS)
             }
 
             is FaildState -> {
-                progress?.updateState(CircleProgress.FAILED)
+                progress.updateState(CircleProgress.FAILED)
             }
         }
 
-        preview?.let {
+        preview.let {
             display(it.context, record.path, it)
         }
 
@@ -68,7 +55,7 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
                     setTitle(R.string.file_operation)
                             .setItems(R.array.array_file_operation) { _, which ->
                                 when (which) {
-                                    0 ->fileDetail(it.context, record.path)
+                                    0 -> fileDetail(it.context, record.path)
 
                                     1 -> rename(it.context, position, record)
                                 }
@@ -81,14 +68,14 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
         }
     }
 
-    fun fileDetail(context : Context, path : String) {
+    fun fileDetail(context: Context, path: String) {
         context.dialog {
             setTitle(path.substringAfterLast(File.separator))
                     .setAdapter(FileDetailAdapter(context, path), null)
         }
     }
 
-    fun rename(context : Context, pos : Int, record : Record) {
+    fun rename(context: Context, pos: Int, record: Record) {
         val path = record.path
         val container = LayoutInflater.from(context).inflate(R.layout.item_file_rename, null)
         val et = container.findViewById<EditText>(R.id.item_et_file_rename_content)
@@ -102,14 +89,20 @@ class HistoryAdapter : MultiDataHolder<History>(R.layout.item_history) {
                         val target = File("${origin.parent}${File.separator}${input}.${origin.extension}")
                         if (File(path).renameTo(target)) {
                             val rec = record.copy(path = target.absolutePath)
-                            adapter?.change(rec to SuccessState(),pos)
-                            context.updateStorage(target.absolutePath)
-
-                            context.database(GlobalScope) { dao ->
-                                dao.update(rec)
-                            }
+                            update(pos, rec to SuccessState())
+                            action(rec)
                         }
                     }
+        }
+    }
+
+    fun update(state: State, record: Record?) {
+        record ?: return
+        val index = itemCount - 1
+        if (state is StartState) {
+            add(record to state)
+        } else {
+            update(index, record to state)
         }
     }
 }

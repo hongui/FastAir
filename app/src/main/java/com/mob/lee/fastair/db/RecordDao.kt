@@ -43,4 +43,5 @@ interface RecordDao{
 
     @Delete()
     suspend fun clearRecord(records : List<Record>)
+
 }

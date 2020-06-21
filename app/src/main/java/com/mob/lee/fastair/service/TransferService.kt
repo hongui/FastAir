@@ -1,23 +1,18 @@
 package com.mob.lee.fastair.service
 
-import android.app.Service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
+import com.mob.lee.fastair.base.AppService
 import com.mob.lee.fastair.io.SocketService
-import com.mob.lee.fastair.io.StringReader
 import com.mob.lee.fastair.io.state.State
-import com.mob.lee.fastair.model.ADDRESS
-import com.mob.lee.fastair.model.IS_HOST
 import com.mob.lee.fastair.model.PORT_MESSAGE
+import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.coroutines.async
 
-abstract class SocketSerice : Service() {
+abstract class TransferService : AppService() {
     var mSocket: SocketService? = null
     var mHandler: Handler? = null
-    val mScope by lazy {
-        ServiceScope.of()
-    }
 
     override fun onCreate() {
         mHandler = Handler {
@@ -36,9 +31,9 @@ abstract class SocketSerice : Service() {
         if (null == intent && null != mSocket) {
             return super.onStartCommand(intent, flags, startId)
         }
-        val host = intent?.getStringExtra(ADDRESS) ?: ""
-        val isHost = intent?.getBooleanExtra(IS_HOST, false) ?: false
-        content(host, isHost,intent)
+        viewModel<DeviceViewModel>().readInfo(this) { host, groupOwner ->
+            content(host, groupOwner, intent)
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -47,14 +42,9 @@ abstract class SocketSerice : Service() {
         return super.onUnbind(intent)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mScope.close()
-    }
-
-    open fun content(host: String, isHost: Boolean,intent: Intent?) {
-        mSocket = SocketService( true)
-        mScope.async {
+    open fun content(host: String?, isHost: Boolean, intent: Intent?) {
+        mSocket = SocketService(true)
+        async {
             mSocket?.open(PORT_MESSAGE, if (isHost) null else host)
             mSocket?.let {
                 connected(it)
@@ -67,5 +57,5 @@ abstract class SocketSerice : Service() {
 
     abstract suspend fun onNewTask(intent: Intent?)
 
-    abstract suspend fun connected(socket:SocketService)
+    abstract suspend fun connected(socket: SocketService)
 }

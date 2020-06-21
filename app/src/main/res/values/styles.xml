@@ -51,7 +51,7 @@
         <item name="colorButtonNormal">@color/colorPrimary</item>
     </style>
 
-    <style name="AppDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="AppDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 </resources>

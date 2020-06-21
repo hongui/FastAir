@@ -1,9 +1,12 @@
 package com.mob.lee.fastair.repository
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.SparseArray
 import com.mob.lee.fastair.model.*
+import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -109,5 +112,12 @@ class StorageDataSource : DataSource {
             channel.close()
         }
         return channel
+    }
+
+    fun updateStorage(context: Context?,path:String?){
+        path ?: return
+        val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        intent.data = Uri.fromFile(File(path))
+        context?.sendBroadcast(intent)
     }
 }
