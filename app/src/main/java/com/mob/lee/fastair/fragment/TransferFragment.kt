@@ -52,7 +52,6 @@ class TransferFragment : ConnectFragment(), ProcessListener {
             }
         }
         mParent?.bindService(intent, mConntect!!, Context.BIND_AUTO_CREATE)
-        mParent?.startService(intent)
     }
 
     override fun onStop() {

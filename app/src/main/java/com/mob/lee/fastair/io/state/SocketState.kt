@@ -29,6 +29,10 @@ const val STATE_DISCONNECTED=8
         STATE_DISCONNECTED)
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class SocketState
+annotation class SocketState{
+    companion object{
+
+    }
+}
 
 typealias SocketStateListener =(state:Int,info:String?)->Unit

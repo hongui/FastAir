@@ -25,8 +25,8 @@ class HistoryFragment : AppFragment() {
         rv_recyclerview?.layoutManager = LinearLayoutManager(context)
         rv_recyclerview?.adapter = adapter
 
-        observe(viewModel.history(mParent)) {
-            adapter.add(it)
+        observe(viewModel.histories(mParent)) {
+            adapter.add(it.data)
         }
     }
 }
