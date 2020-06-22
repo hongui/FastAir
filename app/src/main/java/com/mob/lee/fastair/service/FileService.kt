@@ -18,6 +18,7 @@ import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.utils.updateStorage
+import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.coroutines.async
 import java.io.File
 
@@ -29,6 +30,7 @@ class FileService : TransferService() {
     var oldState = 0F
     var writing = false
     var mFileChangeListener: ProcessListener? = null
+    override var port: Int?=9527
 
     val channelId = "fileservice"
     val channelName by lazy {
@@ -50,7 +52,7 @@ class FileService : TransferService() {
     }
 
     override fun onReceiveMessage(message: State) {
-        Log.d(TAG,"Receive file ${message}")
+        Log.d(TAG, "Receive file ${message}")
         message.let {
             mFileChangeListener?.invoke(it)
         }
@@ -82,7 +84,7 @@ class FileService : TransferService() {
         val record = database.recordDao(this@FileService) {
             DataWrap.success(waitRecord())
         }
-        Log.e(TAG,"Write File ${record}")
+        Log.e(TAG, "Write File ${record}")
         if (record.isSuccess()) {
             mSocket?.write(FileWriter(record.data?.path) {
                 updateRecord(it, record.data)
@@ -125,7 +127,7 @@ class FileService : TransferService() {
             updateStorage(file.absolutePath)
             Record(file.lastModified(), file.length(), file.lastModified(), file.path, Record.STATE_SUCCESS, state.duration)
         } else {
-            record.state =  Record.STATE_SUCCESS
+            record.state = Record.STATE_SUCCESS
             record
         }
 
@@ -158,7 +160,7 @@ class FileService : TransferService() {
         startForeground(9727, notification)
     }
 
-    companion object{
-        const val TAG="File-Transfer"
+    companion object {
+        const val TAG = "FileTransfer"
     }
 }

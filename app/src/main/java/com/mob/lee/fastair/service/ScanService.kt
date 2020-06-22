@@ -5,10 +5,8 @@ import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.IBinder
 import androidx.lifecycle.Observer
-import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppService
 import com.mob.lee.fastair.p2p.P2PManager
-import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 
 /**
@@ -27,19 +25,23 @@ class ScanService : AppService() {
             }
             viewModel.readDevice(this) { device ->
                 devices.find { it.deviceAddress == device }?.let {
-                    if(!P2PManager.isConnected()) {
+                    if (!P2PManager.isConnected()) {
                         P2PManager.connect(this, it)
                     }
                 }
             }
         }
     }
+
     private val connectObserver by lazy {
         Observer<Boolean?> {
+            val intent = Intent(this, FileService::class.java)
             if (true == it) {
                 P2PManager.stopDiscovery(this)
+                startService(intent)
             } else {
                 P2PManager.discover(this)
+                stopService(intent)
             }
         }
     }
@@ -63,7 +65,7 @@ class ScanService : AppService() {
         super.onDestroy()
         P2PManager.devicesLiveData.removeObserver(observer)
         P2PManager.connectLiveData.removeObserver(connectObserver)
-        P2PManager.unregister(this)
+        P2PManager.stopDiscovery(this)
     }
 
     companion object {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.async
 class MessageService : TransferService() {
     var socket: SocketService? = null
     var mMessageListener: ProcessListener? = null
+    override var port: Int?=9528
 
     fun write(content: String) {
         async {

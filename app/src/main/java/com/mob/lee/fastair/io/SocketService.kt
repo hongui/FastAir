@@ -5,87 +5,96 @@ import com.mob.lee.fastair.io.state.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
-import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
-import java.nio.channels.AsynchronousCloseException
-import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
+import java.nio.channels.*
 
 
 /**
  * Created by Andy on 2017/11/29.
  */
-class SocketService(var keepAlive : Boolean = false) {
+class SocketService(var keepAlive: Boolean = false) {
     /**
      * 读取监听器，消息到来会通知
      * @see read
      */
     private val readers = HashSet<Reader>()
+
     /**
      *发送消息
      * @see write
      */
     private val writers = Channel<Writer>(Channel.UNLIMITED)
+
     /**
      * 指示当前连接是否已经开启
      */
-    private var isOpen : Boolean = false
+    private var isOpen: Boolean = false
+
     /**
      * 通信通道
      */
-    private var channel : SocketChannel? = null
+    private var channel: SocketChannel? = null
 
-    private var server : ServerSocketChannel? = null
+    private var server: ServerSocketChannel? = null
 
-    private val listeners=ArrayList<SocketStateListener>()
+    private val listeners = ArrayList<SocketStateListener>()
+
     /**
      * 建立连接，host为空作为客户端，否则作为服务器
      * @param port 端口号
      * @param host 主机地址，当该参数为null时，则开启一个socket监听
      **/
-    suspend fun open(port : Int, host : String? = null) {
-        Log.d(TAG,"try to connect ${host}:${port}")
+    suspend fun open(port: Int, host: String? = null) {
+        Log.d(TAG, "try to connect ${host}:${port}")
         if (isOpen) {
             return
         }
         try {
             if (null != host) {
-                var time=0
+                var time = 0
                 //等待10S
-                while (!(channel?.isConnected?:false)&&time<20) {
+                while (false == channel?.isConnected && time < 20) {
                     try {
-                        if(null==channel) {
+                        if (null == channel) {
                             channel = SocketChannel.open()
                             channel?.socket()?.reuseAddress = true
                         }
                         channel?.connect(InetSocketAddress(host, port))
-                    } catch (e : Exception) {
-                        Log.d(TAG,"To Connect exception: ${e.message}")
+                    } catch (e: AlreadyConnectedException) {
+                        break
+                    } catch (e: ConnectionPendingException) {
+                        Log.d(TAG, "To Connect exception: ${e.message}")
                         delay(500)
                         time++
-                        continue
+                    } catch (e: AsynchronousCloseException) {
+                        Log.d(TAG, "To Connect exception: ${e.message}")
+                        delay(500)
+                        time++
+                    } catch (e: UnresolvedAddressException) {
+                        Log.d(TAG, "To Connect exception: ${e.message}")
+                        delay(500)
+                        time++
                     }
                 }
-                Log.d(TAG,"Connect ${host} : ${port} success")
+                Log.d(TAG, "Connect ${host} : ${port} success")
             } else {
                 server = ServerSocketChannel.open()
                 server?.socket()?.reuseAddress = true
                 server?.socket()?.bind(InetSocketAddress(port))
                 channel = server?.accept()
-                Log.d(TAG,"Accept connect ${port} success")
+                Log.d(TAG, "Accept connect ${port} success")
             }
+
             isOpen = true
             updateState(STATE_CONNECTED)
             handleRead()
             handleWrite()
-        } catch (e : Exception) {
-            Log.d(TAG,"Connect exception: ${e.message}")
-            isOpen = false
-            channel?.let {
-                it.close()
-            }
+
+        } catch (e: Exception) {
+            Log.d(TAG, "Connect exception: ${e.message}")
+
             close(e)
         }
     }
@@ -93,22 +102,22 @@ class SocketService(var keepAlive : Boolean = false) {
     /**
      * 添加收到数据的监听
      **/
-    suspend fun read(reader : Reader) {
+    suspend fun read(reader: Reader) {
         readers.add(reader)
     }
 
     /**
      * 添加写入数据的监听
      */
-    suspend fun write(writer : Writer) {
+    suspend fun write(writer: Writer) {
         writers.send(writer)
     }
 
     /**
      * 关闭连接
      */
-    fun close(e : Exception? = null) {
-        if (! isOpen) {
+    fun close(e: Exception? = null) {
+        if (!isOpen) {
             return
         }
         isOpen = false
@@ -119,7 +128,7 @@ class SocketService(var keepAlive : Boolean = false) {
         try {
             server?.close()
             channel?.close()
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         listeners.clear()
@@ -136,7 +145,7 @@ class SocketService(var keepAlive : Boolean = false) {
      * @see ProtocolType
      * @see ProtocolByte
      */
-    private suspend fun handleRead()  {
+    private suspend fun handleRead() {
         while (isOpen || keepAlive) {
             try {
                 updateState(STATE_READ_START)
@@ -148,9 +157,9 @@ class SocketService(var keepAlive : Boolean = false) {
                     reader(ProtocolByte.wrap(bytes.array(), ProtocolType.wrap(type)))
                 }
                 updateState(STATE_READ_FINISH)
-            } catch (e : Exception) {
-                Log.d(TAG,"Read exception: ${e.message}")
-                updateState(STATE_READ_FAILD,e.message)
+            } catch (e: Exception) {
+                Log.d(TAG, "Read exception: ${e.message}")
+                updateState(STATE_READ_FAILD, e.message)
                 for (reader in readers) {
                     reader.onError(e.message)
                 }
@@ -179,9 +188,9 @@ class SocketService(var keepAlive : Boolean = false) {
                     }
                 }
                 updateState(STATE_WRITE_FINISH)
-            } catch (e : Exception) {
-                Log.d(TAG,"Write exception: ${e.message}")
-                updateState(STATE_WRITE_FAILD,e.message)
+            } catch (e: Exception) {
+                Log.d(TAG, "Write exception: ${e.message}")
+                updateState(STATE_WRITE_FAILD, e.message)
                 if (e is ClosedReceiveChannelException) {
                     close(e)
                     updateState(STATE_DISCONNECTED)
@@ -194,7 +203,7 @@ class SocketService(var keepAlive : Boolean = false) {
     /**
      * 读取特定长度的字节，可能会阻塞
      */
-    private suspend fun readFix(targetSize : Int) : ByteBuffer {
+    private suspend fun readFix(targetSize: Int): ByteBuffer {
         val buffer = ByteBuffer.allocate(targetSize)
         while (buffer.hasRemaining() && isOpen) {
             channel?.read(buffer)
@@ -207,25 +216,24 @@ class SocketService(var keepAlive : Boolean = false) {
      * 状态更新
      * @see SocketState
      */
-    private fun updateState(@SocketState state:Int,info:String?=null){
-        for(l in listeners){
-            l.invoke(state,info)
+    private fun updateState(@SocketState state: Int, info: String? = null) {
+        for (l in listeners) {
+            l.invoke(state, info)
         }
     }
 
-    fun addListener(listener : SocketStateListener):Int{
-        val index=listeners.size
+    fun addListener(listener: SocketStateListener): SocketStateListener {
         listeners.add(listener)
-        return index
+        return listener
     }
 
-    fun removeListener(index:Int){
-        if(index in 0 until listeners.size){
-            listeners.removeAt(index)
-        }
+    fun removeListener(listener: SocketStateListener?) {
+       listeners.remove(listener)
     }
 
-    companion object{
-        const val TAG="SocketService"
+    fun isGroupOwner()=null!=server
+
+    companion object {
+        const val TAG = "SocketService"
     }
 }

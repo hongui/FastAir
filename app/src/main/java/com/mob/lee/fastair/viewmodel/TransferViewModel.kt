@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.History
+import com.mob.lee.fastair.io.state.FaildState
+import com.mob.lee.fastair.io.state.SuccessState
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
@@ -21,18 +23,30 @@ class TransferViewModel : AppViewModel() {
     val storageDataSource by lazy {
         StorageDataSource()
     }
-    fun history(context: Context?) = async<List<History>>{
-                /*dataSource.recordDao(context) {
-                    completedRecords()
-                }*/
-            }
 
-    fun update(record: Record?){
+    fun history(context: Context?) = async<List<History>> {
+        /*dataSource.recordDao(context) {
+            completedRecords()
+        }*/
+    }
+
+    fun histories(context: Context?) = asyncWithWrap {
+        dataSource.recordDao(context) {
+            DataWrap.success(records().map {
+                History(it, when (it.state) {
+                    Record.STATE_SUCCESS -> SuccessState()
+                    else -> FaildState()
+                })
+            })
+        }
+    }
+
+    fun update(record: Record?) {
 
     }
 
     //暂时没必要坐
-    fun clear(context: Context?){
+    fun clear(context: Context?) {
         /*val key = context?.getString(R.string.key_default_clear)
         val clear = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(key, true)
         if (clear) {
@@ -43,9 +57,9 @@ class TransferViewModel : AppViewModel() {
         DataWrap.success("")*/
     }
 
-    fun rename(context: Context?,record:Record?)=asyncWithWrap{
-        storageDataSource.updateStorage(context,record?.path)
-        dataSource.recordDao(context){
+    fun rename(context: Context?, record: Record?) = asyncWithWrap {
+        storageDataSource.updateStorage(context, record?.path)
+        dataSource.recordDao(context) {
             update(record)
             DataWrap.success(0)
         }
