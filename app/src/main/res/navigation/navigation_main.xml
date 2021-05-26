@@ -6,7 +6,29 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.mob.lee.fastair.fragment.HomeFragment"
-        android:label="HomeFragment" />
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_discoverFragment"
+            app:destination="@id/discoverFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_pathPickFragment"
+            app:destination="@id/pathPickFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_payFragment"
+            app:destination="@id/payFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_contentPickFragment"
+            app:destination="@id/contentPickFragment" />
+    </fragment>
     <fragment
         android:id="@+id/contentPickFragment"
         android:name="com.mob.lee.fastair.fragment.ContentPickFragment"

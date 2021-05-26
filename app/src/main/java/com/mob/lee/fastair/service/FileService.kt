@@ -6,8 +6,8 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.IBinder
 import android.util.Log
-import androidx.room.ext.T
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.io.FileReader
 import com.mob.lee.fastair.io.FileWriter
@@ -18,7 +18,6 @@ import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.utils.updateStorage
-import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.coroutines.async
 import java.io.File
 

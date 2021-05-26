@@ -17,6 +17,7 @@ import com.mob.lee.fastair.model.DataWrap
 import kotlinx.android.synthetic.main.fragment_content_pick.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.fragment.app.viewModels
 
 open class AppViewModel : ViewModel() {
     val stateLiveData = DataLoad<Any>()
@@ -86,7 +87,7 @@ open class AppViewModel : ViewModel() {
             }
         }
         if (target.isNotEmpty()) {
-            val viewmodel = ViewModelProviders.of(fragment.requireActivity()).get(PermissionViewModel::class.java)
+            val viewmodel:PermissionViewModel by fragment.viewModels()
             val fragmentManager = fragment.activity?.supportFragmentManager
             val f = PermissionFragment.request(target)
 

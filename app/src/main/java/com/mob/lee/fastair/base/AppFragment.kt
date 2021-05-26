@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.viewmodel.AppViewModel
@@ -76,7 +77,7 @@ abstract class AppFragment : Fragment() {
         })
     }
 
-    fun navigationBack(@IdRes destinationId:Int?=mParent?.mNavController?.currentDestination?.id, inclusive:Boolean=true) {
+    fun navigationBack(@IdRes destinationId:Int?=mParent?.mNavController?.currentDestination?.id, inclusive:Boolean=false) {
         mParent?.mNavController?.popBackStack(destinationId?:-1,inclusive)
     }
 

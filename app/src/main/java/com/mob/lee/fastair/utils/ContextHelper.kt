@@ -27,7 +27,7 @@ fun Context.toast(message : String?, bg : Int) {
     val real = SpannableString(message)
     real.setSpan(ForegroundColorSpan(Color.WHITE), 0, real.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     val toast = Toast.makeText(this, real, Toast.LENGTH_SHORT)
-    toast.view.setBackgroundResource(bg)
+    toast.view?.setBackgroundResource(bg)
     toast.show()
 }
 

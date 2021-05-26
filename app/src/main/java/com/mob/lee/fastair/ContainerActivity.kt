@@ -25,17 +25,19 @@ class ContainerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity)
 
-        P2PManager.connectLiveData.observe(this, Observer {
-            if (false == it) {
-                errorToast(R.string.msg_disconnect)
-                mNavController.popBackStack(R.id.homeFragment, true)
-            }
-        })
+        if(null==savedInstanceState) {
+            P2PManager.connectLiveData.observe(this, Observer {
+                if (false == it) {
+                    errorToast(R.string.msg_disconnect)
+                    mNavController.popBackStack(R.id.homeFragment, true)
+                }
+            })
 
-        P2PManager.p2pInfoLiveData.observe(this, Observer {
-            it?.let {
-                viewModel.saveInfo(this, it)
-            }
-        })
+            P2PManager.p2pInfoLiveData.observe(this, Observer {
+                it?.let {
+                    viewModel.saveInfo(this, it)
+                }
+            })
+        }
     }
 }

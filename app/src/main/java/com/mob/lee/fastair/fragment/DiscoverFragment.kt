@@ -31,7 +31,7 @@ class DiscoverFragment : AppFragment() {
 
     override fun setting() {
         setHasOptionsMenu(true)
-        title(R.string.discoverDevice, false)
+        title(R.string.discoverDevice, true)
 
         P2PManager.devicesLiveData.observe({ lifecycle }) {
             if (null == discoverView || null == it) {
@@ -74,12 +74,6 @@ class DiscoverFragment : AppFragment() {
                                 mParent?.errorToast(R.string.tip_rejected_location)
                             }
                 }
-            }
-        })
-
-        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                navigationBack(R.id.homeFragment)
             }
         })
     }

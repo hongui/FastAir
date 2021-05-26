@@ -39,7 +39,7 @@ class P2PReceiver : BroadcastReceiver() {
                 if (true == wifiP2pInfo?.groupFormed) {
                     P2PManager.p2pInfoLiveData.value = wifiP2pInfo
                     P2PManager.connectLiveData.value = true
-                } else {
+                } else if(true==P2PManager.connectLiveData.value){
                     P2PManager.p2pInfoLiveData.value = null
                     P2PManager.connectLiveData.value = false
                 }

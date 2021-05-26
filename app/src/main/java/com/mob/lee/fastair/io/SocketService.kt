@@ -2,9 +2,9 @@ package com.mob.lee.fastair.io
 
 import android.util.Log
 import com.mob.lee.fastair.io.state.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.delay
 import java.net.InetSocketAddress
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
@@ -46,7 +46,7 @@ class SocketService(var keepAlive: Boolean = false) {
      * @param port 端口号
      * @param host 主机地址，当该参数为null时，则开启一个socket监听
      **/
-    suspend fun open(port: Int, host: String? = null) {
+    suspend fun open(context:CoroutineScope,port: Int, host: String? = null) {
         Log.d(TAG, "try to connect ${host}:${port}")
         if (isOpen) {
             return
@@ -54,10 +54,11 @@ class SocketService(var keepAlive: Boolean = false) {
         try {
             if (null != host) {
                 var time = 0
+                delay(500)
                 //等待10S
-                while (false == channel?.isConnected && time < 20) {
+                while (false == channel?.isConnected?:false && time < 20) {
                     try {
-                        if (null == channel) {
+                        if(null==channel) {
                             channel = SocketChannel.open()
                             channel?.socket()?.reuseAddress = true
                         }
@@ -66,16 +67,15 @@ class SocketService(var keepAlive: Boolean = false) {
                         break
                     } catch (e: ConnectionPendingException) {
                         Log.d(TAG, "To Connect exception: ${e.message}")
-                        delay(500)
-                        time++
-                    } catch (e: AsynchronousCloseException) {
+                    }catch (e: AsynchronousCloseException) {
                         Log.d(TAG, "To Connect exception: ${e.message}")
-                        delay(500)
-                        time++
                     } catch (e: UnresolvedAddressException) {
                         Log.d(TAG, "To Connect exception: ${e.message}")
+                    }
+                    if(false==channel?.isConnected) {
                         delay(500)
                         time++
+                        Log.d(TAG, "Retry Connect ${time}")
                     }
                 }
                 Log.d(TAG, "Connect ${host} : ${port} success")
@@ -89,9 +89,13 @@ class SocketService(var keepAlive: Boolean = false) {
 
             isOpen = true
             updateState(STATE_CONNECTED)
-            handleRead()
-            handleWrite()
 
+            context.async(Dispatchers.IO) {
+                handleRead()
+            }
+            context.async(Dispatchers.IO) {
+                handleWrite()
+            }
         } catch (e: Exception) {
             Log.d(TAG, "Connect exception: ${e.message}")
 

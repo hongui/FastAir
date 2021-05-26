@@ -66,6 +66,7 @@ class ScanService : AppService() {
         P2PManager.devicesLiveData.removeObserver(observer)
         P2PManager.connectLiveData.removeObserver(connectObserver)
         P2PManager.stopDiscovery(this)
+        P2PManager.unregister(this)
     }
 
     companion object {

@@ -1,15 +1,14 @@
 package com.mob.lee.fastair
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import com.mob.lee.fastair.viewmodel.AppViewModel
+import androidx.fragment.app.viewModels
 import com.mob.lee.fastair.viewmodel.PermissionViewModel
-import kotlin.reflect.KClass
 
 /**
  *
@@ -34,7 +33,8 @@ class PermissionFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (PERMISSION == requestCode) {
-            ViewModelProviders.of(requireActivity()).get(PermissionViewModel::class.java).permissionLiveData.value = grantResults
+            val model:PermissionViewModel by viewModels()
+            model.permissionLiveData.value = grantResults
         }
     }
 
