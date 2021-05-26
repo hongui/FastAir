@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
@@ -32,7 +33,11 @@ abstract class AppFragment : Fragment() {
         mParent = context as ContainerActivity
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return if (-1 == defaultContainer) {
             inflater.inflate(layout, container, false)
         } else {
@@ -69,16 +74,29 @@ abstract class AppFragment : Fragment() {
         liveData.observe(this, Observer { action(it) })
     }
 
-    fun navigation(id: Int, args: (Bundle.() -> Unit)? = null) {
-        mParent?.mNavController?.navigate(id, args?.let {
+    fun navigation(
+        id: Int,
+        args: (Bundle.() -> Unit)? = null,
+        options: (NavOptions.Builder.() -> Unit)? = null
+    ) {
+        val bundle = args?.let {
             val bundle = Bundle()
             it(bundle)
             bundle
-        })
+        }
+        val opt = options?.let {
+            val builder = NavOptions.Builder()
+            options(builder)
+            builder.build()
+        }
+        mParent?.mNavController?.navigate(id, bundle, opt)
     }
 
-    fun navigationBack(@IdRes destinationId:Int?=mParent?.mNavController?.currentDestination?.id, inclusive:Boolean=false) {
-        mParent?.mNavController?.popBackStack(destinationId?:-1,inclusive)
+    fun navigationBack(
+        @IdRes destinationId: Int? = mParent?.mNavController?.currentDestination?.id,
+        inclusive: Boolean = false
+    ) {
+        mParent?.mNavController?.popBackStack(destinationId ?: -1, inclusive)
     }
 
     inline fun <reified D : AppViewModel> viewModel(): D {

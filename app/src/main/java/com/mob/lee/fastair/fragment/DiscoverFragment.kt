@@ -57,25 +57,27 @@ class DiscoverFragment : AppFragment() {
         }
         observe(P2PManager.connectLiveData) {
             if (true == it) {
-                mParent?.successToast(R.string.toast_connect_success)
-                navigationBack()
+                jump()
             }
         }
-        viewModel.withPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, action = { _, hasPermission ->
-            if (hasPermission) {
-                ScanService.startScan(requireContext())
-            } else {
-                mParent?.dialog {
-                    setMessage(R.string.tip_need_location)
+        viewModel.withPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            action = { _, hasPermission ->
+                if (hasPermission) {
+                    ScanService.startScan(requireContext())
+                } else {
+                    mParent?.dialog {
+                        setMessage(R.string.tip_need_location)
                             .setPositiveButton(R.string.turn_on) { _, _ ->
                                 viewModel.openSetting(this@DiscoverFragment)
                             }
                             .setNegativeButton(R.string.cancel) { _, _ ->
                                 mParent?.errorToast(R.string.tip_rejected_location)
                             }
+                    }
                 }
-            }
-        })
+            })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -87,10 +89,23 @@ class DiscoverFragment : AppFragment() {
         if (R.id.menu_discover_help == item.itemId) {
             mParent?.dialog {
                 setMessage(R.string.discover_help)
-                        .setPositiveButton(R.string.knowIt, null)
+                    .setPositiveButton(R.string.knowIt, null)
             }
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun jump() {
+        mParent?.successToast(R.string.toast_connect_success)
+        val needToTarget = arguments?.containsKey("target") ?: false
+        if (needToTarget) {
+            val target = requireArguments().getInt("target")
+            navigation(target,args={putAll(arguments)}, options = {
+                setPopUpTo(R.id.homeFragment, false)
+            })
+        } else {
+            mParent?.onBackPressed()
+        }
     }
 }
