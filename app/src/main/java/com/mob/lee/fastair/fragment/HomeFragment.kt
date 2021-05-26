@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.fragment
 
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -124,7 +125,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         toolOperation.setOnClickListener {
             if(viewModel.checkedRecords().isEmpty()){
-                navigation(R.id.transferFragment)
+                P2PManager.withConnectNavigation(this,R.id.discoverFragment){
+                    putInt("target",R.id.transferFragment)
+                }
             }else {
                 observe(viewModel.write(context)) {
                     if (it.isSuccess()) {
@@ -155,27 +158,29 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
 
             R.id.menu_history -> {
-                navigation(R.id.historyFragment) {
+                navigation(R.id.historyFragment,args = {
                     putBoolean("isHistory", true)
-                }
+                })
             }
 
-            R.id.menu_connect_chat -> navigation(R.id.chatFragment) {
+            R.id.menu_connect_chat -> P2PManager.withConnectNavigation(this,R.id.discoverFragment){
                 putAll(P2PManager.bundle())
+                putInt("target",R.id.chatFragment)
             }
 
             R.id.menu_payment -> navigation(R.id.payFragment)
 
-            R.id.menu_help -> navigation(R.id.textFragment) {
+            R.id.menu_help -> navigation(R.id.textFragment,args = {
                 putInt("type", 0)
-            }
+            })
 
-            R.id.menu_about -> navigation(R.id.textFragment) {
+            R.id.menu_about -> navigation(R.id.textFragment,args = {
                 putInt("type", 1)
-            }
+            })
 
             R.id.menu_setting -> navigation(R.id.settingFragment)
         }
+        homeDrawer?.closeDrawer(Gravity.LEFT)
         return true
     }
 

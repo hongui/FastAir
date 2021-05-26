@@ -17,6 +17,7 @@ import com.mob.lee.fastair.viewmodel.DeviceViewModel
  */
 class ScanService : AppService() {
     private val viewModel by lazy { viewModel<DeviceViewModel>() }
+
     private val observer by lazy {
         Observer<List<WifiP2pDevice>> { devices ->
             devices ?: return@Observer
@@ -52,7 +53,8 @@ class ScanService : AppService() {
 
     override fun onCreate() {
         super.onCreate()
-        P2PManager.devicesLiveData.observeForever(observer)
+        //自动重连，比较鸡肋，先去掉了
+        //P2PManager.devicesLiveData.observeForever(observer)
         P2PManager.connectLiveData.observeForever(connectObserver)
         P2PManager.register(this)
     }

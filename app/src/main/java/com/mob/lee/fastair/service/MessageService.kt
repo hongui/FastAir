@@ -12,13 +12,12 @@ import kotlinx.coroutines.async
  * Created by Andy on 2017/8/29.
  */
 class MessageService : TransferService() {
-    var socket: SocketService? = null
     var mMessageListener: ProcessListener? = null
     override var port: Int?=9528
 
     fun write(content: String) {
         async {
-            socket?.write(StringWriter(content))
+            mSocket?.write(StringWriter(content))
         }
     }
 

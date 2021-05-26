@@ -8,6 +8,8 @@ import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
+import com.mob.lee.fastair.R
+import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.ADDRESS
 import com.mob.lee.fastair.model.IS_HOST
 
@@ -60,6 +62,7 @@ object P2PManager {
     fun stopReceiver(context: Context) {
         if (null != receiver) {
             context.unregisterReceiver(receiver)
+            receiver=null
         }
     }
 
@@ -108,4 +111,12 @@ object P2PManager {
     }
 
     fun isConnected() = true == connectLiveData.value
+
+    fun withConnectNavigation(fragment:AppFragment,target:Int,args:(Bundle.()->Unit)?=null){
+        if(isConnected()){
+            fragment.navigation(target,args)
+        }else{
+            fragment.navigation(R.id.discoverFragment,args)
+        }
+    }
 }

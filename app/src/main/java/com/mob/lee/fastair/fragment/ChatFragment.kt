@@ -89,12 +89,10 @@ class ChatFragment : ConnectFragment() {
             }
         }
         context?.bindService(intent, mConnect!!, Context.BIND_AUTO_CREATE)
-        context?.startService(intent)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mParent?.stopService(Intent(context, MessageService::class.java))
         mConnect?.let {
             context?.unbindService(it)
         }
