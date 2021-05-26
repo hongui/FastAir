@@ -7,7 +7,6 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion sdk.compile
-    buildToolsVersion buildTool
     defaultConfig {
         applicationId "com.mob.lee.fastair"
         minSdkVersion sdk.mins
@@ -61,27 +60,26 @@ android {
 }
 
 dependencies {
-    dependencyList.activity
-    implementation dependencyList.activity
-    implementation dependencyList.cardview
-    implementation dependencyList.constraintlayout
-    implementation dependencyList.fragment
-    implementation dependencyList.kdt
-    implementation dependencyList.kotlincoroutine
-    implementation dependencyList.kotlinreflect
-    implementation dependencyList.lifecycle
-    implementation dependencyList.lifecycleruntime
-    implementation dependencyList.material
-    implementation dependencyList.multidex
-    implementation dependencyList.navigation
-    implementation dependencyList.navigationui
-    implementation dependencyList.paging
-    implementation dependencyList.preference
-    implementation dependencyList.recyclerview
-    implementation dependencyList.room
-    implementation dependencyList.roomkapt
-    implementation dependencyList.roomextension
-    implementation dependencyList.viewpager
+    implementation 'androidx.activity:activity-ktx:1.2.3'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.fragment:fragment-ktx:1.3.3'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.5.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.3.1'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+    implementation 'androidx.paging:paging-runtime:3.0.0'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.room:room-runtime:2.3.0'
+    implementation 'androidx.room:room-ktx:2.3.0'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
-    kapt dependencyList.roomkapt
+    kapt 'androidx.room:room-compiler:2.3.0'
 }

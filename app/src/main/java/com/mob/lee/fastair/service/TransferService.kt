@@ -6,11 +6,9 @@ import android.os.IBinder
 import com.mob.lee.fastair.base.AppService
 import com.mob.lee.fastair.io.SocketService
 import com.mob.lee.fastair.io.state.STATE_CONNECTED
-import com.mob.lee.fastair.io.state.SocketState
 import com.mob.lee.fastair.io.state.SocketStateListener
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.model.Args
-import com.mob.lee.fastair.model.PORT_MESSAGE
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,6 +34,9 @@ abstract class TransferService : AppService() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        if (null != mSocket) {
+            async { onNewTask(intent) }
+        }
         return BinderImpl(this)
     }
 
@@ -77,7 +78,7 @@ abstract class TransferService : AppService() {
             }
         }
         async(Dispatchers.IO) {
-            mSocket?.open(port ?: DEFAULT_PORT, if (true == groupOwner) host else null)
+            mSocket?.open(this,port ?: DEFAULT_PORT, if (true == groupOwner) null else host)
         }
     }
 
