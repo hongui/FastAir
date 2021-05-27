@@ -96,6 +96,7 @@ class FileService : TransferService() {
         socket.addListener { state, _ ->
             when (state) {
                 STATE_DISCONNECTED -> {
+                    mSocket?.close()
                     mFileChangeListener?.invoke(FaildState())
                     stopSelf()
                 }
