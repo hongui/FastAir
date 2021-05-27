@@ -100,7 +100,7 @@ class DiscoverFragment : AppFragment() {
         if (needToTarget) {
             val target = requireArguments().getInt("target")
             navigation(target,args={putAll(arguments)}, options = {
-                setPopUpTo(R.id.homeFragment, false)
+                setPopUpTo(R.id.discoverFragment, true)
             })
         } else {
             mParent?.onBackPressed()

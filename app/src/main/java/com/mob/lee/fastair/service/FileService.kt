@@ -26,9 +26,10 @@ import java.io.File
  */
 class FileService : TransferService() {
 
+    var lastId=0L
     var oldState = 0F
     var mFileChangeListener: ProcessListener? = null
-    override var port: Int?=9527
+    override var port: Int? = 9527
 
     val channelId = "fileservice"
     val channelName by lazy {
@@ -42,7 +43,8 @@ class FileService : TransferService() {
         super.onCreate()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            val channel =
+                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
@@ -74,21 +76,21 @@ class FileService : TransferService() {
     }
 
     override suspend fun onNewTask(intent: Intent?) {
-        val records=database.recordDao(this@FileService) {
+        val records = database.recordDao(this@FileService) {
             DataWrap.success(waitRecords())
         }
-        if (records.isSuccess()&&true==records.data.isNullOrEmpty()) {
+        if (records.isSuccess() && true == records.data.isNullOrEmpty()) {
             return
         }
-        val record = database.recordDao(this@FileService) {
-            DataWrap.success(waitRecord())
-        }
-        Log.e(TAG, "Write File ${record}")
-        if (record.isSuccess()) {
-            mSocket?.write(FileWriter(record.data?.path) {
-                updateRecord(it, record.data)
+        val target = records.data?.first { lastId!=it.id }
+        target?.let { record ->
+            Log.e(TAG, "Write File ${record}")
+            lastId=record.id
+            mSocket?.write(FileWriter(record.path) {
+                updateRecord(it, record)
             })
         }
+
     }
 
     override suspend fun connected(socket: SocketService) {
@@ -124,7 +126,14 @@ class FileService : TransferService() {
         file ?: return
         val target = if (null == record) {
             updateStorage(file.absolutePath)
-            Record(file.lastModified(), file.length(), file.lastModified(), file.path, Record.STATE_SUCCESS, state.duration)
+            Record(
+                file.lastModified(),
+                file.length(),
+                file.lastModified(),
+                file.path,
+                Record.STATE_SUCCESS,
+                state.duration
+            )
         } else {
             record.state = Record.STATE_SUCCESS
             record
