@@ -151,6 +151,7 @@ class HomeViewModel : AppViewModel() {
                 it.state = Record.STATE_WAIT
             }
             insert(list)
+            selectedRecords.forEach { it.state=Record.STATE_ORIGIN }
             selectedRecords.clear()
             DataWrap.success("")
         }
