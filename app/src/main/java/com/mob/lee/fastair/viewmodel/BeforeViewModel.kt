@@ -38,7 +38,9 @@ class BeforeViewModel : AppViewModel() {
         database.recordDao(context) {
             val records = waitRecords.filter { Record.STATE_WAIT != it.state }
             clearRecord(records)
-            DataWrap.success(waitRecords.filter { Record.STATE_WAIT == it.state }.size)
+            val size=waitRecords.filter { Record.STATE_WAIT == it.state }.size
+            waitRecords.clear()
+            DataWrap.success(size)
         }
     }
 }

@@ -7,12 +7,8 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
-import com.mob.lee.fastair.adapter.Adapter
 import com.mob.lee.fastair.adapter.RecordAdapter
-import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.io.ProcessListener
-import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.StartState
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.io.state.parseFile
 import com.mob.lee.fastair.service.BinderImpl
@@ -52,6 +48,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
             }
         }
         mParent?.bindService(intent, mConntect!!, Context.BIND_AUTO_CREATE)
+        mParent?.startService(intent)
     }
 
     override fun onStop() {

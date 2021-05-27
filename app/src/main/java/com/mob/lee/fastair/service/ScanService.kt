@@ -40,9 +40,6 @@ class ScanService : AppService() {
             if (true == it) {
                 P2PManager.stopDiscovery(this)
                 startService(intent)
-            } else {
-                P2PManager.discover(this)
-                stopService(intent)
             }
         }
     }
@@ -60,6 +57,7 @@ class ScanService : AppService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        P2PManager.discover(this)
         return START_STICKY_COMPATIBILITY
     }
 
@@ -74,7 +72,6 @@ class ScanService : AppService() {
     companion object {
         fun startScan(context: Context?) {
             val intent = Intent(context, ScanService::class.java)
-            context?.stopService(intent)
             context?.startService(intent)
         }
     }

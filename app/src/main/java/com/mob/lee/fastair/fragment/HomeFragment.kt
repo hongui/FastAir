@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.fragment
 
+import android.content.Intent
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +17,7 @@ import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
+import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
@@ -125,7 +127,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         toolOperation.setOnClickListener {
             if(viewModel.checkedRecords().isEmpty()){
-                P2PManager.withConnectNavigation(this,R.id.discoverFragment){
+                P2PManager.withConnectNavigation(this,R.id.transferFragment){
                     putInt("target",R.id.transferFragment)
                 }
             }else {
@@ -149,6 +151,8 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                         setMessage(R.string.msg_disconnect_now)
                                 .setPositiveButton(R.string.stopAndDisconnect) { _, _ ->
                                     P2PManager.stopConnect()
+                                    val intent= Intent(context,FileService::class.java)
+                                    mParent?.stopService(intent)
                                 }
                                 .setNegativeButton(R.string.cancel, null)
                     }
@@ -163,7 +167,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                 })
             }
 
-            R.id.menu_connect_chat -> P2PManager.withConnectNavigation(this,R.id.discoverFragment){
+            R.id.menu_connect_chat -> P2PManager.withConnectNavigation(this,R.id.chatFragment){
                 putAll(P2PManager.bundle())
                 putInt("target",R.id.chatFragment)
             }
