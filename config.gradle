@@ -1,6 +1,6 @@
 def appVersion = [:]
 appVersion.code = 7
-appVersion.name = '1.4.1'
+appVersion.name = '1.4.3'
 ext.appVersion = appVersion
 
 def sdk = [:]
