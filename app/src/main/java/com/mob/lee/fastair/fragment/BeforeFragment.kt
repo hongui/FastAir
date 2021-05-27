@@ -26,7 +26,7 @@ class BeforeFragment : AppFragment() {
 
         btn_before_action.setOnClickListener {
             observe(viewModel.submit(mParent)) {
-                P2PManager.withConnectNavigation(this,R.id.discoverFragment){
+                P2PManager.withConnectNavigation(this,R.id.transferFragment){
                     putInt("target",R.id.transferFragment)
                 }
             }

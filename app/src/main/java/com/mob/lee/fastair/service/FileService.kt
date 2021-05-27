@@ -27,7 +27,6 @@ import java.io.File
 class FileService : TransferService() {
 
     var oldState = 0F
-    var writing = false
     var mFileChangeListener: ProcessListener? = null
     override var port: Int?=9527
 
@@ -67,7 +66,6 @@ class FileService : TransferService() {
 
             is SuccessState -> {
                 notification(100, file?.name ?: "")
-                writing = false
                 async {
                     onNewTask(null)
                 }
@@ -76,10 +74,12 @@ class FileService : TransferService() {
     }
 
     override suspend fun onNewTask(intent: Intent?) {
-        if (writing) {
+        val records=database.recordDao(this@FileService) {
+            DataWrap.success(waitRecords())
+        }
+        if (records.isSuccess()&&true==records.data.isNullOrEmpty()) {
             return
         }
-        writing = true
         val record = database.recordDao(this@FileService) {
             DataWrap.success(waitRecord())
         }
@@ -89,7 +89,6 @@ class FileService : TransferService() {
                 updateRecord(it, record.data)
             })
         }
-        writing = false
     }
 
     override suspend fun connected(socket: SocketService) {

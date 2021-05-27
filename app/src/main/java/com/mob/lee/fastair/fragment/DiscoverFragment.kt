@@ -1,13 +1,11 @@
 package com.mob.lee.fastair.fragment
 
 import android.Manifest
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.P2PManager
