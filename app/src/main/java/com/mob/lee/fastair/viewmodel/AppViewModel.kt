@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
 
 open class AppViewModel : ViewModel() {
-    val stateLiveData = DataLoad<Any>()
+    val stateLiveData = DataLoad<Any?>()
 
     /**
      * 执行耗时任务，不会阻塞UI
@@ -87,7 +88,7 @@ open class AppViewModel : ViewModel() {
             }
         }
         if (target.isNotEmpty()) {
-            val viewmodel:PermissionViewModel by fragment.viewModels()
+            val viewmodel:PermissionViewModel by fragment.requireActivity().viewModels()
             val fragmentManager = fragment.activity?.supportFragmentManager
             val f = PermissionFragment.request(target)
 
