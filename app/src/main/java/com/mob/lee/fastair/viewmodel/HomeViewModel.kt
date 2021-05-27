@@ -151,6 +151,7 @@ class HomeViewModel : AppViewModel() {
                 it.state = Record.STATE_WAIT
             }
             insert(list)
+            selectedRecords.clear()
             DataWrap.success("")
         }
     }
