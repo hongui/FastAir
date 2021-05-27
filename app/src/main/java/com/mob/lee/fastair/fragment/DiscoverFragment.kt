@@ -42,9 +42,10 @@ class DiscoverFragment : AppFragment() {
             }
             discoverView.removeAllViews()
             for (device in it) {
+                if(null==device) continue
                 val view = LayoutInflater.from(context).inflate(R.layout.item_scan, null)
                 val name = view?.findViewById<TextView>(R.id.item_scan_name)
-                name?.text = device.deviceName
+                name?.text = device?.deviceName
                 view?.setOnClickListener {
                     stopDiscover = true
 

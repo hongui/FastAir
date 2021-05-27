@@ -18,7 +18,7 @@ import com.mob.lee.fastair.model.IS_HOST
  */
 object P2PManager {
     //设备信息列表
-    val devicesLiveData = MutableLiveData<List<WifiP2pDevice>>()
+    val devicesLiveData = MutableLiveData<MutableList<WifiP2pDevice>>()
 
     //连接状态
     val connectLiveData = MutableLiveData<Boolean?>()
@@ -52,7 +52,7 @@ object P2PManager {
     }
 
     fun unregister(context: Context) {
-        devicesLiveData.value = null
+        devicesLiveData.value?.clear()
         connectLiveData.value = null
         p2pInfoLiveData.value = null
         stopReceiver(context)
