@@ -107,8 +107,10 @@ class HomeViewModel : AppViewModel() {
         val hasChecked = checkedRecords().isNotEmpty()
         records.forEach {
             it.state = if (hasChecked) {
+                selectedRecords.remove(it)
                 Record.STATE_ORIGIN
             } else {
+                selectedRecords.add(it)
                 Record.STATE_CHECK
             }
             next(it)
