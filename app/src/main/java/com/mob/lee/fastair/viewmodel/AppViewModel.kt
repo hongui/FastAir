@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
 
 open class AppViewModel : ViewModel() {
-    val stateLiveData = DataLoad<Any>()
+    val stateLiveData = DataLoad<Any?>()
 
     /**
      * 执行耗时任务，不会阻塞UI
