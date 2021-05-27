@@ -19,13 +19,13 @@ class ScanService : AppService() {
     private val viewModel by lazy { viewModel<DeviceViewModel>() }
 
     private val observer by lazy {
-        Observer<List<WifiP2pDevice>> { devices ->
+        Observer<List<WifiP2pDevice?>> { devices ->
             devices ?: return@Observer
             if (P2PManager.isConnected()) {
                 return@Observer
             }
             viewModel.readDevice(this) { device ->
-                devices.find { it.deviceAddress == device }?.let {
+                devices.find { it?.deviceAddress == device }?.let {
                     if (!P2PManager.isConnected()) {
                         P2PManager.connect(this, it)
                     }
