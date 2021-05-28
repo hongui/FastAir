@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.fragment
 
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.FileAdapter
@@ -14,8 +15,7 @@ class ContentPickFragment : AppFragment() {
     override val layout: Int = R.layout.fragment_content_pick
     override val defaultContainer: Int = -1
     override fun setting() {
-        val viewModel = (parentFragment as AppFragment).viewModel<HomeViewModel>()
-
+        val viewModel:HomeViewModel by mParent!!.viewModels()
         val adapter = FileAdapter {
             viewModel.toggleState(it)
         }
