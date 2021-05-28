@@ -1,6 +1,5 @@
 package com.mob.lee.fastair.model
 
-import android.net.Uri
 import android.provider.MediaStore
 import com.mob.lee.fastair.R
 
