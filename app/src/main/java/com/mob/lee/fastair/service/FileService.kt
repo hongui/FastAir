@@ -3,11 +3,14 @@ package com.mob.lee.fastair.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.io.FileReader
 import com.mob.lee.fastair.io.FileWriter
@@ -48,7 +51,7 @@ class FileService : TransferService() {
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
-        notification(0, getString(R.string.trans_ing))
+        notification(0, getString(R.string.trans_waiting))
     }
 
     override fun onReceiveMessage(message: State) {
@@ -151,7 +154,10 @@ class FileService : TransferService() {
         }
     }
 
-    fun notification(progress: Int, title: String) {
+    fun notification(progress: Int, title: String,target:Int?=0) {
+        val intent=PendingIntent.getActivity(this,9527,
+            Intent(this,ContainerActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT)
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, channelId)
         } else {
@@ -161,6 +167,7 @@ class FileService : TransferService() {
         builder.setSmallIcon(R.mipmap.ic_launcher)
         builder.setProgress(100, progress, false)
         builder.setAutoCancel(true)
+        builder.setContentIntent(intent)
         val notification = builder.build()
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager

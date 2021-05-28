@@ -27,7 +27,8 @@
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".ContainerActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
