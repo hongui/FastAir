@@ -14,7 +14,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.viewmodel.AppViewModel

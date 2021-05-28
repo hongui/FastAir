@@ -137,4 +137,6 @@
     <string name="menu_setting">设置</string>
 
     <string name="no_permission_to_scan">没有足够的权限扫描设备文件信息，请打开权限后使用，这不会记录你的任何隐私信息！</string>
+    <string name="alipay">支付宝</string>
+    <string name="wechat">微信支付</string>
 </resources>

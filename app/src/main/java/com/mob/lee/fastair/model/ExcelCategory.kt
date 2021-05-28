@@ -1,7 +1,5 @@
 package com.mob.lee.fastair.model
 
-import android.os.Parcel
-import android.os.Parcelable
 import android.provider.MediaStore
 import com.mob.lee.fastair.R
 

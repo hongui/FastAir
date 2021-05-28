@@ -9,7 +9,6 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
