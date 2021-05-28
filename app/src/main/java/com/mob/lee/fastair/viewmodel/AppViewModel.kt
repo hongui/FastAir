@@ -18,28 +18,9 @@ import com.mob.lee.fastair.model.DataWrap
 import kotlinx.android.synthetic.main.fragment_content_pick.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.fragment.app.viewModels
 
 open class AppViewModel : ViewModel() {
     val stateLiveData = DataLoad<Any?>()
-
-    /**
-     * 执行耗时任务，不会阻塞UI
-     */
-    /*fun <D> async(action: suspend () -> DataWrap<D>): LiveData<D> {
-        val liveData = MutableLiveData<D>()
-        stateLiveData.value = StatusLoading()
-        viewModelScope.launch(Dispatchers.Main) {
-            val result = action()
-            stateLiveData.value = if (result.isSuccess()) {
-                liveData.value = result.data
-                StatusSuccess()
-            } else {
-                StatusError(result.msg)
-            }
-        }
-        return liveData
-    }*/
 
     fun <D> async(liveData: MutableLiveData<D>? = null, action: suspend DataLoad<D>.() -> Unit): LiveData<D> {
         val targetLiveData = liveData.apply { this?.value = null } ?: MutableLiveData<D>()

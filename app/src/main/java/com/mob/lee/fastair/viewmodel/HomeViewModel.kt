@@ -1,21 +1,20 @@
 package com.mob.lee.fastair.viewmodel
 
 import android.Manifest
+import android.content.ClipData
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import androidx.lifecycle.MutableLiveData
-import com.mob.lee.fastair.BuildConfig
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
+import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.dialog
+import com.mob.lee.fastair.utils.urlToPath
 import kotlinx.coroutines.channels.Channel
+import java.io.File
 
 class HomeViewModel : AppViewModel() {
     var isDes = true
@@ -39,20 +38,23 @@ class HomeViewModel : AppViewModel() {
 
     fun updateLocation(fragment: AppFragment, location: Int) {
         position = location
-        withPermission(fragment, Manifest.permission.WRITE_EXTERNAL_STORAGE, action = { _, hasPermission ->
-            if (hasPermission) {
-                fetch(fragment.context)
-            } else {
-                fragment.mParent?.dialog {
-                    setMessage(R.string.no_permission_to_scan)
+        withPermission(
+            fragment,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            action = { _, hasPermission ->
+                if (hasPermission) {
+                    fetch(fragment.context)
+                } else {
+                    fragment.mParent?.dialog {
+                        setMessage(R.string.no_permission_to_scan)
                             .setPositiveButton(R.string.turn_on) { _, _ ->
                                 openSetting(fragment)
                             }.setNegativeButton(R.string.exit) { _, _ ->
                                 fragment.mParent?.finish()
                             }
+                    }
                 }
-            }
-        })
+            })
     }
 
     fun fetch(context: Context?) = async(recordLiveData) {
@@ -68,16 +70,17 @@ class HomeViewModel : AppViewModel() {
     }
 
 
-    inline fun <D : Comparable<D>> sortBy(crossinline selector: (Record) -> D) = async(recordLiveData) {
-        if (isDes) {
-            records.sortByDescending(selector)
-        } else {
-            records.sortBy(selector)
+    inline fun <D : Comparable<D>> sortBy(crossinline selector: (Record) -> D) =
+        async(recordLiveData) {
+            if (isDes) {
+                records.sortByDescending(selector)
+            } else {
+                records.sortBy(selector)
+            }
+            for (r in records) {
+                next(r)
+            }
         }
-        for (r in records) {
-            next(r)
-        }
-    }
 
 
     fun reverse() = async(recordLiveData) {
@@ -151,8 +154,33 @@ class HomeViewModel : AppViewModel() {
                 it.state = Record.STATE_WAIT
             }
             insert(list)
-            selectedRecords.forEach { it.state=Record.STATE_ORIGIN }
+            selectedRecords.forEach { it.state = Record.STATE_ORIGIN }
             selectedRecords.clear()
+            DataWrap.success("")
+        }
+    }
+
+    fun parseClipData(context: Context?, clipData: ClipData) = asyncWithWrap<String> {
+        val records = ArrayList<Record>()
+        val itemCount = clipData.itemCount
+        for (i in 0 until itemCount) {
+            val item = clipData.getItemAt(i)
+            val uri = item.uri
+            val path=context?.urlToPath(uri)
+            if (null != path) {
+                val file = File(path)
+                val record = Record(
+                    System.currentTimeMillis(),
+                    file.length(),
+                    file.lastModified(),
+                    file.absolutePath,
+                    Record.STATE_WAIT
+                )
+                records.add(record)
+            }
+        }
+        database.recordDao(context) {
+            insert(records)
             DataWrap.success("")
         }
     }
