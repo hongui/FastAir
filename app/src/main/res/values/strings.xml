@@ -2,7 +2,7 @@
     <string name="app_name">快传</string>
     <string name="app_description">体验飞起来的速度</string>
     <string name="wait_for_transport_file">待传输列表</string>
-    <string name="trans_ing">正在传送</string>
+    <string name="trans_waiting">等待传送</string>
     <string name="file_transfer">文件传输</string>
     <string name="scan_tips">正在扫描周围设备，请稍等...</string>
     <string name="tips_scan_failed">扫描完毕，未发现周围设备，请确认后再试</string>
