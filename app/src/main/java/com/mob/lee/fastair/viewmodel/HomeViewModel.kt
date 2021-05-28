@@ -108,6 +108,7 @@ class HomeViewModel : AppViewModel() {
 
     fun selectAll() = async(recordLiveData) {
         val hasChecked = checkedRecords().isNotEmpty()
+        hasSelectedLiveData.value=!hasChecked
         records.forEach {
             it.state = if (hasChecked) {
                 selectedRecords.remove(it)
