@@ -1,0 +1,140 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:local="pt-br">
+    <string name="app_name">Fast Air</string>
+    <string name="app_description">Experimente as transferências de alta velocidade</string>
+    <string name="wait_for_transport_file">Lista de transferências pendentes</string>
+    <string name="trans_ing">Transferência em andamento</string>
+    <string name="file_transfer">Transferência de arquivos</string>
+    <string name="scan_tips">Procurando por dispositivos, por favor aguarde...</string>
+    <string name="tips_scan_failed">Procura concluída, nenhum dispositivo encontrado, por favor confirme e tente novamente</string>
+    <string name="tips_init_failed">A iniciação falhou, tente novamente mais tarde</string>
+    <string name="tips_error">Erro</string>
+    <string name="tips_disabled_wifi_p2p">O dispositivo atual não está usando o Wifi Direct ou não tem suporte para ele, por favor confirme e tente novamente</string>
+    <string name="tips_ok">Ok</string>
+    <string name="base.chooseOperator">Selecione a ação</string>
+    <string name="base.findDevice">Localizador de dispositivos</string>
+    <string name="base.transferRecord">Histórico das transferências</string>
+    <string name="base.receive">Aceitar</string>
+    <string name="base.again">Tente novamente</string>
+    <string name="base.chat">Chat</string>
+    <string name="base.exit">Sair</string>
+    <string name="discoverDevice">Conexão do dispositivo</string>
+    <string name="discover.tips">Procurando por dispositivos, por favor aguarde....</string>
+    <string name="action.copy">Copiar ao Clipboard</string>
+    <string name="toast.alreadyCopy">Conteúdo copiado ao Clipboard com sucesso</string>
+    <string name="toast.sendIllegal">Não é possível enviar espaços ou frases em branco</string>
+    <string name="toast.sendFaild">A entrega da mensagem falhou</string>
+    <string name="toast.removeFalid">Ocorreu um erro ao remover do grupo</string>
+    <string name="toast_connect_success">Parabéns, a conexão foi estabelecida!</string>
+    <string name="toast_auto_connect">Dispositivo recentemente conectado foi automaticamente reconectado!</string>
+    <string name="toast.failedOpen">Falha ao abrir, não foi encontrado nenhum app adequado para abrir este arquivo</string>
+    <string name="toast.failedFinder">Localizador falhou</string>
+    <string name="tip_have_no_file">Não é possível enviar, nenhum arquivo foi selecionado</string>
+    <string name="tip_error_p2p_unsupport">Desculpe, este dispositivo não tem suporte aos serviços P2P via Wi-Fi ou serviço não está disponível no momento!</string>
+    <string name="tip_error_p2p_busy">O dispositivo está processando o pedido, por favor aguarde</string>
+    <string name="tip_error_p2p_inter">O serviço está temporariamente indisponível, reiniciando...</string>
+    <string name="tip_use_click">Clique no ícone do celular para completar o emparelhamento com outro dispositivo</string>
+    <string name="tip_use_conntect">Antes de poder ser usado, o App precisa ser emparelhado com outro dispositivo</string>
+    <string name="tip_need_location">O App requer permissão de localização para descobrir dispositivos disponíveis. Isto só é usado para a descoberta de dispositivos.</string>
+    <string name="tip_rejected_location">Você negou permissão de localização, isso pode impedir a descoberta de dispositivos ou possibilidade de ser descoberto por outros.</string>
+    <string name="knowIt">Ok</string>
+    <string name="turn_on">Ligar</string>
+    <string name="retry">Tente novamente</string>
+    <string name="cancel">Cancelar</string>
+    <string name="loading">Carregando...</string>
+    <string name="toggle_open">Configurar</string>
+    <string name="toggle_close">@string/app_name</string>
+    <string name="aes">Ascendente</string>
+    <string name="des">Descendente</string>
+    <string name="swap">Trocar</string>
+    <string name="selectAll">Selecione todos</string>
+    <string name="unSelectAll">Desselecione todos</string>
+    <string name="sort">Ordenar por</string>
+    <string name="delete">Excluir</string>
+    <string name="sortByName">Por nome</string>
+    <string name="sortBySize">Por tamanho</string>
+    <string name="sortByTime">Por tempo</string>
+    <string name="warm">Aviso</string>
+    <string name="giveUp">Desistir</string>
+    <string name="send">Enviar</string>
+    <string name="category_picture">Fotos</string>
+    <string name="category_other">Outros</string>
+    <string name="category_application">Apps</string>
+    <string name="category_zip">Arquivos compactados</string>
+    <string name="category_txt">Texto</string>
+    <string name="category_pdf">PDF</string>
+    <string name="category_powerpoint">PowerPoint</string>
+    <string name="category_excel">Excel</string>
+    <string name="category_word">Word</string>
+    <string name="category_music">Música</string>
+    <string name="category_video">Vídeo</string>
+    <string name="history">Histórico das transferências</string>
+    <string name="setting">Configurações</string>
+    <string name="choose_save_path">Escolha a pasta padrão</string>
+    <string name="home_dir">Principal</string>
+
+    <!--dialog-->
+    <string name="deleteTips">Esta ação excluirá todos os arquivos atualmente selecionados e você não será capaz de recuperá-los após disso.</string>
+    <string name="disconverBackInfo">Procurando por dispositivos, pressione OK para parar a procura e retornar</string>
+    <string name="stop">Parar</string>
+
+    <string name="disconverStateTips">Ou o Wi-Fi está desligado ou o dispositivo não tem suporte às conexões via Wi-Fi Direto</string>
+
+    <string name="ok">Ok</string>
+    <string name="deleteFileList">Lista de arquivos para excluir</string>
+    <string name="wramTips">Dica</string>
+    <string name="chatOverInfo">Você tem certeza de que quer terminar o chat e desconectar-se?</string>
+    <string name="disconnect">Desconectar</string>
+    <string name="justkid">Peraí</string>
+    <string name="chooseDownloadPath">Escolha a pasta de download</string>
+    <string name="dontSelect">Nenhum arquivo selecionado, o que você quer excluir?</string>
+
+    <string name="device_connect">Conectando com o dispositivo</string>
+    <string name="device_disconnect">Desconectando</string>
+    <string name="help">Ajuda</string>
+    <string name="msg_disconnect">A conexão falhou</string>
+    <string name="msg_disconnect_now">O dispositivo está conectado, se você desconectar, precisará reconectar outra vez para poder transferir arquivos e conversar</string>
+    <string name="msg_disconnect_or_exit">Quer interromper o serviço e desconectar (a próxima vez você pode precisar reconectar)</string>
+    <string name="reconnect">Reconectar</string>
+    <string name="exit">Sair</string>
+    <string name="onlyDisconnect">Parar as transferências</string>
+    <string name="stopAndDisconnect">Desconectar</string>
+    <string name="title_error">Ocorreu um erro</string>
+    <string name="msg_disconnect_toast">A conexão falhou</string>
+    <string name="discover_help">1 O App precisa conectar-se aos dispositivos para funcionar. Por favor, certifique-se de que o dispositivo ao qual você quer conectar-se tenha o App aberto e funcionando \n2 Quando o ícone e o nome do celular aparecerem no App, clique nele para completar o emparelhamento \n3 Se você precisar encerrar a conexão, clique no botão desconectar no menu na tela inicial</string>
+    <string name="detect_unfinished_task">Alguns arquivos não foram enviados, você quer tentar enviá-los outra vez?</string>
+    <string name="path_setting_success">A pasta padrão foi modificada com sucesso e os novos arquivos recebidos serão salvos lá: %s</string>
+    <string name="storage_not_ready">O armazenamento do dispositivo não está pronto</string>
+    <string name="later">Mais tarde</string>
+    <string name="file_operation">Atividade de arquivos</string>
+
+    <string name="dropbehavior">com.mob.lee.fastair.view.TranslationBehavior</string>
+
+    <string name="help_content"><b>P:Como enviar arquivos？\n</b></string>
+
+    <string name="file_detail">Detalhes do arquivo</string>
+    <string name="file_rename">Renomear</string>
+    <string name="file_size">Tamanho</string>
+    <string name="file_type">Tipo</string>
+    <string name="file_date">Data</string>
+    <string name="file_path">Pasta</string>
+    <string name="no_application_find">Não foi encontrado nenhum app adequado para abrir o arquivo</string>
+
+    <string name="pref_default_clear_title">Exclusão automática</string>
+    <string name="pref_default_clear_des">Após sair do App é bom limpar as tarefas concluídas para evitar interação inadequada entre os arquivos</string>
+    <string name="pref_default_rewrite_title">Sobrescrever arquivos</string>
+    <string name="pref_default_rewrite_des">Quando você receber um arquivo com o mesmo nome que já existe no seu dispositivo, ele será automaticamente substituído.</string>
+    <string name="pref_default_download">Pasta padrão de arquivos</string>
+    <string name="key_default_clear">Limpeza automática</string>
+    <string name="key_default_rewrite">Sobrescrever</string>
+    <string name="key_default_download">Download</string>
+
+    <string name="menu_disconnect">Desconectar</string>
+    <string name="menu_history">Histórico das transferências</string>
+    <string name="menu_chat">Chat agora</string>
+    <string name="menu_support">Ajuda em descoberta</string>
+    <string name="menu_help">Ajuda</string>
+    <string name="menu_about">Sobre</string>
+    <string name="menu_setting">Configurações</string>
+
+    <string name="no_permission_to_scan">A permissão é necessária para procurar no dispositivo as informações do arquivo, por favor, permita-a para utilizá-lo, isto não capturará nenhuma informação privada sensível!</string>
+</resources>
