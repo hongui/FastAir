@@ -17,7 +17,7 @@ class HistoryFragment : AppFragment() {
     }
 
     override fun setting() {
-        title(R.string.history)
+        title(R.string.transfer_history)
 
         val adapter = RecordAdapter {
             viewModel.rename(requireContext(), it)

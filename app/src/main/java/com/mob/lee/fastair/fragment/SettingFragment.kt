@@ -8,6 +8,6 @@ class SettingFragment : AppFragment() {
     override val layout: Int = R.layout.fragment_setting
 
     override fun setting() {
-        title(R.string.setting)
+        title(R.string.settings)
     }
 }

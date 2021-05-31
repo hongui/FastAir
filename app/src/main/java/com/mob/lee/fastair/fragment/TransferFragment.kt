@@ -66,7 +66,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
     override fun invoke(state: State) {
         val record = parseFile(state)
         if (null == record) {
-            mParent?.errorToast(R.string.msg_disconnect_toast)
+            mParent?.errorToast(R.string.disconnected)
             return
         }
         mAdapter.update(state, record)

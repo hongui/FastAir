@@ -9,7 +9,7 @@
         android:id="@+id/tvErrorMsg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/tips_error"
+        android:text="@string/error_occur"
         android:layout_marginLeft="@dimen/dp16"
         android:layout_marginRight="@dimen/dp16"
         android:gravity="center"

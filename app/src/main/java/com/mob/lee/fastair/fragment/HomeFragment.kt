@@ -85,9 +85,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         toolAll.setOnClickListener {
             viewModel.selectAll()
             val textId = if (viewModel.checkedRecords().isNotEmpty()) {
-                R.string.unSelectAll
+                R.string.unselect_all
             } else {
-                R.string.selectAll
+                R.string.select_all
             }
             toolAll.setText(textId)
         }
@@ -106,11 +106,11 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         }
         toolDelete.setOnClickListener {
             if (viewModel.hasSelectedLiveData.value != true) {
-                mParent?.successToast(R.string.dontSelect)
+                mParent?.successToast(R.string.select_nothing)
                 return@setOnClickListener
             }
             mParent?.dialog {
-                setTitle(R.string.deleteFileList)
+                setTitle(R.string.delete_file_list)
                 val rv = layoutInflater.inflate(R.layout.recyclerview, null) as RecyclerView
                 rv.layoutManager = LinearLayoutManager(mParent)
                 rv.adapter = DeleteAdapter(viewModel)
@@ -148,8 +148,8 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             R.id.menu_disconnet -> {
                 if (P2PManager.isConnected()) {
                     mParent?.dialog {
-                        setMessage(R.string.msg_disconnect_now)
-                                .setPositiveButton(R.string.stopAndDisconnect) { _, _ ->
+                        setMessage(R.string.disconnect_info)
+                                .setPositiveButton(R.string.disconnect_now) { _, _ ->
                                     P2PManager.stopConnect()
                                     val intent= Intent(context,FileService::class.java)
                                     mParent?.stopService(intent)

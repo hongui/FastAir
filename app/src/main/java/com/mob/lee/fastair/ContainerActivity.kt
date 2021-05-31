@@ -30,7 +30,7 @@ class ContainerActivity : AppCompatActivity() {
         if(null==savedInstanceState) {
             P2PManager.connectLiveData.observe(this, Observer {
                 if (false == it) {
-                    errorToast(R.string.msg_disconnect)
+                    errorToast(R.string.disconnected)
                     mNavController.popBackStack(R.id.homeFragment, true)
 
                     try {

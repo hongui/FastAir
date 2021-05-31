@@ -53,7 +53,7 @@ fun Context.successToast(message : String) {
 
 fun Context.dialog(wrap : AlertDialog.Builder.() -> Unit) {
     val builder = AlertDialog.Builder(this)
-            .setTitle(R.string.wramTips)
+            .setTitle(R.string.wram_tips)
     wrap(builder)
     builder.show()
 }
