@@ -29,7 +29,7 @@ class ChatFragment : ConnectFragment() {
     override val layout: Int = R.layout.fragment_chat
 
     override fun setting() {
-        title(R.string.base_chat)
+        title(R.string.chat)
 
         mAdapter = MessageAdapter()
         chatContent?.layoutManager = LinearLayoutManager(mParent)
@@ -55,7 +55,7 @@ class ChatFragment : ConnectFragment() {
             val s = chatInput?.text.toString()
             chatInput?.setText("")
             if (s.matches("\\s+".toRegex())) {
-                mParent?.errorToast(R.string.toast_sendIllegal)
+                mParent?.errorToast(R.string.send_Illegal)
                 return@setOnClickListener
             }
             val message = Message(s)

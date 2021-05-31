@@ -29,7 +29,7 @@ class DiscoverFragment : AppFragment() {
 
     override fun setting() {
         setHasOptionsMenu(true)
-        title(R.string.discoverDevice, true)
+        title(R.string.discover_device, true)
 
         P2PManager.devicesLiveData.observe({ lifecycle }) {
             if (null == discoverView || null == it) {
@@ -67,12 +67,12 @@ class DiscoverFragment : AppFragment() {
                     ScanService.startScan(requireContext())
                 } else {
                     mParent?.dialog {
-                        setMessage(R.string.tip_need_location)
+                        setMessage(R.string.need_location)
                             .setPositiveButton(R.string.turn_on) { _, _ ->
                                 viewModel.openSetting(this@DiscoverFragment)
                             }
                             .setNegativeButton(R.string.cancel) { _, _ ->
-                                mParent?.errorToast(R.string.tip_rejected_location)
+                                mParent?.errorToast(R.string.rejected_location)
                             }
                     }
                 }
@@ -96,7 +96,7 @@ class DiscoverFragment : AppFragment() {
     }
 
     fun jump() {
-        mParent?.successToast(R.string.toast_connect_success)
+        mParent?.successToast(R.string.connect_success)
         val needToTarget = arguments?.containsKey("target") ?: false
         if (needToTarget) {
             val target = requireArguments().getInt("target")

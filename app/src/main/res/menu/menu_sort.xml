@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_content_sort_byname"
-        android:title="@string/sortByName" />
+        android:title="@string/sort_by_name" />
 
     <item
         android:id="@+id/menu_content_sort_bysize"
-        android:title="@string/sortBySize" />
+        android:title="@string/sort_by_size" />
 
     <item
         android:id="@+id/menu_content_sort_bytime"
-        android:title="@string/sortByTime" />
+        android:title="@string/sort_by_time" />
 </menu>

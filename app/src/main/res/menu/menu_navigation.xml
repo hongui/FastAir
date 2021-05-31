@@ -3,36 +3,36 @@
 
     <item
         android:id="@+id/menu_disconnet"
-        android:title="@string/menu_disconnect"
+        android:title="@string/disconnect_device"
         android:icon="@drawable/ic_action_off"/>
 
     <item
         android:id="@+id/menu_history"
-        android:title="@string/menu_history"
+        android:title="@string/transfer_history"
         android:icon="@drawable/ic_action_history"/>
 
     <item
         android:id="@+id/menu_connect_chat"
-        android:title="@string/menu_chat"
+        android:title="@string/chat"
         android:icon="@drawable/ic_action_chat"/>
 
     <item
         android:id="@+id/menu_payment"
-        android:title="@string/menu_support"
+        android:title="@string/donate"
         android:icon="@drawable/ic_action_payment"/>
 
     <item
         android:id="@+id/menu_help"
-        android:title="@string/menu_help"
+        android:title="@string/help"
         android:icon="@drawable/ic_action_help"/>
 
     <item
         android:id="@+id/menu_about"
-        android:title="@string/menu_about"
+        android:title="@string/about"
         android:icon="@drawable/ic_action_info"/>
 
     <item
         android:id="@+id/menu_setting"
-        android:title="@string/menu_setting"
+        android:title="@string/settings"
         android:icon="@drawable/ic_action_setting"/>
 </menu>
