@@ -6,6 +6,7 @@
     <string name="file_transfer">File transfer</string>
     <string name="discover_device">Device connection</string>
     <string name="disconnect_device">Disconnect</string>
+    <string name="local_host">Local Host</string>
     <string name="transfer_history">Transfers history</string>
     <string name="chat">Chat</string>
     <string name="donate">Donation</string>

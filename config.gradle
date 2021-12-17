@@ -1,10 +1,10 @@
 def appVersion = [:]
-appVersion.code = 8
-appVersion.name = '1.4.5'
+appVersion.code = 9
+appVersion.name = '1.5.0'
 ext.appVersion = appVersion
 
 def sdk = [:]
-sdk.mins = 16
-sdk.target = 29
-sdk.compile = 29
+sdk.mins = 21
+sdk.target = 31
+sdk.compile = 31
 ext.sdk = sdk

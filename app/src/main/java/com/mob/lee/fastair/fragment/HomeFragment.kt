@@ -160,6 +160,9 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                     navigation(R.id.discoverFragment)
                 }
             }
+            R.id.menu_host -> {
+                navigation(R.id.hostFragment)
+            }
 
             R.id.menu_history -> {
                 navigation(R.id.historyFragment,args = {

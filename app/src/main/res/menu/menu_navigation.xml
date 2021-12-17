@@ -7,6 +7,11 @@
         android:icon="@drawable/ic_action_off"/>
 
     <item
+        android:id="@+id/menu_host"
+        android:title="@string/local_host"
+        android:icon="@drawable/ic_baseline_devices"/>
+
+    <item
         android:id="@+id/menu_history"
         android:title="@string/transfer_history"
         android:icon="@drawable/ic_action_history"/>

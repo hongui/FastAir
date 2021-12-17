@@ -6,6 +6,7 @@
     <string name="file_transfer">文件传输</string>
     <string name="discover_device">设备连接</string>
     <string name="disconnect_device">断开连接</string>
+    <string name="local_host">本地主机</string>
     <string name="transfer_history">传输历史</string>
     <string name="chat">聊天</string>
     <string name="donate">捐赠</string>
