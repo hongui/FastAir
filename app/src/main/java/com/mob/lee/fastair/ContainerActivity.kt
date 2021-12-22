@@ -18,7 +18,7 @@ import com.mob.lee.fastair.viewmodel.HomeViewModel
 class ContainerActivity : AppCompatActivity() {
 
     val mNavController by lazy {
-        findNavController(R.id.hostFragment)
+        findNavController(R.id.containerFragment)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

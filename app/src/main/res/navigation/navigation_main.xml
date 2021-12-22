@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_homeFragment_to_contentPickFragment"
             app:destination="@id/contentPickFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_hostFragment2"
+            app:destination="@id/hostFragment" />
     </fragment>
     <fragment
         android:id="@+id/contentPickFragment"
@@ -69,4 +72,8 @@
         android:id="@+id/transferFragment"
         android:name="com.mob.lee.fastair.fragment.TransferFragment"
         android:label="TransferFragment" />
+    <fragment
+        android:id="@+id/hostFragment"
+        android:name="com.mob.lee.fastair.fragment.HostFragment"
+        android:label="HostFragment" />
 </navigation>
