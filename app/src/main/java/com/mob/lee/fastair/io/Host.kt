@@ -1,8 +1,10 @@
 package com.mob.lee.fastair.io
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
@@ -14,20 +16,32 @@ class Host {
     var host:ServerSocketChannel?=null
     var selector:Selector?=null
 
-    fun start(lifecycleOwner: LifecycleOwner){
+    fun start(scope: CoroutineScope){
         if(null!=host){
             return
         }
         selector= Selector.open()
         host=ServerSocketChannel.open()
-        host?.run {
+        val state=host?.run {
             configureBlocking(false)
             socket().bind(InetSocketAddress(port))
             register(selector,SelectionKey.OP_ACCEPT)
+            scope.async(Dispatchers.IO) {
+                while (true){
+                    val se=selector?.select()
+                    when(se){
+
+                    }
+                }
+            }
         }
     }
 
     fun stop(){
+
+    }
+
+    private fun handleAccept(){
 
     }
 

@@ -18,6 +18,7 @@ import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
+import com.mob.lee.fastair.io.getNetIP
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
@@ -38,7 +39,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
-        toolbar?.title = getString(R.string.app_description)
+        toolbar?.title = getNetIP(mParent!!)//getString(R.string.app_description)
         toggle.syncState()
 
         homeDrawer?.addDrawerListener(toggle)
