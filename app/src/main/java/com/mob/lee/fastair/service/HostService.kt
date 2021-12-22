@@ -4,10 +4,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import com.mob.lee.fastair.io.Host
+import com.mob.lee.fastair.io.SocketFactory
 
 class HostService : Service() {
-    var mHost: Host? = null
+    var mHost: SocketFactory? = null
 
     companion object {
         const val PORT = "port"
@@ -33,10 +33,7 @@ class HostService : Service() {
         if (port == mHost?.port) {
             mHost?.stop()
         }
-        mHost = Host.host {
-            this.port = port
-            start()
-        }
+
         return super.onStartCommand(intent, flags, startId)
     }
 }
