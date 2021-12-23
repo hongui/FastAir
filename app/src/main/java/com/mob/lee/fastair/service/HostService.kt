@@ -4,7 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import com.mob.lee.fastair.io.SocketFactory
+import com.mob.lee.fastair.io.socket.SocketFactory
 
 class HostService : Service() {
     var mHost: SocketFactory? = null
@@ -30,9 +30,6 @@ class HostService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val port = intent?.getIntExtra(PORT, DEFAULT_PORT) ?: DEFAULT_PORT
-        if (port == mHost?.port) {
-            mHost?.stop()
-        }
 
         return super.onStartCommand(intent, flags, startId)
     }

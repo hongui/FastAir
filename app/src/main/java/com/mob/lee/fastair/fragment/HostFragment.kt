@@ -1,23 +1,29 @@
 package com.mob.lee.fastair.fragment
 
-import android.content.Context
-import android.net.wifi.WifiManager
 import androidx.lifecycle.coroutineScope
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
+import com.mob.lee.fastair.io.getNetIP
+import com.mob.lee.fastair.io.socket.SocketEventObserver
+import com.mob.lee.fastair.io.socket.SocketFactory
 import kotlinx.android.synthetic.main.fragment_host.*
+import java.net.InetSocketAddress
 
-class HostFragment() :AppFragment() {
-    override val layout: Int= R.layout.fragment_host
+class HostFragment() : AppFragment() {
+    override val layout: Int = R.layout.fragment_host
+    lateinit var mSocket: SocketFactory
 
     override fun setting() {
-        Host.host {
-            val info=start(lifecycle.coroutineScope)
-            tv_host.text=info
-        }
-        val manager=mParent?.applicationContext?.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val connect=manager.connectionInfo
-        val ip=connect.ipAddress
-        tv_host.text="${ip and 0xff}.${(ip shr 8) and 0xff}.${(ip shr 16) and 0xff}.${(ip shr 24) and 0xff}"
+        mSocket = SocketFactory.open(lifecycle.coroutineScope, 9527)
+        mSocket.mDispatcher.add(object : SocketEventObserver {
+            override fun onReady(inetSocketAddress: InetSocketAddress) {
+                tv_host.text = getNetIP(mParent!!)+inetSocketAddress.toString()
+            }
+        })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mSocket.stop()
     }
 }
