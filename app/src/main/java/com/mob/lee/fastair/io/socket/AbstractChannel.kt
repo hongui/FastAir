@@ -3,6 +3,10 @@ package com.mob.lee.fastair.io.socket
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
@@ -13,14 +17,13 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import java.nio.channels.spi.AbstractSelectableChannel
 
-class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectableChannel) {
-    var mSelector: Selector? = null
-    var mDispatcher = SocketDispatcher()
-    var mOnError: ((Exception) -> Boolean)? = null
-    var timeout = 1000L
+abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: AbstractSelectableChannel) {
+    var mTimeout = 1000L
     var mRunning = true
+    private var mSelector: Selector? = null
+    private val mWriters = Channel<Writer>(Channel.UNLIMITED)
 
-    private fun startLoop(inet: InetSocketAddress) {
+    fun startLoop(inet: InetSocketAddress) {
         mScope.launch(Dispatchers.IO) {
             try {
                 Log.d(TAG, "Begin config ${inet.toString()}")
@@ -36,9 +39,10 @@ class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectable
                 Log.d(TAG, "End clear")
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
-                if (true == mOnError?.invoke(e)) {
-
-                }
+                onError(e)
+                stop()
+            }finally {
+                onEnd()
             }
         }
     }
@@ -51,16 +55,15 @@ class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectable
         if (channel is ServerSocketChannel) {
             channel.socket().bind(inet)
             channel.register(mSelector, SelectionKey.OP_ACCEPT, inet)
-            mDispatcher.dispatch(READY, inet)
         } else {
             channel.register(mSelector, SelectionKey.OP_CONNECT, inet)
         }
-        mDispatcher.dispatch(START)
+        onStart(inet)
     }
 
     private fun loop() {
         while (mRunning) {
-            val size = mSelector?.select(timeout)
+            val size = mSelector?.select(mTimeout)
             if (0 == size) {
                 continue
             }
@@ -75,8 +78,28 @@ class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectable
     }
 
     fun stop() {
+        if(!mRunning){
+            return
+        }
         mRunning = false
-        mDispatcher.dispatch(STOP)
+        mSelector?.keys()?.forEach {
+            val channel=it.attachment()
+            try {
+                when(channel){
+                    is SocketChannel->channel.finishConnect()
+
+                    is ServerSocketChannel->channel.socket().close()
+                }
+                onDisconnected()
+            }catch (e:Exception){
+
+            }
+
+        }
+    }
+
+    fun write(writer: Writer)=mScope.launch {
+        mWriters.send(writer)
     }
 
     private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) {
@@ -99,24 +122,43 @@ class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectable
         channel.register(mSelector!!, SelectionKey.OP_READ, this)
         channel.register(mSelector!!, SelectionKey.OP_WRITE, this)
         withContext(Dispatchers.Main) {
-            mDispatcher.dispatch(READY, inet)
+            onConnected()
         }
     }
 
     private fun onRead(channel: SocketChannel) {
+        Log.e(TAG,"===========+++=============")
         mScope.launch(Dispatchers.IO) {
-            val buffer = ByteBuffer.allocate(8 * 1024)
-            val size = channel.read(buffer)
-            buffer.flip()
-            val s = String(buffer.array(), 0, size)
-            Log.e(TAG, s)
+            while (mRunning){
+                Log.e(TAG,"========================")
+                val buffer = ByteBuffer.allocate(8 * 1024)
+                try {
+                    channel.read(buffer)
+                }catch (e:Exception){
+                    onError(e)
+                }
+                buffer.flip()
+                onRead(channel, buffer)
+            }
         }
     }
 
-    private fun onWrite(channel: SocketChannel) {
+    private fun onWrite(channel: SocketChannel){
+        /*mScope.launch(Dispatchers.IO) {
+            while (mRunning){
+                val writer = mWriters.receive()
+                try {
+                    writer.collect {
+                        it.flip()
+                        channel.write(it)
+                    }
+                }catch (e:Exception){
+                    onError(e)
+                }
 
+            }
+        }*/
     }
-
     private fun onSelected() {
         val keys = mSelector?.selectedKeys()?.iterator()
         while (true == keys?.hasNext()) {
@@ -125,24 +167,22 @@ class SocketFactory(val mScope: CoroutineScope, val mChannel: AbstractSelectable
                 SelectionKey.OP_ACCEPT -> onAccept(key, mChannel as ServerSocketChannel)
                 SelectionKey.OP_CONNECT -> onConnect(key, mChannel as SocketChannel)
                 SelectionKey.OP_READ -> onRead(key.attachment() as SocketChannel)
-                SelectionKey.OP_WRITE -> onRead(key.attachment() as SocketChannel)
+                SelectionKey.OP_WRITE -> onWrite(key.attachment() as SocketChannel)
             }
             keys.remove()
         }
     }
 
+    open fun onStart(address: InetSocketAddress){}
+    open fun onConnected(){}
+    abstract fun onRead(channel: SocketChannel,buffer:ByteBuffer)
+    open fun onDisconnected(){}
+    open fun onEnd(){}
+    open fun onError(exception: Exception){
+        print(exception)
+    }
+
     companion object {
         const val TAG = "SocketFactory"
-        fun open(scope: CoroutineScope, port: Int, host: String? = null): SocketFactory {
-            return if (null == host) {
-                SocketFactory(scope, ServerSocketChannel.open()) to InetSocketAddress(port)
-            } else {
-                SocketFactory(scope, SocketChannel.open()) to InetSocketAddress(host, port)
-            }.run {
-                first.startLoop(second)
-                first
-            }
-        }
-
     }
 }
