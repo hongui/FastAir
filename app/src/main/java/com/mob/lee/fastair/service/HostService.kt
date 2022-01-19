@@ -3,11 +3,20 @@ package com.mob.lee.fastair.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
 import android.os.IBinder
-import com.mob.lee.fastair.io.socket.SocketFactory
+import android.util.Log
+import com.mob.lee.fastair.io.http.Http
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import java.net.InetSocketAddress
+import kotlin.coroutines.CoroutineContext
 
-class HostService : Service() {
-    var mHost: SocketFactory? = null
+class HostService() : Service(), CoroutineScope {
+    override val coroutineContext: CoroutineContext= SupervisorJob() + Dispatchers.Main.immediate;
+    var mHost: Http? = null
 
     companion object {
         const val PORT = "port"
@@ -30,7 +39,19 @@ class HostService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val port = intent?.getIntExtra(PORT, DEFAULT_PORT) ?: DEFAULT_PORT
+        if(null==mHost){
+            mHost=Http(this)
+            mHost!!.startLoop(InetSocketAddress(port))
+            mHost!!.apply {
+                addHandler(HomeHandler(this@HostService))
+            }
+        }
 
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineContext.cancel()
     }
 }
