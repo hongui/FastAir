@@ -1,6 +1,5 @@
 package com.mob.lee.fastair.io.socket
 
-import kotlinx.coroutines.flow.Flow
-import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 
-typealias Writer = Flow<ByteBuffer>
+typealias Writer =suspend (channel:SocketChannel)->Unit
