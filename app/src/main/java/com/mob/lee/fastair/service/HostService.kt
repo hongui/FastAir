@@ -3,10 +3,11 @@ package com.mob.lee.fastair.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import com.mob.lee.fastair.io.http.Http
+import com.mob.lee.fastair.localhost.CategoryHandler
+import com.mob.lee.fastair.localhost.HomeHandler
+import com.mob.lee.fastair.localhost.ResourceHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,8 +43,10 @@ class HostService() : Service(), CoroutineScope {
         if(null==mHost){
             mHost=Http(this)
             mHost!!.startLoop(InetSocketAddress(port))
-            mHost!!.apply {
+            mHost!!.run {
                 addHandler(HomeHandler(this@HostService))
+                addHandler(ResourceHandler(this@HostService))
+                addHandler(CategoryHandler(this@HostService))
             }
         }
 

@@ -32,9 +32,9 @@ class Http(scope: CoroutineScope): AbstractChannel(scope, ServerSocketChannel.op
 
 
     override fun onRead(channel: SocketChannel, buffer: ByteBuffer) {
-        Log.e(TAG,"===============")
         val request = String(buffer.array(), 0, buffer.limit())
 
+        Log.d(TAG,request)
         val sequences=request.lineSequence()
         val head=sequences.firstOrNull()?.let { parseStatusLine(it) }
         //这里需要再想想
@@ -51,19 +51,19 @@ class Http(scope: CoroutineScope): AbstractChannel(scope, ServerSocketChannel.op
     }
 
     private fun dispatch(request:Request){
-        Log.e(TAG, request.toString())
         mScope.launch {
             handler.forEach {
                 if(it.canHandleIt(request)){
-                    val writer=it.handle(request)
-                    write(writer)
+                    Log.d(TAG,"Choose handler ${it} to handle ${request}")
+                    val result=it.handle(request)
+                    write(result)
                     return@launch
                 }
             }
         }
     }
 
-    fun addHandler(handler: Handler)=this.handler.add(handler)
+    fun addHandler(handler: Handler)=this.handler.add(0,handler)
 
     companion object{
         const val TAG="Http"

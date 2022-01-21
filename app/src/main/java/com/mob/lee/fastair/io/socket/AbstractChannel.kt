@@ -34,15 +34,10 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
                 loop()
                 Log.d(TAG, "End loop")
 
-                Log.d(TAG, "Begin clear")
-                clear()
-                Log.d(TAG, "End clear")
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
                 onError(e)
                 stop()
-            }finally {
-                onEnd()
             }
         }
     }
@@ -62,12 +57,13 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
     }
 
     private fun loop() {
-        while (mRunning) {
+        while (true) {
             val size = mSelector?.select(mTimeout)
             if (0 == size) {
                 continue
             }
             onSelected()
+            return
         }
     }
 
@@ -94,70 +90,69 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
             }catch (e:Exception){
 
             }
-
         }
+        Log.d(TAG, "Begin clear")
+        clear()
+        Log.d(TAG, "End clear")
+
+        onEnd()
     }
 
     fun write(writer: Writer)=mScope.launch {
         mWriters.send(writer)
     }
 
-    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) {
+    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel)=mScope.launch(Dispatchers.IO) {
         var c: SocketChannel? = null
         val start = System.currentTimeMillis()
         do {
             c = channel.accept()
         } while (c == null)
         Log.d(TAG, "Wait accept for ${System.currentTimeMillis() - start}ms,channel=${c}")
-        c.run {
-            configureBlocking(false)
-            register(mSelector!!, SelectionKey.OP_READ, this)
-            register(mSelector!!, SelectionKey.OP_WRITE, this)
-        }
+        connected(c)
     }
 
     private fun onConnect(key: SelectionKey, channel: SocketChannel) = mScope.launch(Dispatchers.IO) {
         val inet = key.attachment() as InetSocketAddress
         channel.connect(inet)
-        channel.register(mSelector!!, SelectionKey.OP_READ, this)
-        channel.register(mSelector!!, SelectionKey.OP_WRITE, this)
+        connected(channel)
+    }
+
+    private suspend fun connected(channel: SocketChannel){
         withContext(Dispatchers.Main) {
             onConnected()
         }
+        onWrite(channel)
+        onRead(channel)
     }
-
-    private fun onRead(channel: SocketChannel) {
-        Log.e(TAG,"===========+++=============")
-        mScope.launch(Dispatchers.IO) {
+    private suspend fun onRead(channel: SocketChannel) {
             while (mRunning){
-                Log.e(TAG,"========================")
-                val buffer = ByteBuffer.allocate(8 * 1024)
+                val buffer = ByteBuffer.allocate(10 * 1024)
                 try {
-                    channel.read(buffer)
+                    var count=0
+                    do {
+                        count = channel.read(buffer)
+                        Log.e(TAG,count.toString())
+                    }while (0==count)
                 }catch (e:Exception){
                     onError(e)
                 }
-                buffer.flip()
                 onRead(channel, buffer)
             }
-        }
     }
 
     private fun onWrite(channel: SocketChannel){
-        /*mScope.launch(Dispatchers.IO) {
+        mScope.launch(Dispatchers.IO) {
             while (mRunning){
                 val writer = mWriters.receive()
                 try {
-                    writer.collect {
-                        it.flip()
-                        channel.write(it)
-                    }
+                    writer(channel)
+                    Log.d(TAG,"Write ${writer} success!")
                 }catch (e:Exception){
                     onError(e)
                 }
-
             }
-        }*/
+        }
     }
     private fun onSelected() {
         val keys = mSelector?.selectedKeys()?.iterator()
@@ -166,8 +161,6 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
             when (key.readyOps()) {
                 SelectionKey.OP_ACCEPT -> onAccept(key, mChannel as ServerSocketChannel)
                 SelectionKey.OP_CONNECT -> onConnect(key, mChannel as SocketChannel)
-                SelectionKey.OP_READ -> onRead(key.attachment() as SocketChannel)
-                SelectionKey.OP_WRITE -> onWrite(key.attachment() as SocketChannel)
             }
             keys.remove()
         }
