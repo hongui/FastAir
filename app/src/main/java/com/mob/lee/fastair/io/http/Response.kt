@@ -19,7 +19,7 @@ abstract class Response(val status: Int):Writer {
 
     abstract fun onWriteBody(channel: SocketChannel)
 
-    override suspend fun invoke(channel: SocketChannel) {
+    override fun invoke(channel: SocketChannel) {
         header.put("Content-Type", contentType)
         header.put("Date", Date().toString())
         header.put("Content-Length",length().toString())

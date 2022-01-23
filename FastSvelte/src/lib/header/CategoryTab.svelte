@@ -72,6 +72,8 @@
 		padding: 0;
 		margin: 0;
 		color: white;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
 	}
 
 	ul::-webkit-scrollbar {

@@ -4,11 +4,9 @@
 
 	let loadCategory=async(i)=>{
 		const response=await fetch("/category/"+i);
-		let arr=[];
-		for(let i=0;i<100;i++){
-			arr.push({id:i,name:""+i});
-		}
-		return arr
+		let body=await response.json()
+		console.log(body)
+		return body.data
 	}
 	let current=0;
 	let chooseTab=(i)=>{
