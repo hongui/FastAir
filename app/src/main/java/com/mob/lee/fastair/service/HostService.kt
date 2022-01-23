@@ -7,6 +7,7 @@ import android.os.IBinder
 import com.mob.lee.fastair.io.http.Http
 import com.mob.lee.fastair.localhost.CategoryHandler
 import com.mob.lee.fastair.localhost.HomeHandler
+import com.mob.lee.fastair.localhost.ImageHandler
 import com.mob.lee.fastair.localhost.ResourceHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,7 @@ class HostService() : Service(), CoroutineScope {
                 addHandler(HomeHandler(this@HostService))
                 addHandler(ResourceHandler(this@HostService))
                 addHandler(CategoryHandler(this@HostService))
+                addHandler(ImageHandler())
             }
         }
 

@@ -10,7 +10,7 @@ class HostFragment() : AppFragment() {
     override val layout: Int = R.layout.fragment_host
 
     override fun setting() {
-        val port=9529
+        val port=9527
         tv_host.text = "${getNetIP(mParent!!)}:${port}"
         HostService.start(requireContext(),port)
     }

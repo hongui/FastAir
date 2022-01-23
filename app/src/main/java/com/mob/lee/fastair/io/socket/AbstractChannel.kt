@@ -4,9 +4,6 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
@@ -21,7 +18,6 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
     var mTimeout = 1000L
     var mRunning = true
     private var mSelector: Selector? = null
-    private val mWriters = Channel<Writer>(Channel.UNLIMITED)
 
     fun startLoop(inet: InetSocketAddress) {
         mScope.launch(Dispatchers.IO) {
@@ -63,7 +59,6 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
                 continue
             }
             onSelected()
-            return
         }
     }
 
@@ -74,20 +69,20 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
     }
 
     fun stop() {
-        if(!mRunning){
+        if (!mRunning) {
             return
         }
         mRunning = false
         mSelector?.keys()?.forEach {
-            val channel=it.attachment()
+            val channel = it.attachment()
             try {
-                when(channel){
-                    is SocketChannel->channel.finishConnect()
+                when (channel) {
+                    is SocketChannel -> channel.finishConnect()
 
-                    is ServerSocketChannel->channel.socket().close()
+                    is ServerSocketChannel -> channel.socket().close()
                 }
                 onDisconnected()
-            }catch (e:Exception){
+            } catch (e: Exception) {
 
             }
         }
@@ -98,11 +93,7 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
         onEnd()
     }
 
-    fun write(writer: Writer)=mScope.launch {
-        mWriters.send(writer)
-    }
-
-    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel)=mScope.launch(Dispatchers.IO) {
+    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) = mScope.launch(Dispatchers.IO) {
         var c: SocketChannel? = null
         val start = System.currentTimeMillis()
         do {
@@ -118,42 +109,28 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
         connected(channel)
     }
 
-    private suspend fun connected(channel: SocketChannel){
+    private suspend fun connected(channel: SocketChannel) {
         withContext(Dispatchers.Main) {
             onConnected()
         }
-        onWrite(channel)
-        onRead(channel)
-    }
-    private suspend fun onRead(channel: SocketChannel) {
-            while (mRunning){
-                val buffer = ByteBuffer.allocate(10 * 1024)
-                try {
-                    var count=0
-                    do {
-                        count = channel.read(buffer)
-                        Log.e(TAG,count.toString())
-                    }while (0==count)
-                }catch (e:Exception){
-                    onError(e)
-                }
-                onRead(channel, buffer)
-            }
+        channel.configureBlocking(false)
+        channel.register(mSelector, SelectionKey.OP_READ)
     }
 
-    private fun onWrite(channel: SocketChannel){
-        mScope.launch(Dispatchers.IO) {
-            while (mRunning){
-                val writer = mWriters.receive()
-                try {
-                    writer(channel)
-                    Log.d(TAG,"Write ${writer} success!")
-                }catch (e:Exception){
-                    onError(e)
-                }
-            }
+    private fun onRead(channel: SocketChannel) {
+        val buffer = ByteBuffer.allocate(10 * 1024)
+        try {
+            var count = 0
+            do {
+                count = channel.read(buffer)
+            } while (0 >= count)
+            Log.d(TAG, "Read ${count} byte data")
+        } catch (e: Exception) {
+            onError(e)
         }
+        onRead(channel, buffer)
     }
+
     private fun onSelected() {
         val keys = mSelector?.selectedKeys()?.iterator()
         while (true == keys?.hasNext()) {
@@ -161,17 +138,18 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
             when (key.readyOps()) {
                 SelectionKey.OP_ACCEPT -> onAccept(key, mChannel as ServerSocketChannel)
                 SelectionKey.OP_CONNECT -> onConnect(key, mChannel as SocketChannel)
+                SelectionKey.OP_READ -> onRead(key.channel() as SocketChannel)
             }
             keys.remove()
         }
     }
 
-    open fun onStart(address: InetSocketAddress){}
-    open fun onConnected(){}
-    abstract fun onRead(channel: SocketChannel,buffer:ByteBuffer)
-    open fun onDisconnected(){}
-    open fun onEnd(){}
-    open fun onError(exception: Exception){
+    open fun onStart(address: InetSocketAddress) {}
+    open fun onConnected() {}
+    abstract fun onRead(channel: SocketChannel, buffer: ByteBuffer)
+    open fun onDisconnected() {}
+    open fun onEnd() {}
+    open fun onError(exception: Exception) {
         print(exception)
     }
 

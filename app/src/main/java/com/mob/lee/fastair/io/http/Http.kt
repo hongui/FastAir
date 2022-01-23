@@ -39,7 +39,7 @@ class Http(scope: CoroutineScope): AbstractChannel(scope, ServerSocketChannel.op
         val head=sequences.firstOrNull()?.let { parseStatusLine(it) }
         //这里需要再想想
         head?:return
-        dispatch(Request(httpMethod(head.first),head.second))
+        dispatch(Request(httpMethod(head.first),head.second),channel)
     }
 
     private fun parseStatusLine(line:String):Pair<String,String>?{
@@ -50,13 +50,13 @@ class Http(scope: CoroutineScope): AbstractChannel(scope, ServerSocketChannel.op
         return null
     }
 
-    private fun dispatch(request:Request){
-        mScope.launch {
+    private fun dispatch(request:Request,channel: SocketChannel){
+        mScope.launch(Dispatchers.IO) {
             handler.forEach {
                 if(it.canHandleIt(request)){
                     Log.d(TAG,"Choose handler ${it} to handle ${request}")
                     val result=it.handle(request)
-                    write(result)
+                    result(channel)
                     return@launch
                 }
             }
