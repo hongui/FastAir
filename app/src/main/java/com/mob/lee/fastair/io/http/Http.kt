@@ -4,13 +4,10 @@ import android.util.Log
 import com.mob.lee.fastair.io.socket.AbstractChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
-import java.nio.channels.spi.AbstractSelectableChannel
 
 /**
  * GET /home.html HTTP/1.1
@@ -27,45 +24,40 @@ import java.nio.channels.spi.AbstractSelectableChannel
  *Cache-Control: max-age=0
  */
 
-class Http(scope: CoroutineScope): AbstractChannel(scope, ServerSocketChannel.open()) {
-    private val handler= ArrayList<Handler>()
+class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.open()) {
+    private val handler = ArrayList<Handler>()
 
 
     override fun onRead(channel: SocketChannel, buffer: ByteBuffer) {
-        val request = String(buffer.array(), 0, buffer.limit())
-
-        Log.d(TAG,request)
-        val sequences=request.lineSequence()
-        val head=sequences.firstOrNull()?.let { parseStatusLine(it) }
+        val request = Request.parse(buffer)
         //这里需要再想想
-        head?:return
-        dispatch(Request(httpMethod(head.first),head.second),channel)
+        request ?: return
+        Log.d(TAG,"Accept request ${request}")
+        dispatch(request, channel)
     }
 
-    private fun parseStatusLine(line:String):Pair<String,String>?{
-        val values = line.split(Regex("\\s"))
-        if(values.size==3){
-            return values[0] to values[1]
-        }
-        return null
-    }
 
-    private fun dispatch(request:Request,channel: SocketChannel){
+    private fun dispatch(request: Request, channel: SocketChannel) {
         mScope.launch(Dispatchers.IO) {
             handler.forEach {
-                if(it.canHandleIt(request)){
-                    Log.d(TAG,"Choose handler ${it} to handle ${request}")
-                    val result=it.handle(request)
-                    result(channel)
+                if (it.canHandleIt(request)) {
+                    Log.d(TAG, "Choose handler ${it} to handle ${request}")
+                    val result = it.handle(request)
+                    try {
+                        result(channel)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        JsonResponse.json(null, SERVERERROR).invoke(channel)
+                    }
                     return@launch
                 }
             }
         }
     }
 
-    fun addHandler(handler: Handler)=this.handler.add(0,handler)
+    fun addHandler(handler: Handler) = this.handler.add(0, handler)
 
-    companion object{
-        const val TAG="Http"
+    companion object {
+        const val TAG = "Http"
     }
 }

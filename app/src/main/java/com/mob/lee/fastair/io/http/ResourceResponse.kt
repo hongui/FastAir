@@ -1,17 +1,13 @@
 package com.mob.lee.fastair.io.http
 
-import android.util.Log
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
-class ResourceResponse(val stream: InputStream,override val contentType: String="text/html; charset=utf-8") :Response(SUCCESS) {
+class ResourceResponse(action:()->InputStream,mime:String) :Response<InputStream>(action,mime=mime) {
 
-    override fun length(): Long =stream.available().toLong()
-
-    override fun onWriteBody(channel: SocketChannel) {
-        Log.e("HomeHandler",stream.toString())
-        stream.use {
+    override fun onWriteBody(channel: SocketChannel,source:InputStream) {
+        source.use {
             val buffer=ByteArray(8*1024)
             var count=it.read(buffer)
             while (count!=-1){
@@ -20,4 +16,6 @@ class ResourceResponse(val stream: InputStream,override val contentType: String=
             }
         }
     }
+
+    override fun onLength(source: InputStream)=source.available().toLong()
 }

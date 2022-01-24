@@ -35,6 +35,28 @@ android {
     }
 }
 
+task clearAssets(type: Delete){
+    def path="${projectDir}/src/main/assets"
+    def target=fileTree(dir: path,exclude:['about.html','help.html'])
+    delete(target,"$path/app")
+}
+
+task frontEnd(type:Exec){
+    dependsOn(clearAssets)
+    workingDir("${rootDir}/FastSvelte")
+    commandLine('npm.cmd','run','build')
+}
+
+task toAssets(type: Copy){
+    def path="${projectDir}/src/main/assets"
+    dependsOn(frontEnd)
+    from("${rootDir}/FastSvelte/build")
+    into(path)
+    doLast {
+        file("$path/_app").renameTo("$path/app")
+    }
+}
+
 dependencies {
     implementation 'androidx.activity:activity-ktx:1.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'

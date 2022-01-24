@@ -2,7 +2,7 @@
     export let record;
 </script>
 
-<img src="/images{record.path}?size=128" alt="{record.name}"/>
+<img src="/images{record.path}?id={record.id}&width=128&height=128" alt="{record.name}"/>
 
 <style>
     img{
