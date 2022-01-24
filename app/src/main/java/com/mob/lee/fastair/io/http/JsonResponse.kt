@@ -5,18 +5,24 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.channels.SocketChannel
 
-class JsonResponse(status:Int, override val contentType: String="application/json"):Response(status) {
-    private var obj=JSONObject()
+class JsonResponse(action:()->JSONObject,status:Int):Response<JSONObject>(action,status,JSON) {
 
-    override fun length()=obj.toString().length.toLong()
-
-    fun json(data: JSONArray, code:Int=0, message:String="Success") {
-        obj.put("code",code)
-        obj.put("msg", message)
-        obj.put("data",data)
+    companion object{
+        fun json(data: JSONArray?, status: Int= SUCCESS, code:Int=0, message:String="Success"):JsonResponse {
+            val obj=JSONObject()
+            obj.put("code",code)
+            obj.put("msg", message)
+            obj.put("data",data)
+            return JsonResponse({
+                obj
+            },status)
+        }
     }
 
-    override fun onWriteBody(channel: SocketChannel) {
-        channel.write(obj.toString().buffer())
+    override fun onWriteBody(channel: SocketChannel, source: JSONObject) {
+        val buffer=source.toString().buffer()
+        channel.write(buffer)
     }
+
+    override fun onLength(source: JSONObject)=source.toString().buffer().remaining().toLong()
 }

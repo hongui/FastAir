@@ -26,9 +26,7 @@ class CategoryHandler(val context: Context?):Handler {
         val all=categories.toList()
         val array = JSONArray()
         all.forEach { array.put(it.dump()) }
-        val response=JsonResponse(SUCCESS)
-        response.json(array)
-        return response
+        return JsonResponse.json(array)
     }
 
     fun Record.dump():JSONObject{

@@ -3,10 +3,11 @@ package com.mob.lee.fastair.io.http
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
-class ByteResponse(val byte:ByteArray, override val contentType: String):Response(SUCCESS) {
-    override fun length(): Long=byte.size.toLong()
+class ByteResponse(action: () -> ByteArray,mime:String) : Response<ByteArray>(action,mime=mime) {
 
-    override fun onWriteBody(channel: SocketChannel) {
-        channel.write(ByteBuffer.wrap(byte))
+    override fun onLength(source: ByteArray)=source.size.toLong()
+
+    override fun onWriteBody(channel: SocketChannel,source:ByteArray) {
+        channel.write(ByteBuffer.wrap(source))
     }
 }
