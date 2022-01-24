@@ -73,3 +73,5 @@ node_modules
 .vercel
 .output
 package-lock.json
+
+**/assets/app
