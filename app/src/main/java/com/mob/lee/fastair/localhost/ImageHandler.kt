@@ -38,7 +38,6 @@ class ImageHandler(val context: Context) : Handler {
         return if (Build.VERSION.SDK_INT >= 29) {
             ThumbnailUtils.createImageThumbnail(File(path), size, null)
         } else {
-            val option = BitmapFactory.Options()
             MediaStore.Images.Thumbnails.getThumbnail(context.contentResolver, id, MediaStore.Images.Thumbnails.MICRO_KIND, null)
         }
     }

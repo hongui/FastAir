@@ -24,5 +24,7 @@ class JsonResponse(action:()->JSONObject,status:Int):Response<JSONObject>(action
         channel.write(buffer)
     }
 
-    override fun onLength(source: JSONObject)=source.toString().buffer().remaining().toLong()
+    override fun addHeader(source: JSONObject) {
+        header.put("Content-Length",source.toString().buffer().remaining().toString())
+    }
 }

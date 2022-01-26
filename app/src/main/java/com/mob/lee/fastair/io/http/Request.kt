@@ -1,12 +1,9 @@
 package com.mob.lee.fastair.io.http
 
-import android.util.Log
 import java.net.URLDecoder
 import java.nio.ByteBuffer
 
 data class Request(@Method val method: Int, val url: String, val urlParams: Map<String, String>, val params: Map<String, String>) {
-
-    fun isKeepAlive()="keep-alive"==params.get("Connection")
 
     fun urlParam(key:String)=urlParams.get(key)
 
