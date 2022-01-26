@@ -47,7 +47,8 @@ class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.o
                         result(channel)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        JsonResponse.json(null, SERVERERROR).invoke(channel)
+                        //JsonResponse.json(null, SERVERERROR).invoke(channel)
+                        Log.e(TAG,"----------------------------------------${e.printStackTrace()}")
                     }
                     return@launch
                 }

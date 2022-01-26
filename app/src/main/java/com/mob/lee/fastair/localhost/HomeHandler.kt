@@ -19,6 +19,7 @@ class HomeHandler(val context: Context) : Handler {
             "js" -> JS
             "png" -> PNG
             "jpeg" -> JPEG
+            "svg" -> SVG
             else -> HTML
         }
         Log.d(TAG, "Open file at ${name},with extension ${ext}")
