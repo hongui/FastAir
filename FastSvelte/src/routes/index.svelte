@@ -1,6 +1,6 @@
 <script>
+	import Modal from 'svelte-simple-modal';
 	import CategoryTab from '$lib/header/CategoryTab.svelte';
-	import Image from '$lib/com/Image.svelte';
 	import CategoryItem from '$lib/com/CategoryItem.svelte';
 
 	let loadCategory = async (i) => {
@@ -20,6 +20,7 @@
 	<title>快传</title>
 </svelte:head>
 
+<Modal>
 <section>
 	<CategoryTab {chooseTab} />
 
@@ -41,7 +42,7 @@
 		</div>
 	{/await}
 </section>
-
+</Modal>
 <style>
 	.container {
 		display: flex;

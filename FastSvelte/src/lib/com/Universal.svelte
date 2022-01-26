@@ -15,7 +15,7 @@
     }
 
 </script>
-<a href="/download{record.path}">
+<a href="/downloads{record.path}" download="{record.name}">
     <Icon style="width: 24px;
     height: 24px;
     margin: 12px;"/>
@@ -32,13 +32,17 @@
     }
 
     .content{
-        flex: auto;
         margin-right: 16px;
         color: var(--text-color);
     }
 
     h3{
         flex: auto;
+    }
+
+    span{
+        font-size: 0.8em;
+        display: inline-block;
     }
 
 </style>
