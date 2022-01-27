@@ -2,25 +2,14 @@
     export let Icon;
     export let record;
 
-    let units=['B','KB','MB','GB']
-
-    let size=()=>{
-        let index=0;
-        let extra=record.size;
-        while(index<4&&Math.round(extra/1024)>0){
-            extra=extra/1024;
-            index++;
-        }
-        return extra.toFixed(2)+" " +units[index];
-    }
+    import File from "$lib/com/File.svelte"
 
 </script>
 <a href="/downloads{record.path}" download="{record.name}">
     <Icon style="width: 24px;
     height: 24px;
     margin: 12px;"/>
-    <h3 class="content">{record.name}</h3>
-    <span class="content">{size()}</span>
+    <File record={record}/>
 </a>
 
 <style>
@@ -30,19 +19,4 @@
         align-items: center;
         color: var(--primary-color);
     }
-
-    .content{
-        margin-right: 16px;
-        color: var(--text-color);
-    }
-
-    h3{
-        flex: auto;
-    }
-
-    span{
-        font-size: 0.8em;
-        display: inline-block;
-    }
-
 </style>
