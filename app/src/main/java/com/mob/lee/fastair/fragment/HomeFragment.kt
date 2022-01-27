@@ -39,7 +39,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
-        toolbar?.title = getNetIP(mParent!!)//getString(R.string.app_description)
+        toolbar?.title = getString(R.string.app_description)
         toggle.syncState()
 
         homeDrawer?.addDrawerListener(toggle)
