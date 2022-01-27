@@ -13,6 +13,13 @@ class HomeHandler(val context: Context) : Handler {
         if (name.isBlank()) {
             return ResourceResponse({ context.assets.open("index.html") }, HTML)
         }
+        if(name.contains("favicon.ico")){
+            return ResourceResponse({ context.assets.open("favicon.png") }, PNG)
+        }else if(name=="chat"){
+            return ResourceResponse({ context.assets.open("chat/index.html") }, HTML)
+        }else if(name=="upload"){
+            return ResourceResponse({ context.assets.open("upload/index.html") }, HTML)
+        }
         val ext = name.split(".").lastOrNull()
         val type = when (ext) {
             "css" -> CSS

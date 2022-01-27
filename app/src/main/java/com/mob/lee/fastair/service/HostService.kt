@@ -5,10 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import com.mob.lee.fastair.io.http.Http
-import com.mob.lee.fastair.localhost.CategoryHandler
-import com.mob.lee.fastair.localhost.DownloadHandler
-import com.mob.lee.fastair.localhost.HomeHandler
-import com.mob.lee.fastair.localhost.ImageHandler
+import com.mob.lee.fastair.localhost.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -49,6 +46,7 @@ class HostService() : Service(), CoroutineScope {
                 addHandler(CategoryHandler(this@HostService))
                 addHandler(ImageHandler(this@HostService))
                 addHandler(DownloadHandler())
+                addHandler(ChatHandler(this@HostService))
             }
         }
 
