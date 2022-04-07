@@ -9,7 +9,11 @@ import android.provider.MediaStore
 import android.util.Size
 import com.mob.lee.fastair.io.http.*
 import com.mob.lee.fastair.io.socket.Writer
+import kotlinx.coroutines.channels.Channel
 import java.io.*
+import java.lang.Exception
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 
 class ImageHandler(val context: Context) : Handler {
     companion object {
@@ -18,17 +22,21 @@ class ImageHandler(val context: Context) : Handler {
 
     override fun canHandleIt(request: Request) = request.url.startsWith(PREV)
 
-    override suspend fun handle(request: Request): Writer {
+    override suspend fun handle(request: Request, channel: SocketChannel): Writer {
         val path = request.url.substring(PREV.length)
         if (request.urlParams.containsKey("width")) {
             val width = request.urlParam("width")!!.toInt()
             val height = request.urlParam("height")!!.toInt()
             val id = request.urlParam("id")!!.toLong()
-            val bitmap = fetchThumb(id, path, Size(width, height))
-            ByteArrayOutputStream().use {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-                val bytes=it.toByteArray()
-                return ByteResponse({bytes},PNG)
+            try {
+                val bitmap = fetchThumb(id, path, Size(width, height))
+                ByteArrayOutputStream().use {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    val bytes=it.toByteArray()
+                    return ByteResponse({bytes},PNG)
+                }
+            }catch (e:Exception){
+                return JsonResponse.json(null, NOTFOUNT)
             }
         }
         return ResourceResponse({ FileInputStream(path) }, PNG)

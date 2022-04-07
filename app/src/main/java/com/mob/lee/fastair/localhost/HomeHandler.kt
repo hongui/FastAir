@@ -4,11 +4,14 @@ import android.content.Context
 import android.util.Log
 import com.mob.lee.fastair.io.http.*
 import com.mob.lee.fastair.io.socket.Writer
+import kotlinx.coroutines.channels.Channel
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 
 class HomeHandler(val context: Context) : Handler {
     override fun canHandleIt(request: Request) = true
 
-    override suspend fun handle(request: Request): Writer {
+    override suspend fun handle(request: Request, channel: SocketChannel): Writer {
         val name = request.url.removePrefix("/")
         if (name.isBlank()) {
             return ResourceResponse({ context.assets.open("index.html") }, HTML)

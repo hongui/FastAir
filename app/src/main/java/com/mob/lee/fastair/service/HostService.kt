@@ -47,6 +47,7 @@ class HostService() : Service(), CoroutineScope {
                 addHandler(ImageHandler(this@HostService))
                 addHandler(DownloadHandler())
                 addHandler(ChatHandler(this@HostService))
+                addHandler(UploadHandler(this@HostService))
             }
         }
 

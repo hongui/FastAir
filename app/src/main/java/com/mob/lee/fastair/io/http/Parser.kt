@@ -1,44 +1,67 @@
 package com.mob.lee.fastair.io.http
 
+import android.net.Uri
 import java.nio.ByteBuffer
-import java.util.regex.Pattern
 
 class Parser {
     companion object {
-        fun parseRequest(buffer: ByteBuffer):Request? {
-            var endHeader = false
-            var index = 0
-            val request=Request()
+        const val CONTENT_DISPOSITION="Content-Disposition"
+        const val CONTENT_TYPE="Content-Type"
+        const val CONTENT_DISPOSITION_LEN= CONTENT_DISPOSITION.length
+        const val CONTENT_TYPE_LEN= CONTENT_TYPE.length
+
+        fun parseRequest(buffer: ByteBuffer): Request? {
+
+            val lines = parseArea(buffer)
+            if (lines.isEmpty()) {
+                return null
+            }
+
+            val statusLine = parseStatusLine(lines[0])
+
+            statusLine?:return null
+
+            val headers = HashMap<String, String>()
+            if (lines.size > 1) {
+                lines.map { parseNameValue(it, ":") }
+                    .forEach {
+                        it?.let {
+                            headers.put(it.first, it.second)
+                        }
+                    }
+            }
+
+            return Request(statusLine.first, statusLine.second.first, statusLine.second.second ?: emptyMap(), headers)
+        }
+
+        fun parsePart(buffer: ByteBuffer): Pair<String,String>? {
+            val lines = parseArea(buffer)
+            if (lines.isEmpty()) {
+                return null
+            }
+            val disposition=lines.find { it.contains(CONTENT_DISPOSITION) }?.substring(CONTENT_DISPOSITION_LEN+1)?.trim()
+            val contentType=lines.find { it.contains(CONTENT_TYPE) }?.substring(CONTENT_TYPE_LEN+1)?.trim()
+            disposition?:return null
+            return disposition to (contentType?:TEXT)
+        }
+
+        fun parseArea(buffer: ByteBuffer): List<String> {
+            var isEnd = false
+            var index = buffer.position()
+            val list = ArrayList<String>()
             do {
                 val (value, position) = readLineWithUpdate(buffer, index)
                 value?.let {
-                    if(0==index){
-                        val statusLine = parseStatusLine(it)
-                        statusLine?:return null
-                        request.method=statusLine.first
-                        request.url=statusLine.second.first
-                        statusLine.second.second?.let {
-                            request.urlParams=it
-                        }
-                    }else {
-                        request.header.add(it)
-                    }
+                    list.add(it)
+                } ?: let {
+                    isEnd = true
                 }
                 index = position
-                endHeader = value?.isBlank() ?: true
-            } while (endHeader)
-            return request
+                isEnd = value?.isBlank() ?: true
+            } while (isEnd)
+            return list
         }
 
-        fun parsePart(buffer: ByteBuffer):String?{
-            val (bound,position) = readLineWithUpdate(buffer,buffer.position())
-            bound?:return null
-            val disposition = readLineWithUpdate(buffer, position)
-            disposition.first?:return null
-            disposition.first
-            val contentType = readLineWithUpdate(buffer, position)
-
-        }
         fun readLine(buffer: ByteBuffer, start: Int): Pair<String?, Int> {
             val limit = buffer.limit()
             if (start >= limit) return null to start
@@ -57,39 +80,40 @@ class Parser {
             return value
         }
 
-        fun parseStatusLine(line: String): Triple<Int,Pair<String,Map<String,String>?>,String>?{
-            val result=line.split(Regex("\\s+"))
+        fun parseStatusLine(line: String): Triple<Int, Pair<String, Map<String, String>?>, String>? {
+            val result = line.split(Regex("\\s+"))
             if (result.size == 3) {
-                val method= httpMethod(result[0])
+                val method = httpMethod(result[0])
                 val urlParameter = parseUrlParameter(result[1])
                 val version = result[2]
-                return Triple(method,urlParameter,version)
+                return Triple(method, urlParameter, version)
             }
             return null
         }
 
-        fun parseUrlParameter(url:String):Pair<String,Map<String,String>?>{
+        fun parseUrlParameter(url: String): Pair<String, Map<String, String>?> {
             val urls = url.split("?")
             if (urls.size == 2) {
-                val params = urls[1].split("&")
-                if(params.size>1){
-                    parseNameValue(params[0])?.let {
-                        return urls[0] to mapOf(it)
+                val strs = urls[1].split("&")
+                val maps = if (strs.size > 1) {
+                    parseNameValue(strs[0])?.let {
+                        mapOf(it)
                     }
-                }else{
-                    val maps = HashMap<String, String>()
-                    for (p in params){
+                } else {
+                    val params = HashMap<String, String>()
+                    for (p in strs) {
                         parseNameValue(p)?.let {
-                            maps.put(it.first,it.second)
+                            params.put(it.first, it.second)
                         }
                     }
-                    return urls[0] to maps
+                    params
                 }
+                return Uri.decode(urls[0]) to maps
             }
             return url to null
         }
 
-        fun parseNameValue(value:String,sep:String="="):Pair<String,String>?{
+        fun parseNameValue(value: String, sep: String = "="): Pair<String, String>? {
             val result = value.split(Regex(sep), 2)
             if (result.size == 2) {
                 return result[0].trim() to result[1].trim()
