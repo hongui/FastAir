@@ -8,7 +8,10 @@ import com.mob.lee.fastair.io.http.Handler
 import com.mob.lee.fastair.io.http.JsonResponse
 import com.mob.lee.fastair.io.http.Request
 import com.mob.lee.fastair.io.socket.Writer
+import kotlinx.coroutines.channels.Channel
 import org.json.JSONArray
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 
 class ChatHandler(val context:Context):Handler {
     companion object {
@@ -20,9 +23,7 @@ class ChatHandler(val context:Context):Handler {
     }
     override fun canHandleIt(request: Request) = request.url.startsWith(PREV)
 
-    override suspend fun handle(request: Request): Writer {
-        Log.e("TAG",request.body)
-
+    override suspend fun handle(request: Request,  channel: SocketChannel): Writer {
         val obj=JSONArray()
 
         val manager = ContextCompat.getSystemService(context, ClipboardManager::class.java)

@@ -4,6 +4,9 @@ import android.util.Log
 import com.mob.lee.fastair.io.socket.AbstractChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
@@ -28,21 +31,42 @@ class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.o
     private val handler = ArrayList<Handler>()
 
 
-    override fun onRead(channel: SocketChannel, buffer: ByteBuffer) {
-        val request = Request.parse(buffer)
+    override suspend fun onRead(channel: SocketChannel, buffer: Channel<ByteBuffer>) {
+        val first=buffer.receive()
+        val request = Parser.parseRequest(first)
         //这里需要再想想
-        request ?: return
+        request ?: let {
+            channel.close()
+            return
+        }
+
+        request.body=if(first.hasRemaining()){
+            val second = buffer.receive()
+            val newBuffer=ByteBuffer.allocate(second.limit()+first.remaining())
+            newBuffer.put(first.slice())
+            newBuffer.put(second)
+            val c = Channel<ByteBuffer>()
+            c.send(newBuffer)
+            buffer.consumeEach {
+                do{
+                    val result=c.trySendBlocking(it)
+                }while (result.isFailure)
+            }
+            c
+        }else{
+            buffer
+        }
         Log.d(TAG,"Accept request ${request}")
         dispatch(request, channel)
     }
 
 
-    private fun dispatch(request: Request, channel: SocketChannel) {
+    private fun dispatch(request: Request,channel: SocketChannel) {
         mScope.launch(Dispatchers.IO) {
             handler.forEach {
                 if (it.canHandleIt(request)) {
                     Log.d(TAG, "Choose handler ${it} to handle ${request}")
-                    val result = it.handle(request)
+                    val result = it.handle(request,channel)
                     try {
                         result(channel)
                     } catch (e: Exception) {
