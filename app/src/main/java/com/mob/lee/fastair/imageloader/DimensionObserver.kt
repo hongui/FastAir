@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.imageloader
 
+import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import java.lang.ref.WeakReference
@@ -7,24 +8,23 @@ import java.lang.ref.WeakReference
 /**
  * Created by Andy on 2017/11/12.
  */
-class DimensionObserver(view:ImageView,val mOnSizeReady:(Int,Int)->Unit):ViewTreeObserver.OnPreDrawListener{
+class DimensionObserver(view:ImageView,val mOnSizeReady:(Int,Int)->Unit):ViewTreeObserver.OnGlobalLayoutListener{
 
     val mRef:WeakReference<ImageView>
 
     init {
         mRef=WeakReference<ImageView>(view)
         val observer = view.viewTreeObserver
-        observer.addOnPreDrawListener(this)
+        observer.addOnGlobalLayoutListener(this)
     }
 
-    override fun onPreDraw(): Boolean {
+    override fun onGlobalLayout() {
         val imageView = mRef.get()
         imageView?.let {
             mOnSizeReady(imageView.width,imageView.height)
-            imageView.viewTreeObserver.removeOnPreDrawListener(this)
+            imageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             mRef.clear()
         }
-        return true
     }
 
 }

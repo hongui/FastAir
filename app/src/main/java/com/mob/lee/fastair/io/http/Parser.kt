@@ -62,7 +62,7 @@ class Parser {
             return list
         }
 
-        fun readLine(buffer: ByteBuffer, start: Int): Pair<String?, Int> {
+        fun readLine(buffer: ByteBuffer, start: Int=buffer.position()): Pair<String?, Int> {
             val limit = buffer.limit()
             if (start >= limit) return null to start
             for (i in start until limit) {
@@ -74,7 +74,7 @@ class Parser {
             return null to start
         }
 
-        fun readLineWithUpdate(buffer: ByteBuffer, start: Int): Pair<String?, Int> {
+        fun readLineWithUpdate(buffer: ByteBuffer, start: Int=buffer.position()): Pair<String?, Int> {
             val value = readLine(buffer, start)
             value.first?.let { buffer.position(value.second) }
             return value

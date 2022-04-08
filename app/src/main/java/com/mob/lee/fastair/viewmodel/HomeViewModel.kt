@@ -4,13 +4,13 @@ import android.Manifest
 import android.content.ClipData
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
-import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.urlToPath
 import kotlinx.coroutines.channels.Channel
@@ -41,7 +41,7 @@ class HomeViewModel : AppViewModel() {
         withPermission(
             fragment,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            action = { _, hasPermission ->
+            action = {hasPermission ->
                 if (hasPermission) {
                     fetch(fragment.context)
                 } else {
@@ -61,7 +61,7 @@ class HomeViewModel : AppViewModel() {
         currentChannel?.cancel()
         records.clear()
 
-        val channel = dataSource.fetch(context, position)
+        val channel = dataSource.fetch(context,viewModelScope,position)
         currentChannel = channel
         for (r in channel) {
             next(r)

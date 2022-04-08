@@ -5,18 +5,18 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageView
 import com.mob.lee.fastair.R
+import com.mob.lee.fastair.imageloader.DisplayManager
 import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.dialog
-import com.mob.lee.fastair.utils.display
 import com.mob.lee.fastair.utils.openFile
 import com.mob.lee.fastair.view.CircleProgress
 import java.io.File
 
 typealias History = Pair<Record, State>
 
-class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.layout.item_history) {
+class RecordAdapter(val displayManager: DisplayManager,val action: (Record) -> Unit) : AppListAdapter<History>(R.layout.item_history) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, data: History) {
 
         val preview = holder.view<ImageView>(R.id.item_history_preview)
@@ -41,7 +41,7 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
         }
 
         preview.let {
-            display(it.context, record.path, it)
+            displayManager.show( it,record.path)
         }
 
         holder.itemView.setOnClickListener {

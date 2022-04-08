@@ -1,10 +1,14 @@
 package com.mob.lee.fastair.fragment
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.PopupMenu
@@ -18,7 +22,6 @@ import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.io.getNetIP
 import com.mob.lee.fastair.p2p.P2PManager
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.dialog
@@ -36,6 +39,11 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
     override val defaultContainer: Int = -1
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val viewModel:HomeViewModel by mParent!!.viewModels()
+        viewModel.registerPermission(this)
+    }
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
@@ -63,7 +71,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         })
 
-        observe(viewModel.hasSelectedLiveData) {
+        viewModel.hasSelectedLiveData.observe {
             val value = if (true == it) {
                 R.drawable.ic_action_send to R.color.color_red
             } else {
@@ -132,7 +140,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                     putInt("target",R.id.transferFragment)
                 }
             }else {
-                observe(viewModel.write(context)) {
+                viewModel.write(context).observe {
                     if (it.isSuccess()) {
                         navigation(R.id.beforeFragment)
                     } else {

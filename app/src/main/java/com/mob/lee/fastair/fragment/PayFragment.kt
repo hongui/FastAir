@@ -2,7 +2,7 @@ package com.mob.lee.fastair.fragment
 
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.utils.display
+import com.mob.lee.fastair.imageloader.Decoder
 import kotlinx.android.synthetic.main.fragment_payment.*
 
 /**
@@ -14,8 +14,8 @@ class PayFragment:AppFragment(){
     override fun setting() {
         title("谢谢客官打赏")
 
-        display(requireContext(),R.drawable.alipay,payAlipay)
-        display(requireContext(),R.drawable.wechat,payWechat)
+        //display(requireContext(),R.drawable.alipay,payAlipay)
+        //display(requireContext(),R.drawable.wechat,payWechat)
     }
 
 }

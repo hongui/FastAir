@@ -4,8 +4,6 @@ import android.os.Environment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.ImageView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.R
@@ -13,7 +11,6 @@ import com.mob.lee.fastair.adapter.AppListAdapter
 import com.mob.lee.fastair.adapter.AppViewHolder
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.formatDate
-import com.mob.lee.fastair.utils.display
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.PathPickViewModel
 import kotlinx.android.synthetic.main.fragment_path_pick.*
@@ -60,7 +57,7 @@ class PathPickFragment : AppFragment() {
         })
 
         viewModel.watchState(this, pathPickContent, adapter)
-        observe(viewModel.currentPositionLiveData) {
+        viewModel.currentPositionLiveData.observe {
             it ?: return@observe
             if (it == pathPickTab.tabCount) {
                 val path = viewModel.currentPath
@@ -77,7 +74,7 @@ class PathPickFragment : AppFragment() {
             pathPickTab.setScrollPosition(pathPickTab.tabCount - 1, 0F, true)
         }
 
-        observe(viewModel.pathLiveData) {
+        viewModel.pathLiveData.observe {
             adapter.clear()
             adapter.add(it)
         }

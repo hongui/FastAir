@@ -11,7 +11,6 @@ import android.text.TextWatcher
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.MessageAdapter
-import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.Message
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService

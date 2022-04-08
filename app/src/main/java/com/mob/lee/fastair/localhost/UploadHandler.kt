@@ -4,9 +4,7 @@ import android.content.Context
 import com.mob.lee.fastair.io.http.*
 import com.mob.lee.fastair.io.socket.Writer
 import com.mob.lee.fastair.utils.createFile
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
-import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
 class UploadHandler(val context: Context) : Handler {

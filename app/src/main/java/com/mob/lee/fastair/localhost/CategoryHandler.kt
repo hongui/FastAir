@@ -25,11 +25,11 @@ class CategoryHandler(val context: Context?):Handler {
     }
 
     override suspend fun handle(request: Request, channel: SocketChannel): Writer {
-        val categories = datasource.fetch(context, category)
+        /*val categories = datasource.fetch(context, category)
         val all=categories.toList()
         val array = JSONArray()
-        all.forEach { array.put(it.dump()) }
-        return JsonResponse.json(array)
+        all.forEach { array.put(it.dump()) }*/
+        return JsonResponse.json(null)
     }
 
     fun Record.dump():JSONObject{

@@ -54,7 +54,7 @@ class DiscoverFragment : AppFragment() {
                 discoverView.addView(view)
             }
         }
-        observe(P2PManager.connectLiveData) {
+        P2PManager.connectLiveData.observe{
             if (true == it) {
                 jump()
             }
@@ -62,7 +62,7 @@ class DiscoverFragment : AppFragment() {
         viewModel.withPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            action = { _, hasPermission ->
+            action = { hasPermission ->
                 if (hasPermission) {
                     ScanService.startScan(requireContext())
                 } else {
