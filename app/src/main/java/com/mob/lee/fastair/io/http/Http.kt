@@ -48,9 +48,7 @@ class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.o
             val c = Channel<ByteBuffer>()
             c.send(newBuffer)
             buffer.consumeEach {
-                do{
-                    val result=c.trySendBlocking(it)
-                }while (result.isFailure)
+                send(it,c)
             }
             c
         }else{

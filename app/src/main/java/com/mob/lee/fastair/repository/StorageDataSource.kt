@@ -6,13 +6,9 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.SparseArray
 import com.mob.lee.fastair.model.*
-import com.mob.lee.fastair.utils.database
 import com.mob.lee.fastair.utils.updateStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.File
 
 class StorageDataSource : DataSource {
@@ -42,18 +38,22 @@ class StorageDataSource : DataSource {
      * */
     val selectRecords = ArrayList<Record>()
 
-    fun fetch(context: Context?, position: Int): Channel<Record> {
+    /**
+     *  Fetch media info
+     *  if there are any cache in records,just return the cache,otherwise launch a task to fetch info with category
+     */
+    fun fetch(context: Context?,scope:CoroutineScope, position: Int): Channel<Record> {
         val list = records.get(position)
 
-        //有缓存，不查库
+        //return cache
         if (true == list?.isNotEmpty()) {
             return send(list)
         }
+
         val channel = Channel<Record>()
         val category = categories()[position]
 
-        //暂时使用全局的Job，不然数据可能会不全
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             val contentResolver = context?.contentResolver
             val cursor = contentResolver?.query(
                     category.uri(),
@@ -65,7 +65,7 @@ class StorageDataSource : DataSource {
                 val count = it.count
                 //应该可以存得下吧o(*￣▽￣*)ブ
                 while (total + count > 50_000) {
-                    val key = records.indexOfKey(0)
+                    val key = records.keyAt(0)
                     val temp = records.get(key)
                     total -= temp?.size ?: 0
                     records.remove(key)
@@ -75,7 +75,6 @@ class StorageDataSource : DataSource {
                     while (cursor.moveToNext()) {
                         val record = category.read(cursor)
                         temp.add(record)
-                        delay(DELAY)
                         channel.send(record)
                     }
                     records.put(position, temp)

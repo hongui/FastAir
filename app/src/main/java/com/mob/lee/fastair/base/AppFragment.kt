@@ -69,8 +69,8 @@ abstract class AppFragment : Fragment() {
         }
     }
 
-    fun <D> observe(liveData: LiveData<D>, action: (D) -> Unit) {
-        liveData.observe(this, Observer { action(it) })
+    fun <D> LiveData<D>.observe( action: (D) -> Unit) {
+        this.observe(this@AppFragment, Observer { action(it) })
     }
 
     fun navigation(

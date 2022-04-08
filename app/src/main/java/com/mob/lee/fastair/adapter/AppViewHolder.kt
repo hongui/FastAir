@@ -5,15 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.mob.lee.fastair.imageloader.ImageLoader
 
 /**
  *
@@ -27,18 +24,6 @@ class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun text(@IdRes id: Int, @StringRes res: Int): AppViewHolder {
         val view = view<TextView>(id)
         view.setText(res)
-        return this
-    }
-
-    fun image(@IdRes id: Int, @DrawableRes drawable: Int): AppViewHolder {
-        val view = view<ImageView>(id)
-        ImageLoader.display(drawable, view)
-        return this
-    }
-
-    fun image(@IdRes id: Int, drawable: String): AppViewHolder {
-        val view = view<ImageView>(id)
-        ImageLoader.display(drawable, view)
         return this
     }
 

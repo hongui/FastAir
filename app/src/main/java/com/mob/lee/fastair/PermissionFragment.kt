@@ -6,6 +6,8 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,7 +29,14 @@ class PermissionFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         arguments?.getStringArray("permissions")?.let {
-            requestPermissions(it, PERMISSION)
+            val permission = ActivityResultContracts.RequestMultiplePermissions()
+            val res = registerForActivityResult(permission, object : ActivityResultCallback<Map<String,Boolean>> {
+
+                override fun onActivityResult(result: Map<String, Boolean>?) {
+
+                }
+            })
+            res.launch(it)
         }
     }
 
