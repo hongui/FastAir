@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.RecordAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.imageloader.DisplayManager
 import com.mob.lee.fastair.viewmodel.TransferViewModel
 import kotlinx.android.synthetic.main.fragment_recyclerview.*
 
@@ -20,10 +19,7 @@ class HistoryFragment : AppFragment() {
     override fun setting() {
         title(R.string.transfer_history)
 
-        val displayManager = DisplayManager(this)
-        displayManager.bindRecyclerView(rv_recyclerview)
-
-        val adapter = RecordAdapter(displayManager) {
+        val adapter = RecordAdapter {
             viewModel.rename(requireContext(), it)
         }
         rv_recyclerview?.layoutManager = LinearLayoutManager(context)

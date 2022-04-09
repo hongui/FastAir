@@ -1,13 +1,10 @@
 package com.mob.lee.fastair.io.socket
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -16,7 +13,10 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import java.nio.channels.spi.AbstractSelectableChannel
 
-abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: AbstractSelectableChannel) {
+abstract class AbstractChannel(
+    val mScope: CoroutineScope,
+    val mChannel: AbstractSelectableChannel
+) {
     var mTimeout = 1000L
     var mRunning = true
     private var mSelector: Selector? = null
@@ -95,21 +95,23 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
         onEnd()
     }
 
-    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) = mScope.launch(Dispatchers.IO) {
-        var c: SocketChannel? = null
-        val start = System.currentTimeMillis()
-        do {
-            c = channel.accept()
-        } while (c == null)
-        Log.d(TAG, "Wait accept for ${System.currentTimeMillis() - start}ms,channel=${c}")
-        connected(c)
-    }
+    private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) =
+        mScope.launch(Dispatchers.IO) {
+            var c: SocketChannel? = null
+            val start = System.currentTimeMillis()
+            do {
+                c = channel.accept()
+            } while (c == null)
+            Log.d(TAG, "Wait accept for ${System.currentTimeMillis() - start}ms,channel=${c}")
+            connected(c)
+        }
 
-    private fun onConnect(key: SelectionKey, channel: SocketChannel) = mScope.launch(Dispatchers.IO) {
-        val inet = key.attachment() as InetSocketAddress
-        channel.connect(inet)
-        connected(channel)
-    }
+    private fun onConnect(key: SelectionKey, channel: SocketChannel) =
+        mScope.launch(Dispatchers.IO) {
+            val inet = key.attachment() as InetSocketAddress
+            channel.connect(inet)
+            connected(channel)
+        }
 
     private suspend fun connected(channel: SocketChannel) {
         withContext(Dispatchers.Main) {
@@ -119,9 +121,11 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
         channel.register(mSelector, SelectionKey.OP_READ)
     }
 
-    private fun onRead(key: SelectionKey, channel: SocketChannel) {
-        mScope.launch(Dispatchers.IO) {
-            val channelBuffer = Channel<ByteBuffer>(10)
+    private fun onRead(channel: SocketChannel) {
+            val channelBuffer = Channel<ByteBuffer>(2)
+            mScope.launch {
+                onRead(channel,channelBuffer)
+            }
             try {
                 do {
                     val buffer = read(channel)?.also {
@@ -131,11 +135,10 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
                 } while (null != buffer)
             } catch (e: Exception) {
                 onError(e)
-            }finally {
-                channelBuffer.close()
                 channel.close()
+            } finally {
+                channelBuffer.close()
             }
-        }
     }
 
     private fun onSelected() {
@@ -145,7 +148,7 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
             when (key.readyOps()) {
                 SelectionKey.OP_ACCEPT -> onAccept(key, mChannel as ServerSocketChannel)
                 SelectionKey.OP_CONNECT -> onConnect(key, mChannel as SocketChannel)
-                SelectionKey.OP_READ -> onRead(key, key.channel() as SocketChannel)
+                SelectionKey.OP_READ -> onRead(key.channel() as SocketChannel)
             }
             keys.remove()
         }
@@ -153,12 +156,9 @@ abstract class AbstractChannel(val mScope: CoroutineScope, val mChannel: Abstrac
 
     fun read(channel: SocketChannel): ByteBuffer? {
         val buffer = ByteBuffer.allocate(10 * 1024)
-        var count = 0
-        do {
-            count = channel.read(buffer)
-        } while (0 == count)
+        val count = channel.read(buffer)
 
-        return if (-1 == count) {
+        return if (-1 == count || 0 == count) {
             null
         } else {
             buffer

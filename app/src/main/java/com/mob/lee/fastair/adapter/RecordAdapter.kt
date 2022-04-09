@@ -16,7 +16,7 @@ import java.io.File
 
 typealias History = Pair<Record, State>
 
-class RecordAdapter(val displayManager: DisplayManager,val action: (Record) -> Unit) : AppListAdapter<History>(R.layout.item_history) {
+class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.layout.item_history) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, data: History) {
 
         val preview = holder.view<ImageView>(R.id.item_history_preview)
@@ -41,7 +41,7 @@ class RecordAdapter(val displayManager: DisplayManager,val action: (Record) -> U
         }
 
         preview.let {
-            displayManager.show( it,record.path)
+            DisplayManager.show( it,record.path)
         }
 
         holder.itemView.setOnClickListener {

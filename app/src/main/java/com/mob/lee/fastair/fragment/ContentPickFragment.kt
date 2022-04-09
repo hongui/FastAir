@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.FileAdapter
 import com.mob.lee.fastair.base.AppFragment
-import com.mob.lee.fastair.imageloader.DisplayManager
 import com.mob.lee.fastair.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_content_pick.*
 
@@ -17,10 +16,8 @@ class ContentPickFragment : AppFragment() {
     override val defaultContainer: Int = -1
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
-        val displayManager=DisplayManager(this)
-        displayManager.bindRecyclerView(pickContent)
 
-        val adapter = FileAdapter(displayManager) {
+        val adapter = FileAdapter {
             viewModel.toggleState(it)
         }
 
