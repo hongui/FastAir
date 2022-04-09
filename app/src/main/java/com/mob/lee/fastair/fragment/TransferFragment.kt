@@ -8,7 +8,6 @@ import android.os.IBinder
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.RecordAdapter
-import com.mob.lee.fastair.imageloader.DisplayManager
 import com.mob.lee.fastair.io.ProcessListener
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.io.state.parseFile
@@ -29,10 +28,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
     override fun setting() {
         title(R.string.file_transfer)
 
-        val displayManager=DisplayManager(this)
-        displayManager.bindRecyclerView(rv_recyclerview)
-
-        mAdapter = RecordAdapter(displayManager) {
+        mAdapter = RecordAdapter {
             viewModel.rename(requireContext(), it)
         }
         rv_recyclerview?.layoutManager = LinearLayoutManager(context)

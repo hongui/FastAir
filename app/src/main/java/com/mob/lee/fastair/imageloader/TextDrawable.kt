@@ -93,13 +93,9 @@ object TextDrawable {
         val x=width/2F- mBound.centerX()
         val y=height/2F+ mBound.height()/2
 
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
         val canvas=Canvas(bitmap)
-        canvas.drawColor(Color.TRANSPARENT)
-        val currentColor = mPaint.color
-        mPaint.color=color
-        canvas.drawRoundRect(RectF(0F, 0F, width.toFloat(), height.toFloat()), width / 8F, height / 8F, mPaint)
-        mPaint.color=currentColor
+        canvas.drawColor(color)
         canvas.drawText(singleText,0,singleText.length,x,y, mPaint)
         return bitmap
     }
@@ -107,7 +103,7 @@ object TextDrawable {
     private fun configString(text: String):String{
         val pattern = Pattern.compile("\\w|[\\u4e00-\\u9fa5]")
         val result = pattern.toRegex().find(text)
-        return result?.value?.toUpperCase()?:"A"
+        return result?.value?.uppercase()?:"A"
     }
 
     private fun initPaint(text: String,width: Int,height: Int){

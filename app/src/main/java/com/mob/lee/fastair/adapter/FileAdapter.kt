@@ -18,14 +18,12 @@ import java.io.File
  * @CreateDate:     2020/6/11 16:54
  * @Description:    无
  */
-class FileAdapter(val displayManager: DisplayManager,val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.item_file) {
+class FileAdapter(val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.item_file) {
     override fun onBindViewHolder(holder: AppViewHolder, position: Int, record: Record) {
         holder.text(R.id.item_file_name, record.name)
         holder.text(R.id.item_file_extra, record.date.formatDate() + "\t\t" + record.size.formatSize(holder.itemView.context))
         val iconView = holder.view<ImageView>(R.id.item_file_icon)
-        if (null != iconView) {
-            displayManager.show(iconView,record.path)
-        }
+        DisplayManager.show(iconView,record.path)
 
         holder.itemView.setOnClickListener {
            action(record)
