@@ -58,7 +58,7 @@ class Parser {
                 }
                 index = position
                 isEnd = value?.isBlank() ?: true
-            } while (isEnd)
+            } while (!isEnd)
             return list
         }
 
@@ -68,7 +68,7 @@ class Parser {
             for (i in start until limit) {
                 val c = buffer.get(i)
                 if (0 == c.compareTo('\n'.code)) {
-                    return String(buffer.array(), start, i - start) to i
+                    return String(buffer.array(), start, i - start) to i+1
                 }
             }
             return null to start
@@ -82,7 +82,7 @@ class Parser {
 
         fun parseStatusLine(line: String): Triple<Int, Pair<String, Map<String, String>?>, String>? {
             val result = line.split(Regex("\\s+"))
-            if (result.size == 3) {
+            if (result.size >= 3) {
                 val method = httpMethod(result[0])
                 val urlParameter = parseUrlParameter(result[1])
                 val version = result[2]
