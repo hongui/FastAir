@@ -1,10 +1,10 @@
 package com.mob.lee.fastair.io.socket
 
 import android.util.Log
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.onFailure
-import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -121,24 +121,19 @@ abstract class AbstractChannel(
         channel.register(mSelector, SelectionKey.OP_READ)
     }
 
-    private fun onRead(channel: SocketChannel) {
-            val channelBuffer = Channel<ByteBuffer>(2)
-            mScope.launch {
-                onRead(channel,channelBuffer)
-            }
-            try {
-                do {
-                    val buffer = read(channel)?.also {
-                        Log.d(TAG, "Read ${it.remaining()} byte data")
-                        send(it, channelBuffer)
-                    }
-                } while (null != buffer)
-            } catch (e: Exception) {
-                onError(e)
-                channel.close()
-            } finally {
-                channelBuffer.close()
-            }
+    private fun onRead(key: SelectionKey, channel: SocketChannel) {
+        Log.d(TAG, "=============={Begin onRead")
+        try {
+            do {
+                val buffer = read(channel)
+                send(channel, buffer)
+            } while (null != buffer)
+        } catch (e: Exception) {
+            onError(e)
+            channel.close()
+        } finally {
+            Log.d(TAG, "finished onRead}==============")
+        }
     }
 
     private fun onSelected() {
@@ -148,16 +143,15 @@ abstract class AbstractChannel(
             when (key.readyOps()) {
                 SelectionKey.OP_ACCEPT -> onAccept(key, mChannel as ServerSocketChannel)
                 SelectionKey.OP_CONNECT -> onConnect(key, mChannel as SocketChannel)
-                SelectionKey.OP_READ -> onRead(key.channel() as SocketChannel)
+                SelectionKey.OP_READ -> onRead(key, key.channel() as SocketChannel)
             }
             keys.remove()
         }
     }
 
     fun read(channel: SocketChannel): ByteBuffer? {
-        val buffer = ByteBuffer.allocate(10 * 1024)
+        val buffer = ByteBuffer.allocate(1024 * 1024)
         val count = channel.read(buffer)
-
         return if (-1 == count || 0 == count) {
             null
         } else {
@@ -165,11 +159,13 @@ abstract class AbstractChannel(
         }
     }
 
-    fun send(buffer: ByteBuffer, channel: Channel<ByteBuffer>) {
-        buffer.flip()
-        channel.trySendBlocking(buffer).onFailure {
-            send(buffer, channel)
+    fun send(channel: SocketChannel, buffer: ByteBuffer?) {
+        buffer?.let {
+            it.flip()
+            onRead(channel, it)
+            Log.d(TAG, "send ${it.remaining()} byte data")
         }
+
     }
 
     open fun onError(exception: Exception) {
@@ -178,7 +174,7 @@ abstract class AbstractChannel(
 
     open fun onStart(address: InetSocketAddress) {}
     open fun onConnected() {}
-    abstract suspend fun onRead(channel: SocketChannel, buffer: Channel<ByteBuffer>)
+    abstract fun onRead(channel: SocketChannel, buffer: ByteBuffer)
     open fun onDisconnected() {}
     open fun onEnd() {}
 
