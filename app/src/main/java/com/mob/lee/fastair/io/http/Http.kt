@@ -5,7 +5,6 @@ import com.mob.lee.fastair.io.socket.AbstractChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.onSuccess
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.launch
@@ -30,54 +29,72 @@ import java.nio.channels.SocketChannel
 
 class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.open()) {
     private val handler = ArrayList<Handler>()
+    private val mCurrentChannel = HashMap<SocketChannel, Channel<ByteBuffer>>()
 
-
-    override suspend fun onRead(channel: SocketChannel, buffer: Channel<ByteBuffer>) {
-        val first = buffer.receive()
-        val request = Parser.parseRequest(first)
-        //这里需要再想想
-        request ?: let {
-            channel.close()
-            return
+    override fun onRead(channel: SocketChannel, buffer: ByteBuffer) {
+        mCurrentChannel.get(channel)?.let {
+            dispatch(channel, buffer = buffer)
+        } ?: Channel<ByteBuffer>(10).apply {
+            val req = firstRequest(this, buffer)
+            req ?: return channel.close()
+            dispatch(channel, req)
         }
-
-        request.body = if (first.hasRemaining()) {
-            val result = buffer.tryReceive()
-            val b = result.getOrNull()
-            val newBuffer = ByteBuffer.allocate((b?.limit() ?: 0) + first.remaining())
-            newBuffer.put(first.slice())
-            b?.let {
-                newBuffer.put(it)
-            }
-            val c = Channel<ByteBuffer>()
-            c.send(newBuffer)
-            buffer.consumeEach {
-                send(it, c)
-            }
-            c
-        } else {
-            buffer
-        }
-        Log.d(TAG, "Accept request ${request}")
-        dispatch(request, channel)
     }
 
 
-    private fun dispatch(request: Request, channel: SocketChannel) {
+    private fun firstRequest(channel: Channel<ByteBuffer>, buffer: ByteBuffer): Request? {
+        val request = Parser.parseRequest(buffer)
+        //这里需要再想想
+        request ?: return null
+        request.body = channel
+        if (buffer.hasRemaining()) {
+            request.firstBody = buffer
+        }
+        Log.d(TAG, "Accept request ${request}")
+        return request
+    }
+
+    private fun dispatch(channel: SocketChannel, request: Request? = null, buffer: ByteBuffer? = null) {
+        mCurrentChannel.get(channel)?.let { ch ->
+            dispatchLeftBuffer(channel, ch, buffer)
+            return
+        }
         mScope.launch(Dispatchers.IO) {
-            handler.forEach {
-                if (it.canHandleIt(request)) {
-                    Log.d(TAG, "Choose handler ${it} to handle ${request}")
-                    val result = it.handle(request, channel)
-                    try {
-                        result(channel)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        //JsonResponse.json(null, SERVERERROR).invoke(channel)
-                        Log.e(TAG, "----------------------------------------${e.printStackTrace()}")
-                    }
-                    return@launch
+            request?.let {
+                dispatchFirstRequest(channel, it)
+            }
+        }
+    }
+
+    private fun dispatchLeftBuffer(socketChannel: SocketChannel, channel: Channel<ByteBuffer>, buffer: ByteBuffer? = null) {
+        buffer?.let {
+            val result = channel.trySendBlocking(it)
+            if (result.isSuccess) {
+                return
+            } else {
+                dispatchLeftBuffer(socketChannel, channel, buffer)
+            }
+        }
+    }
+
+    private suspend fun dispatchFirstRequest(channel: SocketChannel, request: Request) {
+        handler.forEach {
+            if (it.canHandleIt(request)) {
+                Log.d(TAG, "Choose handler ${it} to handle ${request}")
+                mCurrentChannel.put(channel, request.body!!)
+                val result = it.handle(request, channel)
+                try {
+                    result(channel)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    //JsonResponse.json(null, SERVERERROR).invoke(channel)
+                    Log.e(TAG, "----------------------------------------${e.printStackTrace()}")
+                } finally {
+                    mCurrentChannel.remove(channel)
+                    channel.close()
+                    request.body?.close()
                 }
+                return
             }
         }
     }

@@ -1,83 +1,121 @@
 package com.mob.lee.fastair.io.http
 
 import android.net.Uri
+import android.util.Log
 import java.nio.ByteBuffer
 
 class Parser {
     companion object {
-        const val CONTENT_DISPOSITION="Content-Disposition"
-        const val CONTENT_TYPE="Content-Type"
-        const val CONTENT_DISPOSITION_LEN= CONTENT_DISPOSITION.length
-        const val CONTENT_TYPE_LEN= CONTENT_TYPE.length
+        const val CONTENT_DISPOSITION = "Content-Disposition"
+        const val CONTENT_TYPE = "Content-Type"
+        const val CONTENT_DISPOSITION_LEN = CONTENT_DISPOSITION.length
+        const val CONTENT_TYPE_LEN = CONTENT_TYPE.length
 
         fun parseRequest(buffer: ByteBuffer): Request? {
 
-            val lines = parseArea(buffer)
-            if (lines.isEmpty()) {
-                return null
-            }
+            val (line, _) = readLineString(buffer)
+            line?:return null
 
-            val statusLine = parseStatusLine(lines[0])
+            val statusLine = parseStatusLine(line) ?: return null
 
-            statusLine?:return null
+            val area = readAreaString(buffer) ?: return null
 
             val headers = HashMap<String, String>()
-            if (lines.size > 1) {
-                lines.map { parseNameValue(it, ":") }
-                    .forEach {
-                        it?.let {
-                            headers.put(it.first, it.second)
-                        }
+
+            area
+                .lines()
+                .map { parseNameValue(it, ":") }
+                .forEach {
+                    it?.let {
+                        headers.put(it.first, it.second)
                     }
-            }
+                }
 
             return Request(statusLine.first, statusLine.second.first, statusLine.second.second ?: emptyMap(), headers)
         }
 
-        fun parsePart(buffer: ByteBuffer): Pair<String,String>? {
-            val lines = parseArea(buffer)
-            if (lines.isEmpty()) {
+        fun parsePart(buffer: ByteBuffer): Triple<String,String, String>? {
+            val b = readAreaString(buffer) ?: return null
+
+            val lines = b.lines()
+            val disposition = lines.find { it.contains(CONTENT_DISPOSITION) }?.substring(CONTENT_DISPOSITION_LEN + 1)?.trim()
+            val contentType = lines.find { it.contains(CONTENT_TYPE) }?.substring(CONTENT_TYPE_LEN + 1)?.trim()
+            disposition ?: return null
+            return Triple(lines[0],disposition , (contentType ?: TEXT))
+        }
+
+        fun readAreaString(buffer: ByteBuffer): String? {
+            val area = readArea(buffer)
+            if (!area.hasRemaining()) {
                 return null
             }
-            val disposition=lines.find { it.contains(CONTENT_DISPOSITION) }?.substring(CONTENT_DISPOSITION_LEN+1)?.trim()
-            val contentType=lines.find { it.contains(CONTENT_TYPE) }?.substring(CONTENT_TYPE_LEN+1)?.trim()
-            disposition?:return null
-            return disposition to (contentType?:TEXT)
+            return String(area.array(), 0, area.limit())
         }
 
-        fun parseArea(buffer: ByteBuffer): List<String> {
+        fun readArea(buffer: ByteBuffer): ByteBuffer {
             var isEnd = false
-            var index = buffer.position()
-            val list = ArrayList<String>()
+            var position = buffer.position()
+            var start = position
             do {
-                val (value, position) = readLineWithUpdate(buffer, index)
-                value?.let {
-                    list.add(it)
-                } ?: let {
-                    isEnd = true
-                }
-                index = position
-                isEnd = value?.isBlank() ?: true
+                val value = readLine(buffer)
+                isEnd = value.first?.let {
+                    Log.e("Tag", "==========${subStringArray(it)}====${it.limit()}")
+                    it.remaining() == 2 &&
+                            0 == it.get().compareTo('\r'.code) &&
+                            0 == it.get().compareTo('\n'.code)
+                } ?: true
+                position = value.second
             } while (!isEnd)
-            return list
+            return buffer.duplicate().apply {
+                position(start)
+                limit(position)
+            }
         }
 
-        fun readLine(buffer: ByteBuffer, start: Int=buffer.position()): Pair<String?, Int> {
+        fun readLineString(buffer: ByteBuffer, start: Int = buffer.position(), updatePosition: Boolean = true): Pair<String?, Int> {
+            return readLine(buffer, start, updatePosition).run {
+                first?.let {
+                    subStringArray(it) to second
+                } ?: null to second
+            }
+        }
+
+        fun readLine(buffer: ByteBuffer, start: Int = buffer.position(), updatePosition: Boolean = true): Pair<ByteBuffer?, Int> {
             val limit = buffer.limit()
             if (start >= limit) return null to start
+
+            // We need recovery later
+            if (!updatePosition) {
+                buffer.mark()
+            }
+
+            //For slice
+            buffer.position(start)
+
+            var hasBefore = false
             for (i in start until limit) {
                 val c = buffer.get(i)
-                if (0 == c.compareTo('\n'.code)) {
-                    return String(buffer.array(), start, i - start) to i+1
+                if (0 == c.compareTo('\n'.code) && hasBefore) {
+                    // i is \n now,we skip it next time
+                    val position = if (i == buffer.limit()) i else i + 1
+                    val b = buffer.duplicate()
+                    //It's ugly,there are not a sub buffer interface,callee need use careful
+                    b.limit(position)
+                    b.position(start)
+
+                    if (updatePosition) {
+                        buffer.position(position)
+                    } else {
+                        buffer.reset()
+                    }
+                    return b to position
+                } else if (0 == c.compareTo('\r'.code)) {
+                    hasBefore = true
+                } else {
+                    hasBefore = false
                 }
             }
             return null to start
-        }
-
-        fun readLineWithUpdate(buffer: ByteBuffer, start: Int=buffer.position()): Pair<String?, Int> {
-            val value = readLine(buffer, start)
-            value.first?.let { buffer.position(value.second) }
-            return value
         }
 
         fun parseStatusLine(line: String): Triple<Int, Pair<String, Map<String, String>?>, String>? {
@@ -120,5 +158,7 @@ class Parser {
             }
             return null
         }
+
+        private fun subStringArray(buffer: ByteBuffer) = String(buffer.array(), buffer.position(), buffer.limit() - buffer.position())
     }
 }
