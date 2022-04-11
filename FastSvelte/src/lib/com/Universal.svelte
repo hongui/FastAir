@@ -1,12 +1,13 @@
 <script>
-	export let Icon;
+	export let data;
 	export let record;
 
+	import Icon from 'svelte-icon'
 	import File from '$lib/com/File.svelte';
 </script>
 
 <a href="/downloads{record.path}" download={record.name}>
-	<svelte:component this={Icon} style="width: 24px;height: 24px;margin: 12px;" />
+	<Icon data={data}/>
 	<File {record} />
 </a>
 
