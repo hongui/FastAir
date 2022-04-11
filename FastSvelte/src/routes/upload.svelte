@@ -1,7 +1,8 @@
 <script>
+	import Icon from 'svelte-icon'
 	import File from '$lib/com/File.svelte';
-	import CloudDownload from '$lib/icons/CloudDownload.svelte';
-	import Delete from '$lib/icons/Delete.svelte';
+	import cloudDownloadSVG from '$lib/icons/cloud_download.svg?raw';
+	import deleteSVG from '$lib/icons/delete.svg?raw';
 
 	let dropFiles = [];
 	let deny = (e) => {
@@ -54,8 +55,8 @@
 		}
 	};
 	let operators = [
-		{ icon: CloudDownload, action: post },
-		{ icon: Delete, action: reset }
+		{ icon: cloudDownloadSVG, action: post },
+		{ icon: deleteSVG, action: reset }
 	];
 </script>
 
@@ -72,7 +73,7 @@
 <div class="operators">
 	{#each operators as op}
 		<div class="operator" on:click={op.action}>
-			<svelte:component this={op.icon} style="width: 24px; height: 24px; margin: 12px;" />
+			<Icon data={op.icon} size="36px" stroke="none"/>
 		</div>
 	{/each}
 </div>
@@ -114,11 +115,11 @@
 	}
 
 	.operator {
-		fill: var(--primary-color);
+		color: var(--primary-color);
 		margin-top: 16px;
 	}
 	.operator:hover {
-		fill: var(--accent-color);
+		color: var(--accent-color);
 		cursor: pointer;
 	}
 </style>
