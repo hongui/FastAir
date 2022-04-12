@@ -48,6 +48,8 @@
     <string name="detect_unfinished_task">检测到您有未发送的文件，是否马上开始发送？</string>
     <string name="path_setting_success">路径修改成功，新接收的文件将保存在：%s</string>
     <string name="storage_not_ready">外部存储设备未准备好</string>
+    <string name="server_runing">本地主机正在运行</string>
+    <string name="server_stoped">本地主机已停止</string>
 
     <string name="copy_content">复制内容</string>
     <string name="turn_on">去开启</string>
@@ -79,6 +81,9 @@
     <string name="later">稍后再发</string>
     <string name="file_operation">文件操作</string>
     <string name="choose">选择</string>
+    <string name="start_server">启动服务</string>
+    <string name="stop_server">停止服务</string>
+    <string name="restart_server">重启服务</string>
 
     <string name="category_picture">图片</string>
     <string name="category_other">其它</string>

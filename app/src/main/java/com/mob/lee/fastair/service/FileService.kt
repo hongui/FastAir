@@ -7,8 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
@@ -20,6 +18,11 @@ import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
+import com.mob.lee.fastair.service.Notification.Companion.FILE_TRANSFER
+import com.mob.lee.fastair.service.Notification.Companion.FILE_TRANSFER_CODE
+import com.mob.lee.fastair.service.Notification.Companion.channel
+import com.mob.lee.fastair.service.Notification.Companion.easyNotify
+import com.mob.lee.fastair.service.Notification.Companion.foreground
 import com.mob.lee.fastair.utils.updateStorage
 import kotlinx.coroutines.async
 import java.io.File
@@ -34,10 +37,6 @@ class FileService : TransferService() {
     var mFileChangeListener: ProcessListener? = null
     override var port: Int? = 9527
 
-    val channelId = "fileservice"
-    val channelName by lazy {
-        getString(R.string.file_transfer)
-    }
     val database by lazy {
         DataBaseDataSource()
     }
@@ -45,13 +44,16 @@ class FileService : TransferService() {
     override fun onCreate() {
         super.onCreate()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel =
-                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
+        channel(FILE_TRANSFER, getString(R.string.file_transfer))
+        foreground(FILE_TRANSFER, FILE_TRANSFER_CODE){
+            setContentTitle(getString(R.string.file_transfer))
         }
-        notification(0, getString(R.string.trans_waiting))
+        notification(0,getString(R.string.wait_for_transport_file))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopForeground(true)
     }
 
     override fun onReceiveMessage(message: State) {
@@ -154,25 +156,13 @@ class FileService : TransferService() {
         }
     }
 
-    fun notification(progress: Int, title: String,target:Int?=0) {
-        val intent=PendingIntent.getActivity(this,9527,
-            Intent(this,ContainerActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT)
-        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, channelId)
-        } else {
-            Notification.Builder(this)
+    fun notification(progress: Int, title: String) {
+        easyNotify(FILE_TRANSFER, FILE_TRANSFER_CODE){
+            setContentTitle(getString(R.string.file_transfer))
+            setContentText(title)
+            setProgress(100, progress, false)
+            setAutoCancel(true)
         }
-        builder.setContentTitle(title)
-        builder.setSmallIcon(R.mipmap.ic_launcher)
-        builder.setProgress(100, progress, false)
-        builder.setAutoCancel(true)
-        builder.setContentIntent(intent)
-        val notification = builder.build()
-
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-        manager?.notify(9727, notification)
-        startForeground(9727, notification)
     }
 
     companion object {
