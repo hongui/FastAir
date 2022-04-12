@@ -2,12 +2,11 @@
 	export let data;
 	export let record;
 
-	import Icon from 'svelte-icon'
 	import File from '$lib/com/File.svelte';
 </script>
 
 <a href="/downloads{record.path}" download={record.name}>
-	<Icon data={data}/>
+	{data}
 	<File {record} />
 </a>
 

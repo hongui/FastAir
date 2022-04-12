@@ -3,21 +3,21 @@
 	export let record;
 	import Image from '$lib/com/Image.svelte';
 
-	import musicSVG from '$lib/icons/music.svg?raw';
-	import videoSVG from '$lib/icons/video.svg?raw';
-	import wordSVG from '$lib/icons/word.svg?raw';
-	import excelSVG from '$lib/icons/excel.svg?raw';
-	import pptSVG from '$lib/icons/ppt.svg?raw';
-	import txtSVG from '$lib/icons/txt.svg?raw';
-	import pdfSVG from '$lib/icons/pdf.svg?raw';
-	import apkSVG from '$lib/icons/apk.svg?raw';
-	import zipSVG from '$lib/icons/zip.svg?raw';
-	import unknowSVG from '$lib/icons/unknow.svg?raw';
+	import FaMusic from 'svelte-icons/fa/FaMusic.svelte'
+	import FaFileVideo from 'svelte-icons/fa/FaFileVideo.svelte'
+	import FaFileWord from 'svelte-icons/fa/FaFileWord.svelte'
+	import FaFileExcel from 'svelte-icons/fa/FaFileExcel.svelte'
+	import FaFilePowerpoint from 'svelte-icons/fa/FaFilePowerpoint.svelte'
+	import FaFileAlt from 'svelte-icons/fa/FaFileAlt.svelte'
+	import FaFilePdf from 'svelte-icons/fa/FaFilePdf.svelte'
+	import FaAndroid from 'svelte-icons/fa/FaAndroid.svelte'
+	import FaFileArchive from 'svelte-icons/fa/FaFileArchive.svelte'
+	import FaFile from 'svelte-icons/fa/FaFile.svelte'
 
 	import Universal from '$lib/com/Universal.svelte';
 
 
-	let icons=[null,musicSVG,videoSVG,wordSVG,excelSVG,pptSVG,txtSVG,pdfSVG,apkSVG,zipSVG,unknowSVG]
+	let icons=[null,FaMusic,FaFileVideo,FaFileWord,FaFileExcel,FaFilePowerpoint,FaFileAlt,FaFilePdf,FaAndroid,FaFileArchive,FaFile]
 
 </script>
 

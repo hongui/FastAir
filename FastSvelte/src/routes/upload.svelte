@@ -1,8 +1,10 @@
 <script>
-	import Icon from 'svelte-icon'
+	import { showUpload   } from '$lib/store.js';
 	import File from '$lib/com/File.svelte';
-	import cloudDownloadSVG from '$lib/icons/cloud_download.svg?raw';
-	import deleteSVG from '$lib/icons/delete.svg?raw';
+	import FaCloudDownloadAlt from 'svelte-icons/fa/FaCloudDownloadAlt.svelte'
+	import FaTrashAlt from 'svelte-icons/fa/FaTrashAlt.svelte'
+
+	showUpload.set(false);
 
 	let dropFiles = [];
 	let deny = (e) => {
@@ -55,13 +57,13 @@
 		}
 	};
 	let operators = [
-		{ icon: cloudDownloadSVG, action: post },
-		{ icon: deleteSVG, action: reset }
+		{ icon: FaCloudDownloadAlt, action: post },
+		{ icon: FaTrashAlt, action: reset }
 	];
 </script>
 
 <div class="container">
-	<div class="droparea" on:dragenter={deny} on:dragover={deny} on:drop={droped}>
+	<div class="droparea active" on:dragenter={deny} on:dragover={deny} on:drop={droped}>
 		<p>拖拽上传~</p>
 	</div>
 	<div class="files">
@@ -72,8 +74,8 @@
 </div>
 <div class="operators">
 	{#each operators as op}
-		<div class="operator" on:click={op.action}>
-			<Icon data={op.icon} size="36px" stroke="none"/>
+		<div class="operator active activeIcon" on:click={op.action}>
+			<svelte:component this={op.icon}/>
 		</div>
 	{/each}
 </div>
@@ -98,9 +100,10 @@
 	}
 
 	.droparea p {
-		color: var(--primary-color);
+		color: inherit;
 		font-weight: 500;
 	}
+
 	.files {
 		width: 100%;
 		height: 100%;
@@ -115,11 +118,26 @@
 	}
 
 	.operator {
-		color: var(--primary-color);
+		width: 32px;
+		height: 32px;
 		margin-top: 16px;
 	}
-	.operator:hover {
+
+	.active{
+		color: var(--primary-color);
+		border-color: var(--primary-color);
+	}
+
+	.active:hover{
 		color: var(--accent-color);
+		border-color: var(--accent-color);
+	}
+
+	.activeIcon{
+
+	}
+
+	.activeIcon:hover{
 		cursor: pointer;
 	}
 </style>
