@@ -1,10 +1,8 @@
 package com.mob.lee.fastair.io.socket
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import java.net.BindException
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -19,6 +17,7 @@ abstract class AbstractChannel(
 ) {
     var mTimeout = 1000L
     var mRunning = true
+    var mTime=0
     private var mSelector: Selector? = null
 
     fun startLoop(inet: InetSocketAddress) {
@@ -32,10 +31,24 @@ abstract class AbstractChannel(
                 loop()
                 Log.d(TAG, "End loop")
 
+                Log.d(TAG, "Begin finish")
+                finish()
+                Log.d(TAG, "End finish")
+            } catch (e: BindException) {
+                if(mTime>3){
+                    Log.e(TAG, "Port ${inet.port} has used,exit!")
+                    finish()
+                    mTime=0
+                }else{
+                    Log.d(TAG, "Port ${inet.port} has used,retry!")
+                    delay(1000)
+                    startLoop(inet)
+                    mTime+=1
+                }
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
                 onError(e)
-                stop()
+                finish()
             }
         }
     }
@@ -55,7 +68,7 @@ abstract class AbstractChannel(
     }
 
     private fun loop() {
-        while (true) {
+        while (mRunning) {
             val size = mSelector?.select(mTimeout)
             if (0 == size) {
                 continue
@@ -64,17 +77,8 @@ abstract class AbstractChannel(
         }
     }
 
-    private fun clear() {
-        mSelector?.close()
-        mSelector = null
-        mChannel.close()
-    }
-
-    fun stop() {
-        if (!mRunning) {
-            return
-        }
-        mRunning = false
+    private fun finish() {
+        mRunning=false
         mSelector?.keys()?.forEach {
             val channel = it.attachment()
             try {
@@ -93,6 +97,19 @@ abstract class AbstractChannel(
         Log.d(TAG, "End clear")
 
         onEnd()
+    }
+
+    private fun clear() {
+        mSelector?.close()
+        mSelector = null
+        mChannel.close()
+    }
+
+    fun stop() {
+        if (!mRunning) {
+            return
+        }
+        mRunning = false
     }
 
     private fun onAccept(key: SelectionKey, channel: ServerSocketChannel) =
@@ -118,7 +135,7 @@ abstract class AbstractChannel(
             onConnected()
         }
         channel.configureBlocking(false)
-        channel.register(mSelector, SelectionKey.OP_READ)
+        channel.register(mSelector, SelectionKey.OP_READ, channel)
     }
 
     private fun onRead(key: SelectionKey, channel: SocketChannel) {

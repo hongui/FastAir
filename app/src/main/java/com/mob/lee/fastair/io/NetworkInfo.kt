@@ -43,4 +43,4 @@ private fun localIP(): String? {
     return null
 }
 
-private fun ipToString(value: Int) = "${value and 0xff}:${value shr 8 and 0xff}:${value shr 16 and 0xff}:${value shr 24 and 0xff}"
+private fun ipToString(value: Int) = "${value and 0xff}.${value shr 8 and 0xff}.${value shr 16 and 0xff}.${value shr 24 and 0xff}"
