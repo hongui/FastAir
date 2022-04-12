@@ -1,8 +1,11 @@
 <script>
+	import { showUpload   } from '$lib/store.js';
 	import Modal from 'svelte-simple-modal';
 	import CategoryTab from '$lib/header/CategoryTab.svelte';
 	import CategoryItem from '$lib/com/CategoryItem.svelte';
 
+	showUpload.set(true);
+	
 	let loadCategory = async (i) => {
 		const response = await fetch('/category/' + i);
 		let body = await response.json();

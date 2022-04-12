@@ -1,8 +1,7 @@
 <script>
 	import { getContext } from 'svelte';
-	import Icon from 'svelte-icon'
-	import downloadSVG from '$lib/icons/download.svg?raw';
-	import previewSVG from '$lib/icons/preview.svg?raw';
+	import FaCloudDownloadAlt from 'svelte-icons/fa/FaCloudDownloadAlt.svelte'
+	import FaExpand from 'svelte-icons/fa/FaExpand.svelte'
 	import ImagePreview from '$lib/com/ImagePreview.svelte';
 
 	export let record;
@@ -30,8 +29,8 @@
 	/>
 	{#if showMenu}
 		<div class="items">
-			<div class="item" on:click={preview}><Icon data={previewSVG}/></div>
-			<a class="item" href="/downloads{record.path}" download={record.name}><Icon data={downloadSVG}/></a>
+			<div class="item" on:click={preview}><FaExpand /></div>
+			<a class="item" href="/downloads{record.path}" download={record.name}><FaCloudDownloadAlt /></a>
 		</div>
 	{/if}
 </div>
