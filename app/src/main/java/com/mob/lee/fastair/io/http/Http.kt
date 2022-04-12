@@ -5,8 +5,8 @@ import com.mob.lee.fastair.io.socket.AbstractChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.onSuccess
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
@@ -85,14 +85,16 @@ class Http(scope: CoroutineScope) : AbstractChannel(scope, ServerSocketChannel.o
                 val result = it.handle(request, channel)
                 try {
                     result(channel)
+                    Log.d(TAG, "---------------Handler Success------------------")
                 } catch (e: Exception) {
                     e.printStackTrace()
                     //JsonResponse.json(null, SERVERERROR).invoke(channel)
                     Log.e(TAG, "----------------------------------------${e.printStackTrace()}")
                 } finally {
                     mCurrentChannel.remove(channel)
-                    channel.close()
                     request.body?.close()
+                    delay(1000)
+                    channel.close()
                 }
                 return
             }

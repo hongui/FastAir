@@ -23,7 +23,7 @@ abstract class Response<T>(val action:()->T,val status: Int= SUCCESS,val mime: S
         header.put("Date", Date().toString())
         addHeader(a)
         channel.write(toString().buffer())
-        onWriteBody(channel,a)
+        return onWriteBody(channel,a)
     }
 
     fun write(channel: SocketChannel,buffer:ByteArray,length:Int){
@@ -32,6 +32,10 @@ abstract class Response<T>(val action:()->T,val status: Int= SUCCESS,val mime: S
         while (total!=length.toLong()){
             total+=channel.write(buf)
         }
+    }
+
+    fun write(channel: SocketChannel,buffer:ByteBuffer){
+
     }
     override fun toString(): String {
         val value = "HTTP/1.1 ${status} ${status(status)}\n${header.entries.joinToString("\n", transform = { "${it.key}: ${it.value}" })}\n\r\n"

@@ -4,9 +4,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.io.http.Http
+import com.mob.lee.fastair.io.socket.ConnectListener
 import com.mob.lee.fastair.localhost.*
 import com.mob.lee.fastair.service.Notification.Companion.LOCAL_HOST
 import com.mob.lee.fastair.service.Notification.Companion.LOCAL_HOST_CODE
@@ -30,6 +32,7 @@ class HostService() : Service(), CoroutineScope {
         const val PORT = "port"
         const val RESTART = "restart"
         const val DEFAULT_PORT = 9527
+        const val TAG = "HostService"
         fun start(context: Context?, port: Int = DEFAULT_PORT,restart:Boolean=false) {
             val intent = Intent(context, HostService::class.java)
             intent.putExtra(PORT, port)
@@ -50,6 +53,7 @@ class HostService() : Service(), CoroutineScope {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val port = intent?.getIntExtra(PORT, DEFAULT_PORT) ?: DEFAULT_PORT
         val restart = intent?.getBooleanExtra(RESTART, false) ?: false
+        Log.d(TAG,"-------Start Host with port = $port,restart = $restart")
         if(null==mHost){
             start(port)
         }else if(null!=mHost&&restart){
@@ -61,22 +65,28 @@ class HostService() : Service(), CoroutineScope {
     }
 
     fun start(port:Int){
-        mHost=Http(this)
+        mHost=Http(this).apply {
+            mListener=object:ConnectListener(){
+                override fun onStart() {
+                    mStatus.value=true
+                    foreground(LOCAL_HOST, LOCAL_HOST_CODE){
+                        setContentTitle(getString(R.string.server_runing))
+                    }
+                }
+
+                override fun onStop() {
+                    mStatus.value=false
+                }
+            }
+        }
         mHost!!.startLoop(InetSocketAddress(port))
         mHost!!.run {
             addHandler(HomeHandler(this@HostService))
-            addHandler(CategoryHandler(this@HostService))
+            addHandler(CategoryHandler(mScope,this@HostService))
             addHandler(ImageHandler(this@HostService))
             addHandler(DownloadHandler())
             addHandler(ChatHandler(this@HostService))
             addHandler(UploadHandler(this@HostService))
-        }
-        val status=true==mHost?.mRunning
-        mStatus.value=true==status
-        if(status){
-            foreground(LOCAL_HOST, LOCAL_HOST_CODE){
-                setContentTitle(getString(R.string.server_runing))
-            }
         }
     }
 
