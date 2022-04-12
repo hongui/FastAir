@@ -10,6 +10,6 @@ class ByteResponse(action: () -> ByteArray,mime:String) : Response<ByteArray>(ac
     }
 
     override fun onWriteBody(channel: SocketChannel,source:ByteArray) {
-        channel.write(ByteBuffer.wrap(source))
+        write(channel,ByteBuffer.wrap(source))
     }
 }

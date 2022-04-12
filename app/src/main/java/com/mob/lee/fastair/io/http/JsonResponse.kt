@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.io.http
 
+import android.util.Log
 import com.mob.lee.fastair.utils.buffer
 import org.json.JSONArray
 import org.json.JSONObject
@@ -20,8 +21,10 @@ class JsonResponse(action:()->JSONObject,status:Int):Response<JSONObject>(action
     }
 
     override fun onWriteBody(channel: SocketChannel, source: JSONObject) {
+        Log.d("JsonResponse",source.toString())
         val buffer=source.toString().buffer()
-        channel.write(buffer)
+        buffer.flip()
+        write(channel,buffer)
     }
 
     override fun addHeader(source: JSONObject) {

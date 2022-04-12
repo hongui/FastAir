@@ -5,6 +5,7 @@ import com.mob.lee.fastair.io.http.*
 import com.mob.lee.fastair.io.socket.Writer
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.StorageDataSource
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
 import org.json.JSONArray
@@ -12,7 +13,7 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
-class CategoryHandler(val context: Context?):Handler {
+class CategoryHandler(val scope: CoroutineScope, val context: Context?):Handler {
     var category=-1
     val datasource by lazy {
         StorageDataSource()
@@ -25,11 +26,11 @@ class CategoryHandler(val context: Context?):Handler {
     }
 
     override suspend fun handle(request: Request, channel: SocketChannel): Writer {
-        /*val categories = datasource.fetch(context, category)
+        val categories = datasource.fetch(context, scope,category)
         val all=categories.toList()
         val array = JSONArray()
-        all.forEach { array.put(it.dump()) }*/
-        return JsonResponse.json(null)
+        all.forEach { array.put(it.dump()) }
+        return JsonResponse.json(array)
     }
 
     fun Record.dump():JSONObject{

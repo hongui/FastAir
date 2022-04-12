@@ -16,21 +16,39 @@ abstract class AbstractChannel(
     val mChannel: AbstractSelectableChannel
 ) {
     var mTimeout = 1000L
-    var mRunning = true
+    var mRunning = false
     var mTime=0
+    var mListener:ConnectListener?=null
     private var mSelector: Selector? = null
 
     fun startLoop(inet: InetSocketAddress) {
+        Log.d(TAG,"Call loop")
         mScope.launch(Dispatchers.IO) {
             try {
+                mListener?.let {
+                    withContext(Dispatchers.Main){
+                        it.onConfig()
+                    }
+                }
                 Log.d(TAG, "Begin config ${inet.toString()}")
                 config(mChannel, inet)
                 Log.d(TAG, "End config")
 
+                mListener?.let {
+                    withContext(Dispatchers.Main){
+                        it.onStart()
+                    }
+                }
                 Log.d(TAG, "Begin loop")
+                mRunning=true
                 loop()
                 Log.d(TAG, "End loop")
 
+                mListener?.let {
+                    withContext(Dispatchers.Main){
+                        it.onStop()
+                    }
+                }
                 Log.d(TAG, "Begin finish")
                 finish()
                 Log.d(TAG, "End finish")
@@ -64,7 +82,6 @@ abstract class AbstractChannel(
         } else {
             channel.register(mSelector, SelectionKey.OP_CONNECT, inet)
         }
-        onStart(inet)
     }
 
     private fun loop() {
@@ -79,24 +96,9 @@ abstract class AbstractChannel(
 
     private fun finish() {
         mRunning=false
-        mSelector?.keys()?.forEach {
-            val channel = it.attachment()
-            try {
-                when (channel) {
-                    is SocketChannel -> channel.finishConnect()
-
-                    is ServerSocketChannel -> channel.socket().close()
-                }
-                onDisconnected()
-            } catch (e: Exception) {
-
-            }
-        }
         Log.d(TAG, "Begin clear")
         clear()
         Log.d(TAG, "End clear")
-
-        onEnd()
     }
 
     private fun clear() {
@@ -118,9 +120,14 @@ abstract class AbstractChannel(
             val start = System.currentTimeMillis()
             do {
                 c = channel.accept()
-            } while (c == null)
+            } while (c == null&&mRunning)
+            if(!mRunning){
+                Log.e(TAG,"-----Close-----")
+                channel.close()
+                return@launch
+            }
             Log.d(TAG, "Wait accept for ${System.currentTimeMillis() - start}ms,channel=${c}")
-            connected(c)
+            connected(c!!)
         }
 
     private fun onConnect(key: SelectionKey, channel: SocketChannel) =
@@ -132,7 +139,7 @@ abstract class AbstractChannel(
 
     private suspend fun connected(channel: SocketChannel) {
         withContext(Dispatchers.Main) {
-            onConnected()
+            mListener?.onConnect(channel)
         }
         channel.configureBlocking(false)
         channel.register(mSelector, SelectionKey.OP_READ, channel)
@@ -189,11 +196,7 @@ abstract class AbstractChannel(
         print(exception)
     }
 
-    open fun onStart(address: InetSocketAddress) {}
-    open fun onConnected() {}
     abstract fun onRead(channel: SocketChannel, buffer: ByteBuffer)
-    open fun onDisconnected() {}
-    open fun onEnd() {}
 
     open fun close(channel: SocketChannel) {
 
