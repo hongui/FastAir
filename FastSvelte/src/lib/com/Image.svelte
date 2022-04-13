@@ -6,7 +6,6 @@
 
 	export let record;
 
-	Preview;
 	let showMenu = false;
 	let turnOn = () => {
 		showMenu = true;
@@ -66,9 +65,12 @@
 	}
 	.item {
 		margin: 8px;
+		width: 32px;
+		height: 32px;
+		color: var(--primary-color);
 	}
 	.item:hover {
 		cursor: pointer;
-		fill: var(--accent-color);
+		color: var(--accent-color);
 	}
 </style>

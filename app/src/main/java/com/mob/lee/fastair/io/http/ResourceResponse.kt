@@ -11,7 +11,7 @@ class ResourceResponse(action: () -> InputStream, mime: String) : Response<Input
 
     override fun onWriteBody(channel: SocketChannel, source: InputStream) {
         source.use {
-            val buffer = ByteArray(100 * 1024)
+            val buffer = ByteArray(2*1024 * 1024)
             var count = it.read(buffer)
             while (count != -1) {
                 write(channel,buffer,count)
