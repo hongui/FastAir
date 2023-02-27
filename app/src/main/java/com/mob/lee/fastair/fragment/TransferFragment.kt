@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.RecordAdapter
 import com.mob.lee.fastair.io.ProcessListener
@@ -15,7 +16,6 @@ import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.TransferViewModel
-import kotlinx.android.synthetic.main.fragment_recyclerview.*
 
 class TransferFragment : ConnectFragment(), ProcessListener {
     override val layout: Int = R.layout.fragment_recyclerview
@@ -31,6 +31,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
         mAdapter = RecordAdapter {
             viewModel.rename(requireContext(), it)
         }
+        val rv_recyclerview=view<RecyclerView>(R.id.rv_recyclerview)
         rv_recyclerview?.layoutManager = LinearLayoutManager(context)
         rv_recyclerview?.adapter = mAdapter
 

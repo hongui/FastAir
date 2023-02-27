@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.AppListAdapter
 import com.mob.lee.fastair.adapter.SingleAdapter
+import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.DataLoad
 import com.mob.lee.fastair.model.DataWrap
+import com.mob.lee.fastair.utils.dialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -61,16 +63,18 @@ open class AppViewModel : ViewModel() {
         next(data)
     }
 
-    fun withPermission(fragment: Fragment, permission: String, action: (hasPermission: Boolean) -> Unit) {
+    fun withPermission(fragment: AppFragment, permission: String, action: (hasPermission: Boolean) -> Unit) {
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(fragment.requireContext(), permission)) {
             action(true)
         } else if (null == mPermission) {
             throw IllegalArgumentException("Permission launcher is null,you should call registerPermission first")
-        } else if(fragment.shouldShowRequestPermissionRationale(permission)){
-            action(false)
-        }else{
+        }
+        if(fragment.shouldShowRequestPermissionRationale(permission)){
+            //TODO
+        }
+        fragment.view?.post {
             val live=mPermissionData.distinctUntilChanged()
-                live.observe(fragment, object : Observer<Boolean> {
+            live.observe(fragment, object : Observer<Boolean> {
                 override fun onChanged(t: Boolean?) {
                     live.removeObserver(this)
                     action(t ?: false)
@@ -80,21 +84,21 @@ open class AppViewModel : ViewModel() {
         }
     }
 
-    fun <D> watchState(fragment: Fragment, rv: RecyclerView, contentAdapter: AppListAdapter<D>) {
+    fun <D> watchState(fragment: Fragment, rv: RecyclerView?, contentAdapter: AppListAdapter<D>) {
         stateLiveData.observe(fragment, Observer {
             it ?: return@Observer
             when (it.first) {
                 DataLoad.LOADING -> {
-                    rv.adapter = SingleAdapter(R.layout.loading)
+                    rv?.adapter = SingleAdapter(R.layout.loading)
                 }
 
                 DataLoad.EMPTY -> {
-                    rv.adapter = SingleAdapter(R.layout.empty)
+                    rv?.adapter = SingleAdapter(R.layout.empty)
                 }
 
                 DataLoad.STARTED -> {
                     contentAdapter.clear()
-                    rv.adapter = contentAdapter
+                    rv?.adapter = contentAdapter
                 }
             }
         })
@@ -115,12 +119,9 @@ open class AppViewModel : ViewModel() {
     fun registerPermission(fragment: Fragment) {
         mPermission?.let { return }
         val permission = ActivityResultContracts.RequestPermission()
-        mPermission = fragment.registerForActivityResult(permission, object : ActivityResultCallback<Boolean?> {
-
-            override fun onActivityResult(result: Boolean?) {
-                mPermissionData.value = result ?: false
-            }
-        })
+        mPermission = fragment.registerForActivityResult(permission){
+                mPermissionData.value = true==it
+        }
 
         fragment.lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

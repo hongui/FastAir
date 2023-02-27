@@ -71,7 +71,7 @@ class FileService : TransferService() {
                 notification((message.process / message.total * 100).toInt(), file?.name ?: "")
             }
 
-            is SuccessState -> {
+            else -> {
                 notification(100, file?.name ?: "")
                 async {
                     onNewTask(null)

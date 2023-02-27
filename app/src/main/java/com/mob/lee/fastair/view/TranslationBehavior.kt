@@ -50,7 +50,7 @@ class TranslationBehavior : CoordinatorLayout.Behavior<View> {
         animator.setInterpolator(FastOutSlowInInterpolator())
         animator.addListener(object : AnimatorListenerAdapter() {
 
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 mAnimating = false
             }
         })

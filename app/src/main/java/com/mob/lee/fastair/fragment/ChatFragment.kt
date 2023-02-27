@@ -8,14 +8,16 @@ import android.os.IBinder
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.MessageAdapter
 import com.mob.lee.fastair.model.Message
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
 import com.mob.lee.fastair.utils.errorToast
-import kotlinx.android.synthetic.main.fragment_chat.*
 
 /**
  * Created by Andy on 2017/6/7.
@@ -31,6 +33,9 @@ class ChatFragment : ConnectFragment() {
         title(R.string.chat)
 
         mAdapter = MessageAdapter()
+        val chatContent=view<RecyclerView>(R.id.chatContent)
+        val chatInput=view<EditText>(R.id.chatInput)
+        val chatSend=view<TextView>(R.id.chatSend)
         chatContent?.layoutManager = LinearLayoutManager(mParent)
         chatContent?.adapter = mAdapter
 

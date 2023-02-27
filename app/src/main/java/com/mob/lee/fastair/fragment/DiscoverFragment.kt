@@ -13,8 +13,8 @@ import com.mob.lee.fastair.service.ScanService
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
+import com.mob.lee.fastair.view.DiscoverView
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
-import kotlinx.android.synthetic.main.fragment_discover.*
 
 /**
  * Created by Andy on 2017/8/11.
@@ -31,6 +31,7 @@ class DiscoverFragment : AppFragment() {
         setHasOptionsMenu(true)
         title(R.string.discover_device, true)
 
+        val discoverView=view<DiscoverView>(R.id.discoverView)
         P2PManager.devicesLiveData.observe({ lifecycle }) {
             if (null == discoverView || null == it) {
                 return@observe

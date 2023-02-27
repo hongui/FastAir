@@ -35,7 +35,7 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
                 progress.updateState(CircleProgress.SUCCESS)
             }
 
-            is FaildState -> {
+            else -> {
                 progress.updateState(CircleProgress.FAILED)
             }
         }
