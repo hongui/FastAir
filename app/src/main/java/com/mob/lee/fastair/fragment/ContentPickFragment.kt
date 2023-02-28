@@ -33,4 +33,10 @@ class ContentPickFragment : AppFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val viewModel:HomeViewModel by mParent!!.viewModels()
+        viewModel.updateLocation(this,requireArguments().getInt("position",0))
+    }
+
 }

@@ -3,6 +3,8 @@ package com.mob.lee.fastair.viewmodel
 import android.Manifest
 import android.content.ClipData
 import android.content.Context
+import android.os.Build
+import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mob.lee.fastair.R
@@ -12,6 +14,7 @@ import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
 import com.mob.lee.fastair.utils.dialog
+import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.urlToPath
 import kotlinx.coroutines.channels.Channel
 import java.io.File
@@ -38,30 +41,49 @@ class HomeViewModel : AppViewModel() {
 
     fun updateLocation(fragment: AppFragment, location: Int) {
         position = location
-        withPermission(
-            fragment,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            action = {hasPermission ->
-                if (hasPermission) {
-                    fetch(fragment.context)
-                } else {
-                    fragment.mParent?.dialog {
-                        setMessage(R.string.no_permission_to_scan)
-                            .setPositiveButton(R.string.turn_on) { _, _ ->
-                                openSetting(fragment)
-                            }.setNegativeButton(R.string.exit) { _, _ ->
-                                fragment.mParent?.finish()
-                            }
+        if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()) {
+            fragment.mParent?.dialog {
+                setMessage(R.string.no_permission_to_scan)
+                    .setPositiveButton(R.string.turn_on) { _, _ ->
+                        withStoragePermissionROrHigher(
+                            fragment,
+                            Manifest.permission.MANAGE_EXTERNAL_STORAGE
+                        ) {
+                            fragment.requireContext().errorToast(R.string.no_permission_to_scan)
+                        }
+                    }.setNegativeButton(R.string.exit) { _, _ ->
+                        fragment.mParent?.finish()
                     }
-                }
-            })
+            }
+        } else if (Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()) {
+            fetch(fragment.context)
+        } else {
+            withPermission(
+                fragment,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                action = { hasPermission ->
+                    if (hasPermission) {
+                        fetch(fragment.context)
+                    } else {
+                        fragment.requireContext().errorToast(R.string.no_permission_to_scan)
+                        fragment.mParent?.dialog {
+                            setMessage(R.string.no_permission_to_scan)
+                                .setPositiveButton(R.string.turn_on) { _, _ ->
+                                    openSetting(fragment)
+                                }.setNegativeButton(R.string.exit) { _, _ ->
+                                    fragment.mParent?.finish()
+                                }
+                        }
+                    }
+                })
+        }
     }
 
     fun fetch(context: Context?) = async(recordLiveData) {
         currentChannel?.cancel()
         records.clear()
 
-        val channel = dataSource.fetch(context,viewModelScope,position)
+        val channel = dataSource.fetch(context, viewModelScope, position)
         currentChannel = channel
         for (r in channel) {
             next(r)
@@ -108,7 +130,7 @@ class HomeViewModel : AppViewModel() {
 
     fun selectAll() = async(recordLiveData) {
         val hasChecked = checkedRecords().isNotEmpty()
-        hasSelectedLiveData.value=!hasChecked
+        hasSelectedLiveData.value = !hasChecked
         records.forEach {
             it.state = if (hasChecked) {
                 selectedRecords.remove(it)
@@ -167,7 +189,7 @@ class HomeViewModel : AppViewModel() {
         for (i in 0 until itemCount) {
             val item = clipData.getItemAt(i)
             val uri = item.uri
-            val path=context?.urlToPath(uri)
+            val path = context?.urlToPath(uri)
             if (null != path) {
                 val file = File(path)
                 val record = Record(

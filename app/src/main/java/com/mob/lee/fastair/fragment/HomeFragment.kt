@@ -1,15 +1,12 @@
 package com.mob.lee.fastair.fragment
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.AppCompatTextView
@@ -46,7 +43,11 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel:HomeViewModel by mParent!!.viewModels()
-        viewModel.registerPermission(this)
+        if(Build.VERSION.SDK_INT>=30){
+            viewModel.registerActivityResult(this)
+        }else {
+            viewModel.registerPermission(this)
+        }
     }
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
@@ -76,12 +77,6 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                     R.string.device_connect
                 }
                 item?.setTitle(title)
-            }
-        })
-
-        homeContent?.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(this@HomeFragment, position)
             }
         })
 
