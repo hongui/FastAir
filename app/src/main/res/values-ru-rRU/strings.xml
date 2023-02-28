@@ -1,0 +1,117 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:local="ru-ru">
+    <string name="app_name">FastAir</string>
+    <string name="app_description">Испытайте скорость полёта</string>
+
+    <string name="wait_for_transport_file">Список незавершенных передач</string>
+    <string name="file_transfer">Передача файлов</string>
+    <string name="discover_device">Найти устройство</string>
+    <string name="disconnect_device">Отключение</string>
+    <string name="local_host">Сервер</string>
+    <string name="transfer_history">История</string>
+    <string name="chat">Чат</string>
+    <string name="donate">Пожертвование</string>
+    <string name="help">Помощь</string>
+    <string name="about">О нас</string>
+    <string name="settings">Настройки</string>
+    <string name="choose_save_path">Выбрать путь сохранения</string>
+    <string name="delete_file_list">Список файлов для удаления</string>
+
+    <string name="trans_waiting">Ожидание передачи...</string>
+    <string name="scan_ing">Сканирование окружения, пожалуйста, подождите...</string>
+    <string name="scan_failed">Сканирование завершено, окружающих устройств не обнаружено, пожалуйста, попробуйте снова</string>
+    <string name="init_failed">Инициализация не удалась, повторите попытку позже</string>
+    <string name="error_occur">Ошибка</string>
+    <string name="disabled_wifi_p2p">Переключатель Wifi Direct на текущем устройстве не включен, или устройство не поддерживает его, пожалуйста, проверьте и повторите попытку.</string>
+    <string name="tips_ok">Хорошо</string>
+    <string name="copy_success">Копирование прошло успешно</string>
+    <string name="send_Illegal">Пробелы или пустые строки не могут быть отправлены</string>
+    <string name="send_failed">Ошибка доставки сообщения</string>
+    <string name="remove_group_error">Произошла ошибка в группе удаления</string>
+    <string name="connect_success">Поздравляем, подключение прошло успешно!</string>
+    <string name="auto_connect_success">Последнее подключенное устройство подключается автоматически!</string>
+    <string name="failed_to_open">Не было найдено подходящей программы для обработки файла, и файл не удалось открыть</string>
+    <string name="p2p_unsupport_error">К сожалению, это устройство не поддерживает услугу Wi-Fi P2P и временно не может быть использовано!</string>
+    <string name="p2p_busy_error">Устройство обрабатывает запрос, пожалуйста, подождите</string>
+    <string name="p2p_inner_error">Сервис временно недоступен, перезапуск...</string>
+    <string name="need_location">Приложение требует разрешения на определение местоположения для обнаружения доступных устройств вокруг него. Это используется только для сканирования устройств.</string>
+    <string name="rejected_location">Вы отказали в разрешении на определение местоположения, что может помешать обнаружению устройств.</string>
+    <string name="knowIt">Знаю это</string>
+    <string name="wram_tips">Теплые советы</string>
+    <string name="no_application_find">Не найдено подходящего приложения для открытия файла</string>
+    <string name="no_permission_to_scan">Недостаточно прав для сканирования информации о файле устройства, пожалуйста, используйте его после открытия разрешения, это не будет записывать вашу личную информацию!</string>
+    <string name="discover_error">Текущий Wi-Fi выключен или устройство не поддерживает прямое подключение Wi-Fi</string>
+    <string name="choose_download_path">Выберите путь получения файла</string>
+    <string name="select_nothing">Файлы еще не выбраны, я не знаю, что удалить</string>
+    <string name="disconnected">Соединение разорвано</string>
+    <string name="disconnect_info">В настоящее время устройство подключено и должно быть снова подключено после отключения, чтобы иметь возможность передавать файлы и общаться в чате.</string>
+    <string name="discover_help">1. Приложение должно подключить устройства вокруг вас, чтобы использовать его нормально. Убедитесь, что устройство, которое вы хотите подключить, также открыло приложение.\n
+        2. После того, как значок устройства и его имя появятся на странице, щелкните значок, чтобы завершить соединение.\n
+        3. Соединение нужно закрыть. Вы можете нажать, чтобы отключить кнопку подключения, нужно закрыть ее в выдвижном меню на домашней странице</string>
+    <string name="detect_unfinished_task">У вас обнаружен неотправленный документ, начать ли его отправку немедленно?</string>
+    <string name="path_setting_success">Путь успешно изменен, и вновь полученный файл будет сохранен в: %s</string>
+    <string name="storage_not_ready">Ошибка чтения накопителя</string>
+    <string name="server_runing">Сервер запущен</string>
+    <string name="server_stoped">Сервер остановлен</string>
+
+    <string name="copy_content">Копирование содержимого</string>
+    <string name="turn_on">Включить</string>
+    <string name="retry">Повторная попытка</string>
+    <string name="cancel">Отмена</string>
+    <string name="loading">Загрузка...</string>
+    <string name="toggle_open">Открыть</string>
+    <string name="toggle_close">Закрыть</string>
+    <string name="aes">По возрастанию</string>
+    <string name="des">По убыванию</string>
+    <string name="swap">Обмен</string>
+    <string name="select_all">Выбрать\n
+        всё</string>
+    <string name="unselect_all">Снять\n
+        всё</string>
+    <string name="sort">Сортировка</string>
+    <string name="delete">Удалить</string>
+    <string name="sort_by_name">Сортировать по имени</string>
+    <string name="sort_by_size">Сортировать по размеру</string>
+    <string name="sort_by_time">Сортировать по времени</string>
+    <string name="warm">Предупреждение</string>
+    <string name="give_up">Отказаться</string>
+    <string name="send">Отправить</string>
+    <string name="disconnect">Отключить</string>
+    <string name="just_kid">Ясно</string>
+    <string name="device_connect">Устройство подключено</string>
+    <string name="device_disconnect">Устройство отключено</string>
+    <string name="reconnect">Восстановить соединение</string>
+    <string name="exit">Выход</string>
+    <string name="disconnect_now">Отключить сейчас</string>
+    <string name="later">Будет опубликовано позже</string>
+    <string name="file_operation">Операции с файлами</string>
+    <string name="choose">Выберите</string>
+    <string name="start_server">Запустить сервер</string>
+    <string name="stop_server">Остановить сервер</string>
+    <string name="restart_server">Перезапуск сервера</string>
+
+    <string name="category_picture">Фото</string>
+    <string name="category_other">Другие</string>
+    <string name="category_application">APK</string>
+    <string name="category_zip">Архивы</string>
+    <string name="category_txt">Текст</string>
+    <string name="category_pdf">PDF</string>
+    <string name="category_powerpoint">PowerPoint</string>
+    <string name="category_excel">Excel</string>
+    <string name="category_word">Word</string>
+    <string name="category_music">Музыка</string>
+    <string name="category_video">Видео</string>
+    <string name="home_dir">Домашняя папка</string>
+    <string name="file_detail">Детали</string>
+    <string name="file_rename">Переименовать</string>
+    <string name="file_size">Размер</string>
+    <string name="file_type">Формат</string>
+    <string name="file_date">Время</string>
+    <string name="file_path">Путь</string>
+
+    <string name="pref_default_clear_title">Автоматическая очистка</string>
+    <string name="pref_default_clear_des">После выхода из приложения удалите выполненные задачи, чтобы избежать неправильной передачи файла</string>
+    <string name="pref_default_rewrite_title">Перезапись файлов</string>
+    <string name="pref_default_rewrite_des">Если вы получаете файл с тем же именем, что и на устройстве, перезапишите файл с таким же именем на устройстве</string>
+    <string name="pref_default_download">Путь для сохранения файлов</string>
+
+</resources>
