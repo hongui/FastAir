@@ -21,7 +21,7 @@ class FileDetailAdapter(context : Context, path : String) : BaseAdapter() {
 
         infos.append(R.string.file_size, file.length().formatSize(context))
         infos.append(R.string.file_type, path.substringAfterLast(".", "*"))
-        infos.append(R.string.file_date, file.lastModified().formatDate("yyyy年MM月dd日 HH时mm分ss秒"))
+        infos.append(R.string.file_date, file.lastModified().formatDate("yyyy.MM.dd HH:mm:ss"))
         infos.append(R.string.file_path, path)
     }
 
