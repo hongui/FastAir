@@ -1,23 +1,25 @@
 package com.mob.lee.fastair.fragment
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Build
+import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.DeleteAdapter
 import com.mob.lee.fastair.adapter.PageAdapter
@@ -28,7 +30,6 @@ import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
 import com.mob.lee.fastair.viewmodel.HomeViewModel
-import kotlinx.android.synthetic.main.fragment_home.*
 
 /**
  * Created by Andy on 2017/6/7.
@@ -39,13 +40,27 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
     override val defaultContainer: Int = -1
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val viewModel:HomeViewModel by mParent!!.viewModels()
-        viewModel.registerPermission(this)
+        if(Build.VERSION.SDK_INT>=30){
+            viewModel.registerActivityResult(this)
+        }else {
+            viewModel.registerPermission(this)
+        }
     }
     override fun setting() {
         val viewModel:HomeViewModel by mParent!!.viewModels()
+        val homeDrawer=view<DrawerLayout>(R.id.homeDrawer)
+        val toolbar=view<Toolbar>(R.id.toolbar)
+        val homeNavgation=view<NavigationView>(R.id.homeNavgation)
+        val homeContent=view<ViewPager2>(R.id.homeContent)
+        val homeTabs=view<TabLayout>(R.id.homeTabs)
+        val toolOperation=view<FloatingActionButton>(R.id.toolOperation)
+        val toolSwap=view<AppCompatTextView>(R.id.toolSwap)
+        val toolAll=view<AppCompatTextView>(R.id.toolAll)
+        val toolSort=view<AppCompatTextView>(R.id.toolSort)
+        val toolDelete=view<AppCompatTextView>(R.id.toolDelete)
         val toggle = ActionBarDrawerToggle(mParent!!, homeDrawer, toolbar, R.string.toggle_open, R.string.toggle_close)
         toolbar?.title = getString(R.string.app_description)
         toggle.syncState()
@@ -55,34 +70,28 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
         homeDrawer?.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                val item = homeNavgation.menu.findItem(R.id.menu_disconnet)
+                val item = homeNavgation?.menu?.findItem(R.id.menu_disconnet)
                 val title = if (P2PManager.isConnected()) {
                     R.string.device_disconnect
                 } else {
                     R.string.device_connect
                 }
-                item.setTitle(title)
-            }
-        })
-
-        homeContent.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                viewModel.updateLocation(this@HomeFragment, position)
+                item?.setTitle(title)
             }
         })
 
         viewModel.hasSelectedLiveData.observe {
             val value = if (true == it) {
-                R.drawable.ic_action_send to R.color.color_red
+                R.drawable.ic_action_file_upload to R.color.color_red
             } else {
-                R.drawable.ic_action_receive to R.color.colorAccent
+                R.drawable.ic_action_file_download to R.color.colorAccent
             }
-            toolOperation.supportBackgroundTintList= ColorStateList.valueOf(ContextCompat.getColor(requireContext(),value.second))
-            toolOperation.setImageDrawable(ContextCompat.getDrawable(mParent!!, value.first))
+            toolOperation?.supportBackgroundTintList= ColorStateList.valueOf(ContextCompat.getColor(requireContext(),value.second))
+            toolOperation?.setImageDrawable(ContextCompat.getDrawable(mParent!!, value.first))
         }
-        toolOperation.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_receive))
+        toolOperation?.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_file_download))
 
-        toolSwap.setOnClickListener {
+        toolSwap?.setOnClickListener {
             viewModel.reverse()
             val textId = if (viewModel.isDes) {
                 R.string.des
@@ -91,7 +100,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
             toolSwap.setText(textId)
         }
-        toolAll.setOnClickListener {
+        toolAll?.setOnClickListener {
             viewModel.selectAll()
             val textId = if (viewModel.checkedRecords().isNotEmpty()) {
                 R.string.unselect_all
@@ -100,7 +109,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
             toolAll.setText(textId)
         }
-        toolSort.setOnClickListener {
+        toolSort?.setOnClickListener {
             val menus = PopupMenu(mParent!!, toolSort)
             menus.inflate(R.menu.menu_sort)
             menus.setOnMenuItemClickListener {
@@ -113,7 +122,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
             menus.show()
         }
-        toolDelete.setOnClickListener {
+        toolDelete?.setOnClickListener {
             if (viewModel.hasSelectedLiveData.value != true) {
                 mParent?.successToast(R.string.select_nothing)
                 return@setOnClickListener
@@ -134,7 +143,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
             }
         }
 
-        toolOperation.setOnClickListener {
+        toolOperation?.setOnClickListener {
             if(viewModel.checkedRecords().isEmpty()){
                 P2PManager.withConnectNavigation(this,R.id.transferFragment){
                     putInt("target",R.id.transferFragment)
@@ -196,6 +205,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
             R.id.menu_setting -> navigation(R.id.settingFragment)
         }
+        val homeDrawer=view<DrawerLayout>(R.id.homeDrawer)
         homeDrawer?.closeDrawer(Gravity.LEFT)
         return true
     }

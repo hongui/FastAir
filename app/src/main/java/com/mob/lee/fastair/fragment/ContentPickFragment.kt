@@ -2,11 +2,11 @@ package com.mob.lee.fastair.fragment
 
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.FileAdapter
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.viewmodel.HomeViewModel
-import kotlinx.android.synthetic.main.fragment_content_pick.*
 
 /**
  * Created by Andy on 2017/6/20.
@@ -21,7 +21,8 @@ class ContentPickFragment : AppFragment() {
             viewModel.toggleState(it)
         }
 
-        pickContent.layoutManager = LinearLayoutManager(context).apply {
+        val pickContent=view<RecyclerView>(R.id.pickContent)
+        pickContent?.layoutManager = LinearLayoutManager(context).apply {
         }
 
         viewModel.watchState(this,pickContent,adapter)
@@ -29,6 +30,14 @@ class ContentPickFragment : AppFragment() {
         viewModel.recordLiveData.observe {
             it ?: return@observe
             adapter.add(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val viewModel:HomeViewModel by mParent!!.viewModels()
+        view?.post {
+            viewModel.updateLocation(this,requireArguments().getInt("position",0))
         }
     }
 

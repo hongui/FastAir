@@ -1,7 +1,6 @@
 package com.mob.lee.fastair.adapter
 
 import android.graphics.Color
-import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.mob.lee.fastair.R
@@ -37,9 +36,9 @@ class FileAdapter(val action: (Record)->Unit) : AppListAdapter<Record>(R.layout.
             }
             true
         }
-        holder.check(R.id.item_file_selector, Record.STATE_ORIGIN != record.state)
-        val isChecked = holder.view<CheckBox>(R.id.item_file_selector)?.isChecked ?: false
-        val color = if (isChecked) {
+        val checked=Record.STATE_ORIGIN != record.state
+        holder.check(R.id.item_file_selector, checked)
+        val color = if (checked) {
             ContextCompat.getColor(holder.itemView.context, R.color.material_grey_300)
         } else {
             Color.WHITE

@@ -23,7 +23,9 @@ class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     }
 
     companion object {
-        fun bind(fragment: Fragment, viewPager: ViewPager2, tabs: TabLayout) {
+        fun bind(fragment: Fragment, viewPager: ViewPager2?, tabs: TabLayout?) {
+            viewPager?:return
+            tabs?:return
             val adapter = PageAdapter(fragment)
             viewPager.offscreenPageLimit = 1
             viewPager.adapter = adapter

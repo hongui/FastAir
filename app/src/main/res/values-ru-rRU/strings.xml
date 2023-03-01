@@ -52,6 +52,7 @@
     <string name="storage_not_ready">Ошибка чтения накопителя</string>
     <string name="server_runing">Сервер запущен</string>
     <string name="server_stoped">Сервер остановлен</string>
+    <string name="current_device_info">Текущее имя устройства = %1$s, статус = %2$s</string>
 
     <string name="copy_content">Копирование содержимого</string>
     <string name="turn_on">Включить</string>
@@ -114,4 +115,9 @@
     <string name="pref_default_rewrite_des">Если вы получаете файл с тем же именем, что и на устройстве, перезапишите файл с таким же именем на устройстве</string>
     <string name="pref_default_download">Путь для сохранения файлов</string>
 
+    <string name="device_status_available">Доступный</string>
+    <string name="device_status_connected">Связанный</string>
+    <string name="device_status_failed">Неуспешный</string>
+    <string name="device_status_invaited">Приглашенный</string>
+    <string name="device_status_unavailable">недоступен</string>
 </resources>

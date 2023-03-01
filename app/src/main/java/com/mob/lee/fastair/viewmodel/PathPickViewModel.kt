@@ -60,12 +60,7 @@ class PathPickViewModel : AppViewModel() {
                 val file = File(dir, name)
                 file.isDirectory && !file.isHidden
             }
-            files?.sortBy { it.name.toLowerCase() }
-            if (files.isNullOrEmpty()) {
-                empty()
-            } else {
-                next(files?.toList())
-            }
+            files?.sortedBy { it.name.lowercase() }?.let { next(it) }?:empty()
         }
     }
 

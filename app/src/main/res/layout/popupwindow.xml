@@ -4,5 +4,5 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_primary_text_bg"
-    android:textSize="14sp"
+    android:textSize="@dimen/sp14"
     android:textColor="@android:color/white"/>

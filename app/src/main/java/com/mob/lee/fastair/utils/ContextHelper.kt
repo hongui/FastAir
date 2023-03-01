@@ -14,7 +14,7 @@ import com.mob.lee.fastair.db.AppDatabase
 import com.mob.lee.fastair.db.RecordDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * Created by Andy on 2017/7/7.
@@ -64,7 +64,7 @@ fun Context.database(scope : CoroutineScope, action : suspend (RecordDao) -> Uni
     try {
         db = Room.databaseBuilder(this, AppDatabase::class.java, database).build()
         val dao = db.recordDao()
-        scope.async(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             action(dao)
             db.close()
         }

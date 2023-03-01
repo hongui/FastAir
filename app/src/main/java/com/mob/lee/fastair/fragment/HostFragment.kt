@@ -4,6 +4,8 @@ import android.app.Service
 import android.content.*
 import android.os.IBinder
 import android.view.*
+import android.widget.Button
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.mob.lee.fastair.R
@@ -11,7 +13,6 @@ import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.io.getNetIP
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.HostService
-import kotlinx.android.synthetic.main.fragment_host.*
 
 class HostFragment() : AppFragment(), ServiceConnection {
     val port = 9527
@@ -23,10 +24,11 @@ class HostFragment() : AppFragment(), ServiceConnection {
         setHasOptionsMenu(true)
         title(R.string.local_host)
 
-        tv_host_ip.text = "${getNetIP(mParent!!)}:${port}"
+        val tv_host_ip=view<TextView>(R.id.tv_host_ip)
+        tv_host_ip?.text = "${getNetIP(mParent!!)}:${port}"
         HostService.start(requireContext(), port)
 
-        tv_host_ip.setOnClickListener {
+        tv_host_ip?.setOnClickListener {
             val manager = ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
             manager?.let {
                 it.setPrimaryClip(ClipData.newPlainText("ipInfo",tv_host_ip.text.toString()))
@@ -80,15 +82,17 @@ class HostFragment() : AppFragment(), ServiceConnection {
         }else{
             R.string.server_stoped to R.string.start_server
         }
-        tv_host_status.setText(text.first)
+        val tv_host_status=view<TextView>(R.id.tv_host_status)
+        val btn_host_action=view<Button>(R.id.btn_host_action)
+        tv_host_status?.setText(text.first)
 
-        btn_host_action.setOnClickListener {
+        btn_host_action?.setOnClickListener {
             if(text.second==R.string.stop_server){
                 mHostService?.stop()
             }else{
                 HostService.start(requireContext(),port)
             }
         }
-        btn_host_action.setText(text.second)
+        btn_host_action?.setText(text.second)
     }
 }

@@ -1,14 +1,8 @@
 package com.mob.lee.fastair.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import com.mob.lee.fastair.ContainerActivity
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.io.FileReader
 import com.mob.lee.fastair.io.FileWriter
@@ -24,7 +18,7 @@ import com.mob.lee.fastair.service.Notification.Companion.channel
 import com.mob.lee.fastair.service.Notification.Companion.easyNotify
 import com.mob.lee.fastair.service.Notification.Companion.foreground
 import com.mob.lee.fastair.utils.updateStorage
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -53,7 +47,11 @@ class FileService : TransferService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopForeground(true)
+        if(Build.VERSION.SDK_INT>=24) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        }else{
+            stopForeground(true)
+        }
     }
 
     override fun onReceiveMessage(message: State) {
@@ -71,9 +69,9 @@ class FileService : TransferService() {
                 notification((message.process / message.total * 100).toInt(), file?.name ?: "")
             }
 
-            is SuccessState -> {
+            else -> {
                 notification(100, file?.name ?: "")
-                async {
+                launch {
                     onNewTask(null)
                 }
             }
@@ -144,7 +142,7 @@ class FileService : TransferService() {
             record
         }
 
-        async {
+        launch {
             database.recordDao(this@FileService) {
                 if (null == record) {
                     insert(target)

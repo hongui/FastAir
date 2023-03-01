@@ -1,8 +1,8 @@
 package com.mob.lee.fastair.fragment
 
+import android.webkit.WebView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
-import kotlinx.android.synthetic.main.fragment_text.*
 
 
 /**
@@ -17,13 +17,13 @@ class TextFragment : AppFragment() {
         val type = arguments?.getInt("type") ?: 0
 
         val name = if (0 == type) {
-            title("使用帮助")
+            title(R.string.help)
             "help.html"
         } else {
-            title("关于")
+            title(R.string.about)
             "about.html"
         }
         val url = "file:///android_asset/$name"
-        webView.loadUrl(url)
+        view<WebView>(R.id.webView)?.loadUrl(url)
     }
 }

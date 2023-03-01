@@ -12,7 +12,6 @@ import com.mob.lee.fastair.R
 class Notification {
     companion object {
         const val FILE_TRANSFER = "file_transfor"
-        const val FILE_TRANSFER_NAME = "file_transfor"
         const val FILE_TRANSFER_CODE = 9527
         const val LOCAL_HOST = "local_host"
         const val LOCAL_HOST_NAME = "local_host"
@@ -26,11 +25,15 @@ class Notification {
             }
         }
 
-        fun Context.easyNotify(channelId: String, code: Int, builder: Notification.Builder.() -> Unit):Notification {
+        fun Context.easyNotify(
+            channelId: String,
+            code: Int,
+            builder: Notification.Builder.() -> Unit
+        ): Notification {
             val intent = PendingIntent.getActivity(
                 this, code,
                 Intent(this, ContainerActivity::class.java),
-                if(Build.VERSION.SDK_INT>=31) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+                if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
             )
             val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Notification.Builder(this, channelId)
@@ -38,7 +41,7 @@ class Notification {
                 Notification.Builder(this)
             }
             b.setSmallIcon(R.drawable.ic_launcher_foreground)
-            b.setColor(ContextCompat.getColor(this,R.color.colorAccent))
+            b.setColor(ContextCompat.getColor(this, R.color.colorAccent))
             b.setContentIntent(intent)
             b.setAutoCancel(true)
             builder(b)
@@ -49,13 +52,17 @@ class Notification {
             return notification
         }
 
-        fun Service.foreground(channelId: String, code: Int, builder: Notification.Builder.() -> Unit){
+        fun Service.foreground(
+            channelId: String,
+            code: Int,
+            builder: Notification.Builder.() -> Unit
+        ) {
             easyNotify(channelId, code, builder).let {
-                startForeground(code,it)
+                startForeground(code, it)
             }
         }
 
-        fun Context.cancelNotify(id:Int){
+        fun Context.cancelNotify(id: Int) {
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.cancel(id)
         }

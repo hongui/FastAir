@@ -38,7 +38,7 @@ class SettingContentFragment : PreferenceFragmentCompat() {
         val preferenceDownload = findPreference<Preference>(key)
         if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
             val defaultDownloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val manager = PreferenceManager.getDefaultSharedPreferences(context)
+            val manager = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val value = manager.getString(key, defaultDownloadPath?.absolutePath)
             preferenceDownload?.summary = value
         } else {

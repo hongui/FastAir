@@ -11,12 +11,12 @@ data class Message(var content: String = "",
                    var type: Int = MESSAGE_TEXT,
                    var contentLength: Int = content.length,
                    var date: Long = System.currentTimeMillis()) : Parcelable {
-    override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeString(content)
-        dest?.writeInt(from)
-        dest?.writeInt(type)
-        dest?.writeInt(contentLength)
-        dest?.writeLong(date)
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(content)
+        dest.writeInt(from)
+        dest.writeInt(type)
+        dest.writeInt(contentLength)
+        dest.writeLong(date)
     }
 
     override fun describeContents(): Int {

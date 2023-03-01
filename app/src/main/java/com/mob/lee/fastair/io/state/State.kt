@@ -42,7 +42,7 @@ class FaildState(obj: Any? = null) : State(FAILD, obj){
 }
 
 fun parseFile(state: State): Record? {
-    val file = state?.obj as? File
+    val file = state.obj as? File
     file ?: return null
     return Record(file.lastModified(), file.length(), file.lastModified(), file.absolutePath, state.what, 0)
 }

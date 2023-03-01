@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.AppListAdapter
@@ -13,7 +14,6 @@ import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.PathPickViewModel
-import kotlinx.android.synthetic.main.fragment_path_pick.*
 import java.io.File
 
 
@@ -33,16 +33,18 @@ class PathPickFragment : AppFragment() {
         title(R.string.choose_save_path)
 
         val adapter = PathAdapter()
+        val pathPickContent=view<RecyclerView>(R.id.pathPickContent)
+        val pathPickTab=view<TabLayout>(R.id.pathPickTab)
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            pathPickContent.layoutManager = LinearLayoutManager(context)
-            pathPickContent.adapter = adapter
+            pathPickContent?.layoutManager = LinearLayoutManager(context)
+            pathPickContent?.adapter = adapter
             viewModel.updatePath(mParent, pos = 0)
         } else {
             mParent?.errorToast(R.string.storage_not_ready)
             mParent?.onBackPressed()
         }
 
-        pathPickTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        pathPickTab?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 viewModel.updatePath(mParent, pos = tab?.position)
             }
@@ -59,7 +61,7 @@ class PathPickFragment : AppFragment() {
         viewModel.watchState(this, pathPickContent, adapter)
         viewModel.currentPositionLiveData.observe {
             it ?: return@observe
-            if (it == pathPickTab.tabCount) {
+            if (it == pathPickTab?.tabCount) {
                 val path = viewModel.currentPath
                 pathPickTab.addTab(pathPickTab.newTab().setText(if (0 == it) {
                     getString(R.string.home_dir)
@@ -67,11 +69,12 @@ class PathPickFragment : AppFragment() {
                     path?.getName() ?: getString(R.string.home_dir)
                 }))
             } else {
-                for (i in pathPickTab.getTabCount() - 1 downTo it + 1) {
-                    pathPickTab.removeTabAt(i)
+                val tabCount=(pathPickTab?.getTabCount()?:1) - 1
+                for (i in tabCount downTo it + 1) {
+                    pathPickTab?.removeTabAt(i)
                 }
             }
-            pathPickTab.setScrollPosition(pathPickTab.tabCount - 1, 0F, true)
+            pathPickTab?.setScrollPosition(pathPickTab.tabCount - 1, 0F, true)
         }
 
         viewModel.pathLiveData.observe {

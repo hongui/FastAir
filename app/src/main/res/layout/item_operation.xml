@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.mob.lee.fastair.view.SqureLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_gravity="center"
-                                            android:background="@drawable/item_primary"
-                                            android:clickable="true"
-                                            android:gravity="center"
-                                            android:orientation="vertical"
-                                            android:paddingBottom="@dimen/dp8"
-                                            android:paddingTop="@dimen/dp8">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/item_primary"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/dp8"
+    android:paddingBottom="@dimen/dp8">
 
     <ImageView
         android:id="@+id/item_category_icon"
         android:layout_width="@dimen/dp48"
         android:layout_height="@dimen/dp48"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/item_category_title"
@@ -22,5 +23,5 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp4"
         android:textColor="@color/colorPrimaryText"
-        android:textSize="16sp"/>
+        android:textSize="@dimen/sp16" />
 </com.mob.lee.fastair.view.SqureLinearLayout>

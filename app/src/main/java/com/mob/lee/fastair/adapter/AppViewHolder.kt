@@ -64,7 +64,7 @@ class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     fun check(id: Int, checked: Boolean) {
-        view<CheckBox>(id)?.isChecked=checked
+        view<CheckBox>(id).isChecked=checked
     }
 
     fun <V : View> view(@IdRes id: Int): V {

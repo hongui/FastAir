@@ -73,6 +73,8 @@ abstract class AppFragment : Fragment() {
         this.observe(this@AppFragment, Observer { action(it) })
     }
 
+    inline fun <reified T:View> view(@IdRes id:Int)=view?.findViewById<T>(id)
+
     fun navigation(
         id: Int,
         args: (Bundle.() -> Unit)? = null,

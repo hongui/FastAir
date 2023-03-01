@@ -6,6 +6,7 @@
     <string name="file_transfer">Transferência de arquivos</string>
     <string name="discover_device">Conexão do dispositivo</string>
     <string name="disconnect_device">Desconectar</string>
+    <string name="local_host">Anfitrião Local</string>
     <string name="transfer_history">Histórico das transferências</string>
     <string name="chat">Chat</string>
     <string name="donate">Doação</string>
@@ -16,7 +17,7 @@
     <string name="delete_file_list">Lista de arquivos para excluir</string>
 
     <string name="trans_waiting">Aguarde a transferências</string>
-    <string name="scan_ing">Procurando por dispositivos, por favor aguarde...</string>
+    <string name="scan_ing">Procurando por dispositivos, por favor aguarde&#8230;</string>
     <string name="scan_failed">Procura concluída, nenhum dispositivo encontrado, por favor confirme e tente novamente</string>
     <string name="init_failed">A iniciação falhou, tente novamente mais tarde</string>
     <string name="error_occur">Erro</string>
@@ -31,7 +32,7 @@
     <string name="failed_to_open">Falha ao abrir, não foi encontrado nenhum app adequado para abrir este arquivo</string>
     <string name="p2p_unsupport_error">Desculpe, este dispositivo não tem suporte aos serviços P2P via Wi-Fi ou serviço não está disponível no momento!</string>
     <string name="p2p_busy_error">O dispositivo está processando o pedido, por favor aguarde</string>
-    <string name="p2p_inner_error">O serviço está temporariamente indisponível, reiniciando...</string>
+    <string name="p2p_inner_error">O serviço está temporariamente indisponível, reiniciando&#8230;</string>
     <string name="need_location">O App requer permissão de localização para descobrir dispositivos disponíveis. Isto só é usado para a descoberta de dispositivos.</string>
     <string name="rejected_location">Você negou permissão de localização, isso pode impedir a descoberta de dispositivos ou possibilidade de ser descoberto por outros.</string>
     <string name="knowIt">Ok</string>
@@ -47,12 +48,15 @@
     <string name="detect_unfinished_task">Alguns arquivos não foram enviados, você quer tentar enviá-los outra vez?</string>
     <string name="path_setting_success">A pasta padrão foi modificada com sucesso e os novos arquivos recebidos serão salvos lá: %s</string>
     <string name="storage_not_ready">O armazenamento do dispositivo não está pronto</string>
+    <string name="server_runing">O host local está em execução</string>
+    <string name="server_stoped">O host local parou</string>
+    <string name="current_device_info">Nome do dispositivo atual = %1$s,status = %2$s</string>
 
     <string name="copy_content">Copiar ao Clipboard</string>
     <string name="turn_on">Ligar</string>
     <string name="retry">Tente novamente</string>
     <string name="cancel">Cancelar</string>
-    <string name="loading">Carregando...</string>
+    <string name="loading">Carregando&#8230;</string>
     <string name="toggle_open">Configurar</string>
     <string name="toggle_close">@string/app_name</string>
     <string name="aes">Ascendente</string>
@@ -78,6 +82,9 @@
     <string name="later">Mais tarde</string>
     <string name="file_operation">Atividade de arquivos</string>
     <string name="choose">Escolher</string>
+    <string name="start_server">Iniciar servidor</string>
+    <string name="stop_server">Parar servidor</string>
+    <string name="restart_server">reiniciar o servidor</string>
 
     <string name="category_picture">Fotos</string>
     <string name="category_other">Outros</string>
@@ -103,4 +110,10 @@
     <string name="pref_default_rewrite_title">Sobrescrever arquivos</string>
     <string name="pref_default_rewrite_des">Quando você receber um arquivo com o mesmo nome que já existe no seu dispositivo, ele será automaticamente substituído.</string>
     <string name="pref_default_download">Pasta padrão de arquivos</string>
+
+    <string name="device_status_available">Disponível</string>
+    <string name="device_status_connected">Conectado</string>
+    <string name="device_status_failed">Fracassado</string>
+    <string name="device_status_invaited">Convidamos</string>
+    <string name="device_status_unavailable">indisponível</string>
 </resources>

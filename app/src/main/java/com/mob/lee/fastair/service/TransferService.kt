@@ -11,7 +11,7 @@ import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.model.Args
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 abstract class TransferService : AppService() {
     var mSocket: SocketService? = null
@@ -35,14 +35,14 @@ abstract class TransferService : AppService() {
 
     override fun onBind(intent: Intent?): IBinder {
         if (null != mSocket) {
-            async { onNewTask(intent) }
+            launch { onNewTask(intent) }
         }
         return BinderImpl(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (null != mSocket) {
-            async { onNewTask(intent) }
+            launch { onNewTask(intent) }
             return super.onStartCommand(intent, flags, startId)
         }
         viewModel<DeviceViewModel>().readInfo(this) { h, isHost ->
@@ -71,13 +71,13 @@ abstract class TransferService : AppService() {
         listener = mSocket?.addListener { state, _ ->
             if (STATE_CONNECTED == state) {
                 mSocket?.removeListener(listener)
-                async(Dispatchers.IO) {
+                launch (Dispatchers.IO) {
                     connected(mSocket!!)
                     onNewTask(intent)
                 }
             }
         }
-        async(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             mSocket?.open(this,port ?: DEFAULT_PORT, if (true == groupOwner) null else host)
         }
     }

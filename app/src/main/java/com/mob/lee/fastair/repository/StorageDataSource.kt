@@ -29,7 +29,6 @@ class StorageDataSource : DataSource {
         }
     }
 
-    val states = SparseArray<Boolean>()
     var total = 0
     val records = SparseArray<List<Record>>()
 
@@ -61,7 +60,7 @@ class StorageDataSource : DataSource {
                     category.select(),
                     category.value(),
                     "${MediaStore.MediaColumns.DATE_MODIFIED} DESC")
-            cursor?.let {
+            cursor?.use {
                 val count = it.count
                 //应该可以存得下吧o(*￣▽￣*)ブ
                 while (total + count > 50_000) {

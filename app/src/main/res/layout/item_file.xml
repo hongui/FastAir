@@ -4,12 +4,14 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="@dimen/dp16">
+    android:padding="@dimen/dp16"
+    android:clickable="true"
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/item_file_icon"
-        android:layout_width="@dimen/dp36"
-        android:layout_height="@dimen/dp36"
+        android:layout_width="@dimen/dp48"
+        android:layout_height="@dimen/dp48"
         android:layout_gravity="center_vertical"
         android:scaleType="centerCrop" />
 
@@ -30,14 +32,14 @@
             android:lines="1"
             android:singleLine="true"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="16sp" />
+            android:textSize="@dimen/sp16" />
 
         <TextView
             android:id="@+id/item_file_extra"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="14sp" />
+            android:textSize="@dimen/sp14" />
     </LinearLayout>
 
     <CheckBox
