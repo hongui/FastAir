@@ -39,7 +39,7 @@ class DiscoverView : ViewGroup {
         for (i in 0 until count) {
             val child = getChildAt(i)
             if (checkLayoutParams(child.layoutParams)) {
-                val params = child.layoutParams as DiscoverView.LayoutParams
+                val params = child.layoutParams as LayoutParams
                 params.width=child.measuredWidth
                 params.height=child.measuredHeight
                 params.calculate(width-params.width, height-params.height)
@@ -52,7 +52,7 @@ class DiscoverView : ViewGroup {
         val count = childCount
         for (i in 0 until count) {
             val view = getChildAt(i)
-            val layoutParams = view.layoutParams as DiscoverView.LayoutParams
+            val layoutParams = view.layoutParams as LayoutParams
             view.layout(layoutParams.x, layoutParams.y, layoutParams.x + layoutParams.width, layoutParams.y + layoutParams.height)
         }
     }
@@ -69,7 +69,7 @@ class DiscoverView : ViewGroup {
             currentRadius = den.toFloat()
         }
 
-        var temp = currentRadius.toInt()
+        val temp = currentRadius.toInt()
         paint.color=backColor
         paint.style=Paint.Style.STROKE
         paint.strokeWidth= TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,1F,resources.displayMetrics)
@@ -94,17 +94,17 @@ class DiscoverView : ViewGroup {
     }
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
-        val layoutParams = DiscoverView.LayoutParams(context, attrs)
+        val layoutParams = LayoutParams(context, attrs)
         return layoutParams
     }
 
     override fun generateLayoutParams(p: ViewGroup.LayoutParams?): LayoutParams {
-        val layoutParams = DiscoverView.LayoutParams(p)
+        val layoutParams = LayoutParams(p)
         return layoutParams
     }
 
     override fun checkLayoutParams(p: ViewGroup.LayoutParams?): Boolean {
-        return p is DiscoverView.LayoutParams
+        return p is LayoutParams
     }
 
     fun init() {

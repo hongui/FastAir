@@ -1,9 +1,6 @@
 package com.mob.lee.fastair.viewmodel
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
-import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.History
 import com.mob.lee.fastair.io.state.FaildState
 import com.mob.lee.fastair.io.state.SuccessState
@@ -11,10 +8,6 @@ import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.repository.DataBaseDataSource
 import com.mob.lee.fastair.repository.StorageDataSource
-import com.mob.lee.fastair.utils.database
-import com.mob.lee.fastair.utils.updateStorage
-import kotlinx.coroutines.GlobalScope
-import java.io.File
 
 class TransferViewModel : AppViewModel() {
     val dataSource by lazy {
@@ -22,12 +15,6 @@ class TransferViewModel : AppViewModel() {
     }
     val storageDataSource by lazy {
         StorageDataSource()
-    }
-
-    fun history(context: Context?) = async<List<History>> {
-        /*dataSource.recordDao(context) {
-            completedRecords()
-        }*/
     }
 
     fun histories(context: Context?) = asyncWithWrap {

@@ -3,6 +3,7 @@ package com.mob.lee.fastair.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +14,6 @@ import com.mob.lee.fastair.localhost.*
 import com.mob.lee.fastair.service.Notification.Companion.LOCAL_HOST
 import com.mob.lee.fastair.service.Notification.Companion.LOCAL_HOST_CODE
 import com.mob.lee.fastair.service.Notification.Companion.LOCAL_HOST_NAME
-import com.mob.lee.fastair.service.Notification.Companion.cancelNotify
 import com.mob.lee.fastair.service.Notification.Companion.channel
 import com.mob.lee.fastair.service.Notification.Companion.foreground
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,7 @@ import java.net.InetSocketAddress
 import kotlin.coroutines.CoroutineContext
 
 class HostService() : Service(), CoroutineScope {
-    override val coroutineContext: CoroutineContext= SupervisorJob() + Dispatchers.Main.immediate;
+    override val coroutineContext: CoroutineContext= SupervisorJob() + Dispatchers.Main
     var mHost: Http? = null
     val mStatus=MutableLiveData<Boolean>()
 
@@ -46,7 +46,7 @@ class HostService() : Service(), CoroutineScope {
         channel(LOCAL_HOST, LOCAL_HOST_NAME)
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return BinderImpl(this)
     }
 
@@ -96,7 +96,11 @@ class HostService() : Service(), CoroutineScope {
             mStatus.value=false
         }
         mHost=null
-        stopForeground(true)
+        if(Build.VERSION.SDK_INT>=24) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        }else{
+            stopForeground(true)
+        }
         stopSelf()
     }
 

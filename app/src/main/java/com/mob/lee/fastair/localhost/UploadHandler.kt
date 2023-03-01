@@ -16,10 +16,10 @@ class UploadHandler(val context: Context) : Handler {
         val buffer = request.consumeBody()
         buffer ?: return JsonResponse.json(null, NOTFOUNT)
 
-        var before = buffer.position()
+        val before = buffer.position()
         val part = Parser.parsePart(buffer)
         part ?: return JsonResponse.json(null, NOTFOUNT)
-        var after = buffer.position()
+        val after = buffer.position()
 
         size -= after - before
 
@@ -30,7 +30,7 @@ class UploadHandler(val context: Context) : Handler {
 
         context.createFile(name).outputStream().use { file ->
             do {
-                val b = request.consumeBody()?.also {
+                request.consumeBody()?.also {
                     size -= it.remaining()
                     file.write(it.array(), it.position(), it.remaining())
                     it.position(it.limit())

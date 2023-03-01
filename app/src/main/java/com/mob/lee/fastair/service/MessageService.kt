@@ -6,7 +6,7 @@ import com.mob.lee.fastair.io.SocketService
 import com.mob.lee.fastair.io.StringReader
 import com.mob.lee.fastair.io.StringWriter
 import com.mob.lee.fastair.io.state.State
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * Created by Andy on 2017/8/29.
@@ -16,7 +16,7 @@ class MessageService : TransferService() {
     override var port: Int?=9528
 
     fun write(content: String) {
-        async {
+        launch {
             mSocket?.write(StringWriter(content))
         }
     }

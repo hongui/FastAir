@@ -6,17 +6,11 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import androidx.annotation.IntDef
 import androidx.core.content.ContextCompat
 import com.mob.lee.fastair.R
-import java.lang.annotation.RetentionPolicy
-import kotlin.math.min
-import kotlin.properties.Delegates
 import kotlin.random.Random
-import kotlin.random.nextInt
 
 class LoadingView : View {
 
@@ -45,9 +39,9 @@ class LoadingView : View {
 
     val mRandom = Random(System.currentTimeMillis())
 
-    val mRain = Array<Rain>(256, {
+    val mRain = Array<Rain>(256){
         genOrUpdate()
-    })
+    }
 
     var mCuurentActive = 1
 

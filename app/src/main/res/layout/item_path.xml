@@ -30,13 +30,13 @@
             android:lines="1"
             android:singleLine="true"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="16sp" />
+            android:textSize="@dimen/sp16" />
 
         <TextView
             android:id="@+id/item_path_extra"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="14sp" />
+            android:textSize="@dimen/sp14" />
     </LinearLayout>
 </LinearLayout>

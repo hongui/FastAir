@@ -1,5 +1,6 @@
 package com.mob.lee.fastair.fragment
 
+import android.widget.ImageView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 
@@ -10,10 +11,10 @@ class PayFragment:AppFragment(){
     override val layout: Int= R.layout.fragment_payment
 
     override fun setting() {
-        title("谢谢客官打赏")
+        title(R.string.donate)
 
-        //display(requireContext(),R.drawable.alipay,payAlipay)
-        //display(requireContext(),R.drawable.wechat,payWechat)
+        view<ImageView>(R.id.payAlipay)?.setImageResource(R.drawable.alipay)
+        view<ImageView>(R.id.payWechat)?.setImageResource(R.drawable.wechat)
     }
 
 }

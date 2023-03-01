@@ -10,7 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 
 object DisplayManager {
-    val mCache =
+    private val mCache =
         object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 8 / 1024).toInt()) {
             override fun sizeOf(key: String?, value: Bitmap?): Int {
                 if (null == value) {

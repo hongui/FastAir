@@ -10,6 +10,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textSize="10sp"
+        android:textSize="@dimen/sp10"
         android:textColor="@color/colorSecondaryText"/>
 </LinearLayout>

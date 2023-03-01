@@ -17,10 +17,10 @@ class TextFragment : AppFragment() {
         val type = arguments?.getInt("type") ?: 0
 
         val name = if (0 == type) {
-            title("使用帮助")
+            title(R.string.help)
             "help.html"
         } else {
-            title("关于")
+            title(R.string.about)
             "about.html"
         }
         val url = "file:///android_asset/$name"

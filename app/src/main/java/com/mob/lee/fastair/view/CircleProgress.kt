@@ -1,14 +1,7 @@
 package com.mob.lee.fastair.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PathMeasure
-import android.graphics.Rect
-import android.graphics.RectF
-import android.os.Build
+import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -146,9 +139,6 @@ class CircleProgress : View {
     }
 
     private fun init() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
         val attrs = intArrayOf(android.R.attr.colorPrimary, android.R.attr.colorAccent)
         val typedArray = context.obtainStyledAttributes(attrs)
         val primary = typedArray.getColor(0, Color.BLACK)
@@ -166,6 +156,7 @@ class CircleProgress : View {
 
         mRectF = RectF(0F, 0F, 0F, 0F)
         mBounds = Rect(0, 0, 0, 0)
+        typedArray.recycle()
     }
 
     private fun progress(canvas: Canvas) {

@@ -21,8 +21,8 @@ fun getNetIP(context: Context): String? {
 }
 
 private fun wifiIP(context: Context): String? {
-    val manager = context.getSystemService(Context.WIFI_SERVICE) as? WifiManager
-    return manager?.connectionInfo?.run { ipToString(ipAddress) } ?: null
+    val manager = context.getApplicationContext().getSystemService(Context.WIFI_SERVICE) as? WifiManager
+    return manager?.connectionInfo?.run { ipToString(ipAddress) }
 }
 
 private fun localIP(): String? {

@@ -82,14 +82,14 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
 
         viewModel.hasSelectedLiveData.observe {
             val value = if (true == it) {
-                R.drawable.ic_action_send to R.color.color_red
+                R.drawable.ic_action_file_upload to R.color.color_red
             } else {
-                R.drawable.ic_action_receive to R.color.colorAccent
+                R.drawable.ic_action_file_download to R.color.colorAccent
             }
             toolOperation?.supportBackgroundTintList= ColorStateList.valueOf(ContextCompat.getColor(requireContext(),value.second))
             toolOperation?.setImageDrawable(ContextCompat.getDrawable(mParent!!, value.first))
         }
-        toolOperation?.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_receive))
+        toolOperation?.setImageDrawable(ContextCompat.getDrawable(mParent!!, R.drawable.ic_action_file_download))
 
         toolSwap?.setOnClickListener {
             viewModel.reverse()

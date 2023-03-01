@@ -1,10 +1,8 @@
 package com.mob.lee.fastair.imageloader
 
-import android.util.Log
 import android.util.Size
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.ImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch

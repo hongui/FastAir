@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/item_chat_receive_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/dp48"
+        android:layout_height="@dimen/dp48"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_chat_receive_icon"/>
 
@@ -18,7 +18,7 @@
         android:id="@+id/item_chat_receive_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="32dp"
+        android:layout_marginRight="@dimen/dp32"
         android:layout_marginLeft="@dimen/dp8"
         android:background="@drawable/ic_chat_receive_bg"
         android:textSize="14sp"

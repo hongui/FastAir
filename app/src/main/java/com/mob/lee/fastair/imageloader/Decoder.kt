@@ -12,7 +12,6 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Size
-import android.widget.ImageView
 import java.io.File
 
 class Decoder {
@@ -87,16 +86,16 @@ class Decoder {
             if (null == cursor || !cursor.moveToFirst()) {
                 return decodeOther(path, size)
             }
-            with(cursor, {
+            cursor.use {
                 val realPath = cursor.getString(0)
                 if (TextUtils.isEmpty(path)) {
                     return decodeOther(path, size)
                 }
                 return decodePic(realPath, size)
-            })
+            }
         }
 
-        fun decodeOther(path: String, size: Size): Bitmap? {
+        fun decodeOther(path: String, size: Size): Bitmap {
             return TextDrawable.build(path.substring(path.indexOfLast { it == '/' } + 1), size.width, size.height)
         }
 

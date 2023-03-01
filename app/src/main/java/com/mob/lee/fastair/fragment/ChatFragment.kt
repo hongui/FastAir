@@ -23,7 +23,6 @@ import com.mob.lee.fastair.utils.errorToast
  * Created by Andy on 2017/6/7.
  */
 class ChatFragment : ConnectFragment() {
-    var mBack = false
     var mConnect : ServiceConnection? = null
     var mService : MessageService? = null
     lateinit var mAdapter : MessageAdapter
@@ -47,11 +46,7 @@ class ChatFragment : ConnectFragment() {
             }
 
             override fun onTextChanged(s : CharSequence?, start : Int, before : Int, count : Int) {
-                if (TextUtils.isEmpty(s)) {
-                    chatSend?.isEnabled = false
-                } else {
-                    chatSend?.isEnabled = true
-                }
+                chatSend?.isEnabled = !TextUtils.isEmpty(s)
             }
         })
 

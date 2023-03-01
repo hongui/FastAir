@@ -53,10 +53,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginRight="@dimen/dp16"
+        android:layout_marginEnd="@dimen/dp16"
         android:layout_marginBottom="@dimen/dp32"
         app:layout_behavior="@string/dropbehavior"
         app:elevation="@dimen/dp8"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:focusable="true"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolMenus"
@@ -65,7 +67,8 @@
         android:layout_gravity="bottom"
         android:background="@color/colorPrimary"
         app:layout_behavior="@string/dropbehavior"
-        android:clickable="true">
+        android:clickable="true"
+        android:focusable="true">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/toolSwap"

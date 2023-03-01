@@ -21,9 +21,9 @@ class LoadView : View {
             this.color = ContextCompat.getColor(context, R.color.colorPrimary)
         }
     }
-    val mCircles=Array(mCircleCount,{
+    val mCircles=Array(mCircleCount){
         Circle(0F,0F)
-    })
+    }
 
     constructor(context: Context) : super(context, null)
 

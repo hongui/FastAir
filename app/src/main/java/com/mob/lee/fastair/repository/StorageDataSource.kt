@@ -29,7 +29,6 @@ class StorageDataSource : DataSource {
         }
     }
 
-    val states = SparseArray<Boolean>()
     var total = 0
     val records = SparseArray<List<Record>>()
 
