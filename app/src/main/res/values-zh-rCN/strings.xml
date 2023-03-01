@@ -114,7 +114,7 @@
     <string name="device_status_available">可连接</string>
     <string name="device_status_connected">已连接</string>
     <string name="device_status_failed">失败</string>
-    <string name="device_status_invaited">无效</string>
+    <string name="device_status_invaited">已邀请</string>
     <string name="device_status_unavailable">不可用</string>
 
 </resources>
