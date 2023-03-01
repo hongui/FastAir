@@ -27,9 +27,13 @@
 </div>
 
 <style>
+	h3{
+		margin: 8px 0;
+	}
 	p {
 		color: var(--text-color);
         line-height: 1;
+		margin: 8px 0;
 	}
 
 	span {

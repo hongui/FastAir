@@ -23,7 +23,6 @@ class JsonResponse(action:()->JSONObject,status:Int):Response<JSONObject>(action
     override fun onWriteBody(channel: SocketChannel, source: JSONObject) {
         Log.d("JsonResponse",source.toString())
         val buffer=source.toString().buffer()
-        buffer.flip()
         write(channel,buffer)
     }
 

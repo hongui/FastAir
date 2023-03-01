@@ -35,7 +35,9 @@ abstract class Response<T>(val action:()->T,val status: Int= SUCCESS,val mime: S
     }
 
     fun write(channel: SocketChannel,buffer:ByteBuffer){
-
+        while (buffer.hasRemaining()){
+            channel.write(buffer)
+        }
     }
     override fun toString(): String {
         val value = "HTTP/1.1 ${status} ${status(status)}\n${header.entries.joinToString("\n", transform = { "${it.key}: ${it.value}" })}\n\r\n"

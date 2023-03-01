@@ -147,16 +147,18 @@ abstract class AbstractChannel(
 
     private fun onRead(key: SelectionKey, channel: SocketChannel) {
         Log.d(TAG, "=============={Begin onRead")
-        try {
-            do {
-                val buffer = read(channel)
-                send(channel, buffer)
-            } while (null != buffer)
-        } catch (e: Exception) {
-            onError(e)
-            channel.close()
-        } finally {
-            Log.d(TAG, "finished onRead}==============")
+        mScope.launch(Dispatchers.IO) {
+            try {
+                do {
+                    val buffer = read(channel)
+                    send(channel, buffer)
+                } while (null != buffer)
+            } catch (e: Exception) {
+                onError(e)
+                channel.close()
+            } finally {
+                Log.d(TAG, "finished onRead}==============")
+            }
         }
     }
 
@@ -174,7 +176,7 @@ abstract class AbstractChannel(
     }
 
     fun read(channel: SocketChannel): ByteBuffer? {
-        val buffer = ByteBuffer.allocate(1024 * 1024)
+        val buffer = ByteBuffer.allocate(2*1024 * 1024)
         val count = channel.read(buffer)
         return if (-1 == count || 0 == count) {
             null
@@ -186,8 +188,8 @@ abstract class AbstractChannel(
     fun send(channel: SocketChannel, buffer: ByteBuffer?) {
         buffer?.let {
             it.flip()
-            onRead(channel, it)
             Log.d(TAG, "send ${it.remaining()} byte data")
+            onRead(channel, it)
         }
 
     }
