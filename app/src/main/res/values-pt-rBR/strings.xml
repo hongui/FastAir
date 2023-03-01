@@ -50,6 +50,7 @@
     <string name="storage_not_ready">O armazenamento do dispositivo não está pronto</string>
     <string name="server_runing">O host local está em execução</string>
     <string name="server_stoped">O host local parou</string>
+    <string name="current_device_info">Nome do dispositivo atual = %1$s,status = %2$s</string>
 
     <string name="copy_content">Copiar ao Clipboard</string>
     <string name="turn_on">Ligar</string>
@@ -109,4 +110,10 @@
     <string name="pref_default_rewrite_title">Sobrescrever arquivos</string>
     <string name="pref_default_rewrite_des">Quando você receber um arquivo com o mesmo nome que já existe no seu dispositivo, ele será automaticamente substituído.</string>
     <string name="pref_default_download">Pasta padrão de arquivos</string>
+
+    <string name="device_status_available">Disponível</string>
+    <string name="device_status_connected">Conectado</string>
+    <string name="device_status_failed">Fracassado</string>
+    <string name="device_status_invaited">Convidamos</string>
+    <string name="device_status_unavailable">indisponível</string>
 </resources>

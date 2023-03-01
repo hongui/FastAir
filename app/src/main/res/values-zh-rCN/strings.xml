@@ -50,6 +50,7 @@
     <string name="storage_not_ready">外部存储设备未准备好</string>
     <string name="server_runing">本地主机正在运行</string>
     <string name="server_stoped">本地主机已停止</string>
+    <string name="current_device_info">当前你的设备 名字 = %1$s,状态 = %2$s</string>
 
     <string name="copy_content">复制内容</string>
     <string name="turn_on">去开启</string>
@@ -109,4 +110,11 @@
     <string name="pref_default_rewrite_title">文件覆盖</string>
     <string name="pref_default_rewrite_des">收到和本机重名的文件时，覆盖本机重名的文件</string>
     <string name="pref_default_download">文件保存地址</string>
+
+    <string name="device_status_available">可连接</string>
+    <string name="device_status_connected">已连接</string>
+    <string name="device_status_failed">失败</string>
+    <string name="device_status_invaited">无效</string>
+    <string name="device_status_unavailable">不可用</string>
+
 </resources>

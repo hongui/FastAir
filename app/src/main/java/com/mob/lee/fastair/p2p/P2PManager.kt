@@ -6,6 +6,7 @@ import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
+import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
@@ -29,6 +30,8 @@ object P2PManager {
     //连接信息
     var p2pInfoLiveData = MutableLiveData<WifiP2pInfo?>()
 
+    var currentDevice = MutableLiveData<WifiP2pDevice?>()
+
     var receiver: P2PReceiver? = null
     var manager: WifiP2pManager? = null
     var channel: WifiP2pManager.Channel? = null
@@ -49,6 +52,14 @@ object P2PManager {
 
         manager = context.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
         channel = manager?.initialize(context, context.mainLooper) { unregister(context) }
+
+        if(Build.VERSION.SDK_INT>=29) {
+            manager?.requestDeviceInfo(channel!!, object : WifiP2pManager.DeviceInfoListener {
+                override fun onDeviceInfoAvailable(device: WifiP2pDevice?) {
+                    currentDevice.value=device
+                }
+            })
+        }
     }
 
     fun unregister(context: Context) {

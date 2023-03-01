@@ -1,6 +1,9 @@
 package com.mob.lee.fastair.fragment
 
 import android.Manifest
+import android.net.wifi.p2p.WifiP2pDevice
+import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,11 +30,16 @@ class DiscoverFragment : AppFragment() {
         viewModel<DeviceViewModel>()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.registerPermission(this)
+    }
     override fun setting() {
         setHasOptionsMenu(true)
         title(R.string.discover_device, true)
 
         val discoverView=view<DiscoverView>(R.id.discoverView)
+        val deviceStatus=view<TextView>(R.id.device_status)
         P2PManager.devicesLiveData.observe({ lifecycle }) {
             if (null == discoverView || null == it) {
                 return@observe
@@ -44,7 +52,7 @@ class DiscoverFragment : AppFragment() {
                 if(null==device) continue
                 val view = LayoutInflater.from(context).inflate(R.layout.item_scan, null)
                 val name = view?.findViewById<TextView>(R.id.item_scan_name)
-                name?.text = device?.deviceName
+                name?.text = device.deviceName
                 view?.setOnClickListener {
                     stopDiscover = true
 
@@ -60,9 +68,23 @@ class DiscoverFragment : AppFragment() {
                 jump()
             }
         }
+        P2PManager.currentDevice.observe {
+            val status=when(it?.status){
+                WifiP2pDevice.AVAILABLE->R.string.device_status_available
+                WifiP2pDevice.CONNECTED->R.string.device_status_connected
+                WifiP2pDevice.FAILED->R.string.device_status_failed
+                WifiP2pDevice.INVITED->R.string.device_status_invaited
+                else->R.string.device_status_unavailable
+            }
+            deviceStatus?.text=getString(R.string.current_device_info,it?.deviceName,getString(status))
+        }
         viewModel.withPermission(
             this,
-            Manifest.permission.ACCESS_FINE_LOCATION,
+            if(Build.VERSION.SDK_INT>=33){
+                Manifest.permission.NEARBY_WIFI_DEVICES
+            }else {
+                Manifest.permission.ACCESS_FINE_LOCATION
+            },
             action = { hasPermission ->
                 if (hasPermission) {
                     ScanService.startScan(requireContext())
