@@ -70,9 +70,9 @@
         всё</string>
     <string name="sort">Сортировка</string>
     <string name="delete">Удалить</string>
-    <string name="sort_by_name">Сортировать по имени</string>
-    <string name="sort_by_size">Сортировать по размеру</string>
-    <string name="sort_by_time">Сортировать по времени</string>
+    <string name="sort_by_name">По имени</string>
+    <string name="sort_by_size">По размеру</string>
+    <string name="sort_by_time">По времени</string>
     <string name="warm">Предупреждение</string>
     <string name="give_up">Отказаться</string>
     <string name="send">Отправить</string>
@@ -120,4 +120,13 @@
     <string name="device_status_failed">Неуспешный</string>
     <string name="device_status_invaited">Приглашенный</string>
     <string name="device_status_unavailable">недоступен</string>
+    
+    <string name="key_default_clear" translatable="false">autoclear</string>
+    <string name="key_default_rewrite" translatable="false">rewrite</string>
+    <string name="key_default_download" translatable="false">download</string>
+
+    <string name="alipay">Alipay</string>
+    <string name="wechat">WeChat</string>
+
+    <string name="dropbehavior" translatable="false">com.mob.lee.fastair.view.TranslationBehavior</string>
 </resources>
