@@ -3,6 +3,7 @@ package com.mob.lee.fastair.service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 import com.mob.lee.fastair.base.AppService
 import com.mob.lee.fastair.io.SocketService
 import com.mob.lee.fastair.io.state.STATE_CONNECTED
@@ -42,21 +43,23 @@ abstract class TransferService : AppService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (null != mSocket) {
+            Log.e("TAG","+++++++++++++++++++++++++")
             launch { onNewTask(intent) }
             return super.onStartCommand(intent, flags, startId)
         }
-        viewModel<DeviceViewModel>().readInfo(this) { h, isHost ->
-            if (null == host) {
-                host = h
-            }
-            if (null == port) {
-                port = intent?.getIntExtra(Args.PORT, DEFAULT_PORT)
-            }
-            if (null == groupOwner) {
-                groupOwner = isHost
-            }
-            connect(intent)
+        val (h, isHost) = DeviceViewModel.unBundle(intent?.extras)
+        Log.e("TAG","host =$h,isHost = $isHost----------------------------------------")
+        if (null == host) {
+            host = h
         }
+        if (null == port) {
+            port = intent?.getIntExtra(Args.PORT, DEFAULT_PORT)
+        }
+        if (null == groupOwner) {
+            groupOwner = isHost
+        }
+        connect(intent)
+
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -71,14 +74,14 @@ abstract class TransferService : AppService() {
         listener = mSocket?.addListener { state, _ ->
             if (STATE_CONNECTED == state) {
                 mSocket?.removeListener(listener)
-                launch (Dispatchers.IO) {
+                launch(Dispatchers.IO) {
                     connected(mSocket!!)
                     onNewTask(intent)
                 }
             }
         }
         launch(Dispatchers.IO) {
-            mSocket?.open(this,port ?: DEFAULT_PORT, if (true == groupOwner) null else host)
+            mSocket?.open(this, port ?: DEFAULT_PORT, if (true == groupOwner) null else host)
         }
     }
 

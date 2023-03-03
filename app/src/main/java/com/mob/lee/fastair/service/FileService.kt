@@ -85,7 +85,7 @@ class FileService : TransferService() {
         if (records.isSuccess() && true == records.data.isNullOrEmpty()) {
             return
         }
-        val target = records.data?.first { lastId!=it.id }
+        val target = records.data?.firstOrNull() { lastId!=it.id }
         target?.let { record ->
             Log.e(TAG, "Write File ${record}")
             lastId=record.id

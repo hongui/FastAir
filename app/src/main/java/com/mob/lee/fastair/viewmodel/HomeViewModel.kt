@@ -60,7 +60,7 @@ class HomeViewModel : AppViewModel() {
         } else {
             withPermission(
                 fragment,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 action = { hasPermission ->
                     if (hasPermission) {
                         fetch(fragment.context)

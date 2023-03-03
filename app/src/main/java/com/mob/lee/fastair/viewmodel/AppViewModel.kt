@@ -125,7 +125,6 @@ open class AppViewModel : ViewModel() {
                 }
             })
             mActivityResult?.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-
         }
     }
 

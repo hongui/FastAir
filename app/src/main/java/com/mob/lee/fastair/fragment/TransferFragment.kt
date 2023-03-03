@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
@@ -15,6 +16,7 @@ import com.mob.lee.fastair.io.state.parseFile
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.errorToast
+import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import com.mob.lee.fastair.viewmodel.TransferViewModel
 
 class TransferFragment : ConnectFragment(), ProcessListener {
@@ -31,25 +33,30 @@ class TransferFragment : ConnectFragment(), ProcessListener {
         mAdapter = RecordAdapter {
             viewModel.rename(requireContext(), it)
         }
-        val rv_recyclerview=view<RecyclerView>(R.id.rv_recyclerview)
-        rv_recyclerview?.layoutManager = LinearLayoutManager(context)
-        rv_recyclerview?.adapter = mAdapter
-
-        val intent = Intent(mParent, FileService::class.java)
-
-        mConntect = object : ServiceConnection {
-            override fun onServiceDisconnected(name: ComponentName?) {
-
-            }
-
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as BinderImpl?
-                val fileService = binder?.mService as FileService?
-                fileService?.mFileChangeListener = this@TransferFragment
-            }
+        view<RecyclerView>(R.id.rv_recyclerview)?.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = mAdapter
         }
-        mParent?.bindService(intent, mConntect!!, Context.BIND_AUTO_CREATE)
-        mParent?.startService(intent)
+
+        Intent(requireContext(), FileService::class.java).apply {
+            val device:DeviceViewModel by requireActivity().viewModels()
+            putExtras(device.bundle())
+            mConntect = object : ServiceConnection {
+                override fun onServiceDisconnected(name: ComponentName?) {
+
+                }
+
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    val binder = service as BinderImpl?
+                    val fileService = binder?.mService as FileService?
+                    fileService?.mFileChangeListener = this@TransferFragment
+                }
+            }
+            mParent?.startService(this)
+            requireActivity().bindService(this, mConntect!!, Context.BIND_IMPORTANT)
+        }
+
+
     }
 
     override fun onStop() {
@@ -70,6 +77,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
             mParent?.errorToast(R.string.disconnected)
             return
         }
+        viewModel.transSpeed(state)
         mAdapter.update(state, record)
     }
 }

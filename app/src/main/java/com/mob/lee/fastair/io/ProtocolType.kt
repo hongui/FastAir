@@ -22,7 +22,8 @@ enum class ProtocolType(val type:Byte){
     E(ProtocolType.CE);
 
     companion object {
-        const val CB:Byte=0x01 shl 0
+        @JvmStatic val CB:Byte=0x01
+        @JvmStatic val CS:Byte= (0x01 shl 1).toByte()
         const val CS:Byte=0x01 shl 1
         const val CI:Byte=0x01 shl 2
         const val CL:Byte=0x01 shl 3

@@ -2,9 +2,12 @@ package com.mob.lee.fastair.io
 
 import android.util.Log
 import com.mob.lee.fastair.io.state.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.net.InetSocketAddress
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
@@ -56,7 +59,7 @@ class SocketService(var keepAlive: Boolean = false) {
                 var time = 0
                 delay(500)
                 //等待10S
-                while (false == channel?.isConnected?:false && time < 20) {
+                while ((false == channel?.isConnected) && time < 20) {
                     try {
                         if(null==channel) {
                             channel = SocketChannel.open()
@@ -90,10 +93,10 @@ class SocketService(var keepAlive: Boolean = false) {
             isOpen = true
             updateState(STATE_CONNECTED)
 
-            context.async(Dispatchers.IO) {
+            context.launch(Dispatchers.IO) {
                 handleRead()
             }
-            context.async(Dispatchers.IO) {
+            context.launch(Dispatchers.IO) {
                 handleWrite()
             }
         } catch (e: Exception) {

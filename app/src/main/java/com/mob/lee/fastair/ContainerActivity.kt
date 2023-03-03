@@ -1,13 +1,12 @@
 package com.mob.lee.fastair
 
 import android.content.Intent
+import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import com.mob.lee.fastair.p2p.P2PManager
-import com.mob.lee.fastair.service.FileService
+import com.mob.lee.fastair.p2p.failedReason
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import com.mob.lee.fastair.viewmodel.HomeViewModel
@@ -27,28 +26,22 @@ class ContainerActivity : AppCompatActivity() {
 
         handleIntent(intent)
 
-        if(null==savedInstanceState) {
-            P2PManager.connectLiveData.observe(this, Observer {
-                if (false == it) {
+        val viewModel: DeviceViewModel by viewModels()
+        viewModel.run {
+            init(this@ContainerActivity)
+            discover(object : WifiP2pManager.ActionListener {
+                override fun onSuccess() {
+                }
+
+                override fun onFailure(reason: Int) {
+                    errorToast(failedReason(reason))
+                }
+            })
+            connectState.observe(this@ContainerActivity) {
+                if (!it) {
                     errorToast(R.string.disconnected)
-                    mNavController.popBackStack(R.id.homeFragment, true)
-
-                    try {
-                        val intent = Intent(this, FileService::class.java)
-                        stopService(intent)
-                    }catch (e:Exception){
-                        e.printStackTrace()
-                    }
-
                 }
-            })
-
-            P2PManager.p2pInfoLiveData.observe(this, Observer {
-                it?.let {
-                    val viewModel:DeviceViewModel  by viewModels()
-                    viewModel.saveInfo(this, it)
-                }
-            })
+            }
         }
     }
 
@@ -57,11 +50,11 @@ class ContainerActivity : AppCompatActivity() {
         handleIntent(intent)
     }
 
-    fun handleIntent(intent: Intent?){
+    fun handleIntent(intent: Intent?) {
         val data = intent?.clipData
         if (null != data) {
-            val v:HomeViewModel  by viewModels()
-            v.parseClipData(this,data).observe(this){
+            val v: HomeViewModel by viewModels()
+            v.parseClipData(this, data).observe(this) {
                 mNavController.navigate(R.id.beforeFragment)
             }
         }
