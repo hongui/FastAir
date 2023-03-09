@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.NetworkInfo
 import android.net.wifi.p2p.*
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
+import com.mob.lee.fastair.p2p.failedReason
 
 /**
  *
@@ -38,30 +40,44 @@ class DeviceViewModel : AppViewModel() {
     private val receiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                Log.e("Tag", "-----${intent?.action}------------")
+                Log.i(TAG, " Receive broadcast intent = ${intent?.action}")
                 when (intent?.action) {
-                    WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> state.value = WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(
+                    WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> state.value = (WifiP2pManager.WIFI_P2P_STATE_ENABLED == intent.getIntExtra(
                         WifiP2pManager.EXTRA_WIFI_STATE, WifiP2pManager.WIFI_P2P_STATE_DISABLED
-                    )
+                    )).apply { Log.i(TAG, "Device state = $this") }
 
                     WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> manager?.requestPeers(channel) {
+                        Log.i(TAG, "Receive peers,peers = ${it.deviceList.joinToString()}")
                         devices.value = it.deviceList
                     }
 
 
                     WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
-                        p2pInfo.value = intent.parcelableExtra<WifiP2pInfo>(WifiP2pManager.EXTRA_WIFI_P2P_INFO)
-                        connectState.value=true == p2pInfo.value?.groupFormed
+                        if (NetworkInfo.State.CONNECTED == intent.parcelableExtra<NetworkInfo>(WifiP2pManager.EXTRA_NETWORK_INFO)?.state) {
+                            p2pInfo.value = intent.parcelableExtra<WifiP2pInfo>(WifiP2pManager.EXTRA_WIFI_P2P_INFO)
+                            connectState.value = true
+                        } else if (NetworkInfo.State.DISCONNECTED == intent.parcelableExtra<NetworkInfo>(WifiP2pManager.EXTRA_NETWORK_INFO)?.state) {
+                            p2pInfo.value = null
+                            connectState.value = false
+                        }
+                        Log.i(
+                            TAG,
+                            "p2pinfo = ${p2pInfo.value}, connected = ${connectState.value},group = ${intent.parcelableExtra<WifiP2pGroup>(WifiP2pManager.EXTRA_WIFI_P2P_GROUP)},network = ${
+                                intent.parcelableExtra<NetworkInfo>(WifiP2pManager.EXTRA_NETWORK_INFO)
+                            }"
+                        )
                     }
 
-                    WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> device.value = intent.parcelableExtra<WifiP2pDevice>(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)
+                    WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> device.value = intent.parcelableExtra<WifiP2pDevice>(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE).apply {
+                        Log.i(TAG, "Device change device = $this")
+                    }
                 }
             }
         }
     }
 
     private var channel: WifiP2pManager.Channel? = null
-    private var connectTimes= RETRY_TIMES
+    private var connectTimes = RETRY_TIMES
 
     fun init(activity: FragmentActivity) {
         if (hasPermission(activity)) {
@@ -81,19 +97,21 @@ class DeviceViewModel : AppViewModel() {
     }
 
     fun discover(listener: WifiP2pManager.ActionListener?) {
-        connectTimes= RETRY_TIMES
+        connectTimes = RETRY_TIMES
         channel?.let {
-            manager?.discoverPeers(it, object :WifiP2pManager.ActionListener{
+            manager?.discoverPeers(it, object : WifiP2pManager.ActionListener {
                 override fun onSuccess() {
-                    connectTimes= RETRY_TIMES
+                    connectTimes = RETRY_TIMES
+                    Log.i(TAG, "discover peers success")
                 }
 
                 override fun onFailure(reason: Int) {
-                    if(WifiP2pManager.BUSY==reason){
+                    Log.e(TAG, "discover peers failed,reason = ${failedReason(reason)}")
+                    if (WifiP2pManager.BUSY == reason) {
                         if (0 != connectTimes) {
-                            connectTimes-=1
+                            connectTimes -= 1
                             disconnect(null)
-                            manager?.discoverPeers(it,this)
+                            manager?.discoverPeers(it, this)
                         }
                     }
                     listener?.onFailure(reason)
@@ -107,6 +125,7 @@ class DeviceViewModel : AppViewModel() {
         config.deviceAddress = device.deviceAddress
 
         manager?.connect(channel, config, listener)
+        Log.i(TAG, "Start connect.")
     }
 
     fun disconnect(actionListener: WifiP2pManager.ActionListener?) {
@@ -114,6 +133,13 @@ class DeviceViewModel : AppViewModel() {
         manager?.cancelConnect(channel, actionListener)
         connectState.value = false
         p2pInfo.value = null
+        Log.i(TAG, "Group has been removed.")
+    }
+
+    fun stopDiscover(){
+        channel?.let {
+            manager?.stopPeerDiscovery(it,null)
+        }
     }
 
     fun withConnectNavigation(
@@ -130,9 +156,12 @@ class DeviceViewModel : AppViewModel() {
 
     fun bundle(): Bundle {
         val info = p2pInfo.value
+        val host = info?.groupOwnerAddress?.hostAddress
+        val groupOwner = info?.isGroupOwner ?: false
         val bundle = Bundle()
-        bundle.putString(HOST, info?.groupOwnerAddress?.hostAddress)
-        bundle.putBoolean(GROUP_OWNER, info?.isGroupOwner ?: false)
+        bundle.putString(HOST, host)
+        bundle.putBoolean(GROUP_OWNER, groupOwner)
+        Log.d(TAG, "bundle host = $host, groupwoner = $groupOwner")
         return bundle
     }
 
@@ -199,6 +228,9 @@ class DeviceViewModel : AppViewModel() {
 
     companion object {
         @JvmStatic
+        val TAG = "DeviceViewModel"
+
+        @JvmStatic
         val HOST = "host"
 
         @JvmStatic
@@ -209,7 +241,7 @@ class DeviceViewModel : AppViewModel() {
 
         fun unBundle(bundle: Bundle?): Pair<String?, Boolean> {
             bundle ?: return null to false
-            return bundle.getString(HOST, null) to bundle.getBoolean(GROUP_OWNER, false)
+            return (bundle.getString(HOST, null) to bundle.getBoolean(GROUP_OWNER, false)).apply { Log.d(TAG, "unbundle host = $first,group_owner = $second") }
         }
     }
 }

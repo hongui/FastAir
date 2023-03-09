@@ -1,29 +1,29 @@
 package com.mob.lee.fastair.io
 
 import android.content.Context
-import com.mob.lee.fastair.io.state.FaildState
+import com.mob.lee.fastair.io.state.FailedState
 import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.StartState
+import com.mob.lee.fastair.io.state.StartRecordState
 import com.mob.lee.fastair.io.state.SuccessState
+import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.utils.createFile
-import java.io.File
 import java.io.FileOutputStream
 
-class FileReader(val context: Context?, val listener: ProcessListener? = null) : Reader {
-    var length = 0L
-    var alreadyFinished = 0L
-    var startTime=0L
-    lateinit var file: File
-    lateinit var stream: FileOutputStream
+class FileReader(val context: Context, var listener: ProgressListener? = null) : Reader {
+    private var alreadyFinished = 0L
+    private var startTime = 0L
+    private var stream: FileOutputStream? = null
+    private var record: Record? = null
+
     override fun invoke(data: ProtocolByte) {
-        when (data.type) {
+        when (data.getType()) {
             ProtocolType.E -> receiveOver()
 
             ProtocolType.L -> {
-                length = data.getLong()
-                alreadyFinished=0
-                startTime=System.currentTimeMillis()
-                if(0L==length){
+                record = Record(System.currentTimeMillis(), data.getLong(), System.currentTimeMillis(), "")
+                alreadyFinished = 0
+                startTime = System.currentTimeMillis()
+                if (0L == record?.size) {
                     receiveOver()
                 }
             }
@@ -31,33 +31,42 @@ class FileReader(val context: Context?, val listener: ProcessListener? = null) :
             ProtocolType.W -> {
                 val name = data.getString()
                 try {
-                    val f = context?.createFile(name)
-                    f?.let {
-                        file = it
-                        stream = file.outputStream()
-                        listener?.invoke(StartState(obj = file))
+                    val f = context.createFile(name)
+                    stream = f.outputStream()
+                    record?.apply {
+                        path = f.absolutePath
+                        state = Record.STATE_TRANSPORT
+                        duration = System.currentTimeMillis() - startTime
                     }
+                    listener?.invoke(StartRecordState(record!!))
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    listener?.invoke(FaildState(obj = file))
+                    listener?.invoke(FailedState(record, e))
                 }
             }
 
             else -> {
-                stream.write(data.bytes())
-                alreadyFinished += data.bytes().size
-                listener?.invoke(ProcessState(alreadyFinished, length, obj = file))
+                val buffer=data.bytes()
+                stream?.write(buffer.array(),buffer.position(),buffer.limit())
+                alreadyFinished += data.getContentLength()
+                record?.apply {
+                    duration = System.currentTimeMillis() - startTime
+                }
+                listener?.invoke(ProcessState(alreadyFinished, startTime,record!!))
             }
         }
     }
 
-    fun receiveOver(){
+    private fun receiveOver() {
         try {
-            stream.close()
-            listener?.invoke(SuccessState(System.currentTimeMillis()-startTime,obj = file))
+            record?.let { r ->
+                stream?.close()
+
+                r.duration = System.currentTimeMillis() - startTime
+                listener?.invoke(SuccessState(r, true,r.size/1024F/r.duration/1000))
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            listener?.invoke(FaildState(obj = file))
         }
     }
 }

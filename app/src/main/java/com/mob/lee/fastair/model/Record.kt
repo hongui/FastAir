@@ -22,6 +22,8 @@ data class Record(@PrimaryKey var id: Long,
         }
 
 
+    fun valid()=0L!=size&&0L!=date
+
     companion object{
         /*文件状态*/
         /*原始状态，即本机文件*/

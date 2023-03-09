@@ -84,4 +84,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     ksp 'androidx.room:room-compiler:2.5.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.google.truth:truth:1.1.3"
 }

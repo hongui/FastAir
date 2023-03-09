@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.MessageAdapter
+import com.mob.lee.fastair.io.state.MessageState
 import com.mob.lee.fastair.model.Message
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.MessageService
@@ -23,29 +24,29 @@ import com.mob.lee.fastair.utils.errorToast
  * Created by Andy on 2017/6/7.
  */
 class ChatFragment : ConnectFragment() {
-    var mConnect : ServiceConnection? = null
-    var mService : MessageService? = null
-    lateinit var mAdapter : MessageAdapter
+    var mConnect: ServiceConnection? = null
+    var mService: MessageService? = null
+    lateinit var mAdapter: MessageAdapter
     override val layout: Int = R.layout.fragment_chat
 
     override fun setting() {
         title(R.string.chat)
 
         mAdapter = MessageAdapter()
-        val chatContent=view<RecyclerView>(R.id.chatContent)
-        val chatInput=view<EditText>(R.id.chatInput)
-        val chatSend=view<TextView>(R.id.chatSend)
+        val chatContent = view<RecyclerView>(R.id.chatContent)
+        val chatInput = view<EditText>(R.id.chatInput)
+        val chatSend = view<TextView>(R.id.chatSend)
         chatContent?.layoutManager = LinearLayoutManager(mParent)
         chatContent?.adapter = mAdapter
 
         chatInput?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s : Editable?) {
+            override fun afterTextChanged(s: Editable?) {
             }
 
-            override fun beforeTextChanged(s : CharSequence?, start : Int, count : Int, after : Int) {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
-            override fun onTextChanged(s : CharSequence?, start : Int, before : Int, count : Int) {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 chatSend?.isEnabled = !TextUtils.isEmpty(s)
             }
         })
@@ -68,20 +69,19 @@ class ChatFragment : ConnectFragment() {
             intent.putExtras(it)
         }
         mConnect = object : ServiceConnection {
-            override fun onServiceDisconnected(name : ComponentName?) {
+            override fun onServiceDisconnected(name: ComponentName?) {
                 context?.errorToast("连接断开")
             }
 
-            override fun onServiceConnected(name : ComponentName?, service : IBinder?) {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 if (null == service) {
                     return
                 }
                 val binder = service as BinderImpl
                 mService = binder.mService as MessageService
-                mService?.mMessageListener = {
-                    val msg = it.obj as? String
-                    msg?.let {
-                        mAdapter.add(Message(it, Message.OTHER))
+                mService?.mMessageListener = {state->
+                    if(state is MessageState){
+                        mAdapter.add(Message(state.msg, Message.OTHER))
                         chatContent?.smoothScrollToPosition(mAdapter.getItemCount())
                     }
                 }

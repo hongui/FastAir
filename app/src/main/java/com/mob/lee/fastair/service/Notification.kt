@@ -17,9 +17,14 @@ class Notification {
         const val LOCAL_HOST_NAME = "local_host"
         const val LOCAL_HOST_CODE = 9528
 
-        fun Context.channel(id: String, name: String) {
+        fun Context.channel(id: String, name: String,importance:Int=0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
+                val i=if(importance > NotificationManager.IMPORTANCE_MIN&& importance < NotificationManager.IMPORTANCE_MAX){
+                    importance
+                }else{
+                    NotificationManager.IMPORTANCE_DEFAULT
+                }
+                val channel = NotificationChannel(id, name, i)
                 val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.createNotificationChannel(channel)
             }

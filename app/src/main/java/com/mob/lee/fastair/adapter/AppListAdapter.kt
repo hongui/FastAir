@@ -42,6 +42,10 @@ open class AppListAdapter<D>(val layout: Int) : RecyclerView.Adapter<AppViewHold
 
     fun update(pos:Int,data:D?){
         data?:return
+        if(originData.isNullOrEmpty()){
+            add(data)
+            return
+        }
         originData[pos]=data
         notifyItemChanged(pos)
     }

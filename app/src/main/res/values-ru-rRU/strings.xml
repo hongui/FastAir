@@ -3,6 +3,7 @@
     <string name="app_description">Испытайте скорость полёта</string>
 
     <string name="wait_for_transport_file">Список незавершенных передач</string>
+    <string name="transfer_service">трансфер</string>
     <string name="file_transfer">Передача файлов</string>
     <string name="discover_device">Найти устройство</string>
     <string name="disconnect_device">Отключение</string>

@@ -40,6 +40,7 @@ class ContainerActivity : AppCompatActivity() {
             connectState.observe(this@ContainerActivity) {
                 if (!it) {
                     errorToast(R.string.disconnected)
+                    mNavController.popBackStack(R.id.homeFragment,false)
                 }
             }
         }

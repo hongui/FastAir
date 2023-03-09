@@ -1,17 +1,14 @@
 package com.mob.lee.fastair.io
 
-import com.mob.lee.fastair.io.state.FaildState
-import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.StartState
-import com.mob.lee.fastair.io.state.State
-import com.mob.lee.fastair.io.state.SuccessState
-import java.io.File
+import com.mob.lee.fastair.io.state.*
+import com.mob.lee.fastair.model.Record
 import java.io.FileInputStream
 
-class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer {
+class FileWriter(val record: Record, val listener: ProgressListener? = null) : Writer {
     var state = 0
     var alreadyFinished = 0L
     var tempLength = 0
+    var startTime: Long = 0
 
     val size = 1024 * 8
 
@@ -20,57 +17,55 @@ class FileWriter(val file: File, val listener: ProcessListener? = null) : Writer
     }
 
     val stream: FileInputStream by lazy {
-        FileInputStream(file)
+        FileInputStream(record.path)
     }
 
-    constructor(path: String) : this(File(path))
-
-    constructor(path: String?, listener: ProcessListener? = null) : this(File(path), listener)
 
     override fun hasNext(): Boolean {
-        //不发送文件夹
-        if (null == file || file.isDirectory) {
-            return false
-        }
         return state != -1
     }
 
     override fun next(): ProtocolByte =
-            when (state) {
-                0 -> {
-                    state = 1
-                    listener?.invoke(StartState(obj = file))
-                    ProtocolByte.empty()
-                }
+        when (state) {
+            0 -> {
+                state = 1
+                ProtocolByte.empty()
+            }
 
-                1 -> {
-                    state = 2
-                    ProtocolByte.string(file.name)
-                }
+            1 -> {
+                state = 2
+                ProtocolByte.long(record.size)
+            }
 
-                2 -> {
-                    state = 3
-                    ProtocolByte.long(file.length())
-                }
+            2 -> {
+                state = 3
+                startTime = System.currentTimeMillis()
+                record.state = Record.STATE_TRANSPORT
+                listener?.invoke(StartRecordState(record))
+                ProtocolByte.string(record.name)
+            }
 
-                else -> {
-                    try {
-                        tempLength = stream.read(bytes)
+            else -> {
+                try {
+                    tempLength = stream.read(bytes)
 
-                        if (-1 == tempLength || 0L == file.length()) {
-                            finished(SuccessState(obj = file))
-                        } else {
-                            alreadyFinished += tempLength
-                            listener?.invoke(ProcessState(alreadyFinished, file.length(), obj = file))
-                            ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        listener?.invoke(FaildState(obj = file))
-                        finished(FaildState(obj = file))
+                    if (-1 == tempLength || 0L == record.size) {
+                        record.state = Record.STATE_SUCCESS
+                        finished(SuccessState(record, speed = record.size.toFloat()/(System.currentTimeMillis()-startTime)/1000F))
+                    } else {
+                        alreadyFinished += tempLength
+                        record.duration = System.currentTimeMillis() - startTime
+                        listener?.invoke(ProcessState(alreadyFinished, startTime,record))
+                        ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    record.state = Record.STATE_FAILED
+                    listener?.invoke(FailedState(record, e))
+                    finished(FailedState(record))
                 }
             }
+        }
 
     fun finished(s: State): ProtocolByte {
         state = -1

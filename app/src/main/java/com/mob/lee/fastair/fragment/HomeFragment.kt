@@ -187,6 +187,7 @@ class HomeFragment : AppFragment(), NavigationView.OnNavigationItemSelectedListe
                             .setPositiveButton(R.string.disconnect_now) { _, _ ->
                                 val intent = Intent(context, FileService::class.java)
                                 mParent?.stopService(intent)
+                                mDeviceViewModel.disconnect(null)
                             }
                             .setNegativeButton(R.string.cancel, null)
                     }

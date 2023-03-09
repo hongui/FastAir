@@ -3,6 +3,7 @@
     <string name="app_description">Experimente as transferências de alta velocidade</string>
 
     <string name="wait_for_transport_file">Lista de transferências pendentes</string>
+    <string name="transfer_service">serviço de transfer</string>
     <string name="file_transfer">Transferência de arquivos</string>
     <string name="discover_device">Conexão do dispositivo</string>
     <string name="disconnect_device">Desconectar</string>

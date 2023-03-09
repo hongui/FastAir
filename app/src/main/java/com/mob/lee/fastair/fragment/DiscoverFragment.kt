@@ -64,6 +64,7 @@ class DiscoverFragment : AppFragment() {
         }
         viewModel.connectState.observe {
             if (true == it) {
+                viewModel.stopDiscover()
                 jump()
             }
         }
@@ -95,7 +96,7 @@ class DiscoverFragment : AppFragment() {
                             }
 
                             override fun onFailure(reason: Int) {
-                                requireContext().errorToast(failedReason(reason))
+                                context?.errorToast(failedReason(reason))
                             }
                         })
                 } else {

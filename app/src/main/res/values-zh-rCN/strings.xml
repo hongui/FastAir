@@ -3,6 +3,7 @@
     <string name="app_description">体验飞起来的速度</string>
 
     <string name="wait_for_transport_file">待传输列表</string>
+    <string name="transfer_service">传输服务</string>
     <string name="file_transfer">文件传输</string>
     <string name="discover_device">设备连接</string>
     <string name="disconnect_device">断开连接</string>

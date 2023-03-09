@@ -10,16 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.adapter.RecordAdapter
-import com.mob.lee.fastair.io.ProcessListener
+import com.mob.lee.fastair.io.ProgressListener
 import com.mob.lee.fastair.io.state.State
-import com.mob.lee.fastair.io.state.parseFile
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
-import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import com.mob.lee.fastair.viewmodel.TransferViewModel
 
-class TransferFragment : ConnectFragment(), ProcessListener {
+class TransferFragment : ConnectFragment(), ProgressListener {
     override val layout: Int = R.layout.fragment_recyclerview
     private var mConntect: ServiceConnection? = null
     private lateinit var mAdapter: RecordAdapter
@@ -39,7 +37,7 @@ class TransferFragment : ConnectFragment(), ProcessListener {
         }
 
         Intent(requireContext(), FileService::class.java).apply {
-            val device:DeviceViewModel by requireActivity().viewModels()
+            val device: DeviceViewModel by requireActivity().viewModels()
             putExtras(device.bundle())
             mConntect = object : ServiceConnection {
                 override fun onServiceDisconnected(name: ComponentName?) {
@@ -49,10 +47,10 @@ class TransferFragment : ConnectFragment(), ProcessListener {
                 override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                     val binder = service as BinderImpl?
                     val fileService = binder?.mService as FileService?
-                    fileService?.mFileChangeListener = this@TransferFragment
+                    fileService?.mListener = this@TransferFragment
                 }
             }
-            mParent?.startService(this)
+            requireActivity().startService(this)
             requireActivity().bindService(this, mConntect!!, Context.BIND_IMPORTANT)
         }
 
@@ -72,12 +70,11 @@ class TransferFragment : ConnectFragment(), ProcessListener {
     }
 
     override fun invoke(state: State) {
-        val record = parseFile(state)
+        val record = viewModel.parseState(state)
         if (null == record) {
-            mParent?.errorToast(R.string.disconnected)
+            //mParent?.errorToast(R.string.disconnected)
             return
         }
-        viewModel.transSpeed(state)
-        mAdapter.update(state, record)
+        mAdapter.update(record, state)
     }
 }

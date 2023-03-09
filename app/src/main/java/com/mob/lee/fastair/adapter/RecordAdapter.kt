@@ -6,7 +6,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.imageloader.DisplayManager
-import com.mob.lee.fastair.io.state.*
+import com.mob.lee.fastair.io.state.ProcessState
+import com.mob.lee.fastair.io.state.StartRecordState
+import com.mob.lee.fastair.io.state.State
+import com.mob.lee.fastair.io.state.SuccessState
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.dialog
@@ -28,11 +31,13 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
         holder.text(R.id.item_history_date, record.date.formatDate("MM/dd/yy HH:mm"))
         when (state) {
             is ProcessState -> {
-                progress.progress(state.percentage())
+                progress.progress(state.percentage()*100)
+                holder.text(R.id.item_history_speed, "${state.speed()}MB/S")
             }
 
             is SuccessState -> {
                 progress.updateState(CircleProgress.SUCCESS)
+                holder.text(R.id.item_history_speed, "${state.speed}MB/S")
             }
 
             else -> {
@@ -89,20 +94,19 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
                         val target = File("${origin.parent}${File.separator}${input}.${origin.extension}")
                         if (File(path).renameTo(target)) {
                             val rec = record.copy(path = target.absolutePath)
-                            update(pos, rec to SuccessState())
+                            update(pos, rec to SuccessState(rec))
                             action(rec)
                         }
                     }
         }
     }
 
-    fun update(state: State, record: Record?) {
-        record ?: return
+    fun update(record: Record,state:State) {
         val index = itemCount - 1
-        if (state is StartState) {
+        if(state is StartRecordState) {
             add(record to state)
-        } else {
-            update(index, record to state)
+        }else{
+            update(index,record to state)
         }
     }
 }

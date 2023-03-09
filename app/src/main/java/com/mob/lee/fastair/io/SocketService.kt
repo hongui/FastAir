@@ -1,7 +1,6 @@
 package com.mob.lee.fastair.io
 
 import android.util.Log
-import com.mob.lee.fastair.io.state.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -18,11 +17,6 @@ import java.nio.channels.*
  * Created by Andy on 2017/11/29.
  */
 class SocketService(var keepAlive: Boolean = false) {
-    /**
-     * 读取监听器，消息到来会通知
-     * @see read
-     */
-    private val readers = HashSet<Reader>()
 
     /**
      *发送消息
@@ -33,7 +27,7 @@ class SocketService(var keepAlive: Boolean = false) {
     /**
      * 指示当前连接是否已经开启
      */
-    private var isOpen: Boolean = false
+    var isConnected: Boolean = false
 
     /**
      * 通信通道
@@ -49,9 +43,9 @@ class SocketService(var keepAlive: Boolean = false) {
      * @param port 端口号
      * @param host 主机地址，当该参数为null时，则开启一个socket监听
      **/
-    suspend fun open(context:CoroutineScope,port: Int, host: String? = null) {
-        Log.d(TAG, "try to connect ${host}:${port}")
-        if (isOpen) {
+    suspend fun open(context: CoroutineScope, port: Int, host: String? = null,extra: Any?=null) {
+        Log.i(TAG, "try to connect ${host}:${port}")
+        if (isConnected) {
             return
         }
         try {
@@ -59,9 +53,9 @@ class SocketService(var keepAlive: Boolean = false) {
                 var time = 0
                 delay(500)
                 //等待10S
-                while ((false == channel?.isConnected) && time < 20) {
+                while (false == (channel?.isConnected ?: false) && time < 20) {
                     try {
-                        if(null==channel) {
+                        if (null == channel) {
                             channel = SocketChannel.open()
                             channel?.socket()?.reuseAddress = true
                         }
@@ -69,48 +63,44 @@ class SocketService(var keepAlive: Boolean = false) {
                     } catch (e: AlreadyConnectedException) {
                         break
                     } catch (e: ConnectionPendingException) {
-                        Log.d(TAG, "To Connect exception: ${e.message}")
-                    }catch (e: AsynchronousCloseException) {
-                        Log.d(TAG, "To Connect exception: ${e.message}")
+                        Log.e(TAG, "To Connect exception: ${e.message}")
+                    } catch (e: AsynchronousCloseException) {
+                        Log.e(TAG, "To Connect exception: ${e.message}")
                     } catch (e: UnresolvedAddressException) {
-                        Log.d(TAG, "To Connect exception: ${e.message}")
+                        Log.e(TAG, "To Connect exception: ${e.message}")
                     }
-                    if(false==channel?.isConnected) {
+                    if (false == channel?.isConnected) {
                         delay(500)
                         time++
-                        Log.d(TAG, "Retry Connect ${time}")
+                        Log.w(TAG, "Retry Connect ${time}")
                     }
                 }
-                Log.d(TAG, "Connect ${host} : ${port} success")
+                Log.i(TAG, "Connect ${host} : ${port} success,times = $time")
             } else {
                 server = ServerSocketChannel.open()
                 server?.socket()?.reuseAddress = true
                 server?.socket()?.bind(InetSocketAddress(port))
                 channel = server?.accept()
-                Log.d(TAG, "Accept connect ${port} success")
+                Log.i(TAG, "Accept connect ${port} success")
             }
 
-            isOpen = true
-            updateState(STATE_CONNECTED)
+            channel?.let { c ->
+                Log.i(TAG, "Connect finished.")
+                isConnected = true
+                listeners.forEach { it.onConnected(c,extra) }
 
-            context.launch(Dispatchers.IO) {
-                handleRead()
-            }
-            context.launch(Dispatchers.IO) {
-                handleWrite()
+                context.launch(Dispatchers.IO) {
+                    handleRead(c)
+                }
+                context.launch(Dispatchers.IO) {
+                    handleWrite(c)
+                }
             }
         } catch (e: Exception) {
-            Log.d(TAG, "Connect exception: ${e.message}")
+            Log.e(TAG, "Connect exception: ${e.message}")
 
             close(e)
         }
-    }
-
-    /**
-     * 添加收到数据的监听
-     **/
-    suspend fun read(reader: Reader) {
-        readers.add(reader)
     }
 
     /**
@@ -124,14 +114,12 @@ class SocketService(var keepAlive: Boolean = false) {
      * 关闭连接
      */
     fun close(e: Exception? = null) {
-        if (!isOpen) {
+        listeners.forEach { it.onDisconnected(e) }
+        if (!isConnected) {
             return
         }
-        isOpen = false
+        isConnected = false
         writers.close()
-        for (r in readers) {
-            r.onError(e?.message)
-        }
         try {
             server?.close()
             channel?.close()
@@ -152,27 +140,24 @@ class SocketService(var keepAlive: Boolean = false) {
      * @see ProtocolType
      * @see ProtocolByte
      */
-    private suspend fun handleRead() {
-        while (isOpen || keepAlive) {
+    private suspend fun handleRead(channel: SocketChannel) {
+        Log.i(TAG, "Start handle read.")
+        while (isConnected || keepAlive) {
             try {
-                updateState(STATE_READ_START)
-                val head = readFix(5)
+                listeners.forEach { it.onReadStart(channel) }
+                val head = readFix(channel, 5)
                 val type = head.get()
                 val length = head.int
-                val bytes = readFix(length)
-                for (reader in readers) {
-                    reader(ProtocolByte.wrap(bytes.array(), ProtocolType.wrap(type)))
+                val bytes = readFix(channel, length)
+                listeners.forEach {
+                    it.onReadFinished(channel, ProtocolByte.wrap(bytes.array(), type))
                 }
-                updateState(STATE_READ_FINISH)
+
             } catch (e: Exception) {
-                Log.d(TAG, "Read exception: ${e.message}")
-                updateState(STATE_READ_FAILD, e.message)
-                for (reader in readers) {
-                    reader.onError(e.message)
-                }
+                Log.e(TAG, "Read exception: ${e.message}")
+                listeners.forEach { it.onReadError(channel, e) }
                 //读取失败
                 if (e is BufferUnderflowException || e is AsynchronousCloseException) {
-                    updateState(STATE_DISCONNECTED)
                     close(e)
                     break
                 }
@@ -183,24 +168,25 @@ class SocketService(var keepAlive: Boolean = false) {
     /**
      * 发送数据
      */
-    private suspend fun handleWrite() {
-        while (isOpen || keepAlive) {
+    private suspend fun handleWrite(channel: SocketChannel) {
+        Log.i(TAG, "Start handle write.")
+        var writer: Writer? = null
+        while (isConnected || keepAlive) {
             try {
-                val data = writers.receive()
-                updateState(STATE_WRITE_START)
-                for (d in data) {
+                writer = writers.receive()
+                listeners.forEach { it.onWriteStart(channel, writer) }
+                for (d in writer) {
                     val bytes = d.bytes
                     while (bytes.hasRemaining()) {
-                        channel?.write(bytes)
+                        channel.write(bytes)
                     }
                 }
-                updateState(STATE_WRITE_FINISH)
+                listeners.forEach { it.onWriteFinished(channel, writer) }
             } catch (e: Exception) {
-                Log.d(TAG, "Write exception: ${e.message}")
-                updateState(STATE_WRITE_FAILD, e.message)
+                Log.e(TAG, "Write exception: ${e.message}")
+                listeners.forEach { it.onWriteError(channel, e, writer) }
                 if (e is ClosedReceiveChannelException) {
                     close(e)
-                    updateState(STATE_DISCONNECTED)
                     break
                 }
             }
@@ -210,23 +196,13 @@ class SocketService(var keepAlive: Boolean = false) {
     /**
      * 读取特定长度的字节，可能会阻塞
      */
-    private suspend fun readFix(targetSize: Int): ByteBuffer {
+    private suspend fun readFix(channel: SocketChannel, targetSize: Int): ByteBuffer {
         val buffer = ByteBuffer.allocate(targetSize)
-        while (buffer.hasRemaining() && isOpen) {
-            channel?.read(buffer)
+        while (buffer.hasRemaining() && isConnected) {
+            channel.read(buffer)
         }
         buffer.flip()
         return buffer
-    }
-
-    /**
-     * 状态更新
-     * @see SocketState
-     */
-    private fun updateState(@SocketState state: Int, info: String? = null) {
-        for (l in listeners) {
-            l.invoke(state, info)
-        }
     }
 
     fun addListener(listener: SocketStateListener): SocketStateListener {
@@ -235,12 +211,25 @@ class SocketService(var keepAlive: Boolean = false) {
     }
 
     fun removeListener(listener: SocketStateListener?) {
-       listeners.remove(listener)
+        listeners.remove(listener)
     }
 
-    fun isGroupOwner()=null!=server
+    fun isGroupOwner() = null != server
 
     companion object {
         const val TAG = "SocketService"
+    }
+
+    interface SocketStateListener {
+        fun onConnected(channel: SocketChannel,extra:Any?)
+        fun onDisconnected(exception: Exception?)
+        fun onReadStart(channel: SocketChannel)
+        fun onReadFinished(channel: SocketChannel, data: ProtocolByte)
+        fun onReadError(channel: SocketChannel, exception: Exception)
+
+        fun onWriteStart(channel: SocketChannel, writer: Writer)
+        fun onWriteFinished(channel: SocketChannel, writer: Writer)
+
+        fun onWriteError(channel: SocketChannel, exception: Exception, writer: Writer?)
     }
 }
