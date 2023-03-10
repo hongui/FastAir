@@ -27,6 +27,8 @@
     <string name="copy_success">Conteúdo copiado ao Clipboard com sucesso</string>
     <string name="send_Illegal">Não é possível enviar espaços ou frases em branco</string>
     <string name="send_failed">A entrega da mensagem falhou</string>
+    <string name="transfer_failed">Falha na transferência de arquivo</string>
+    <string name="transfer_success">Transferência de arquivo bem-sucedida</string>
     <string name="remove_group_error">Ocorreu um erro ao remover do grupo</string>
     <string name="connect_success">Parabéns, a conexão foi estabelecida!</string>
     <string name="auto_connect_success">Dispositivo recentemente conectado foi automaticamente reconectado!</string>

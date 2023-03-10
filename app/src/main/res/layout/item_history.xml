@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/dp16"
-    android:layout_marginRight="@dimen/dp16"
+    android:paddingLeft="@dimen/dp16"
+    android:paddingRight="@dimen/dp16"
+    android:paddingTop="@dimen/dp6"
+    android:paddingBottom="@dimen/dp6"
     app:layout_constraintVertical_chainStyle="spread">
 
     <ImageView
@@ -24,7 +26,8 @@
         android:layout_marginLeft="@dimen/dp16"
         android:layout_marginTop="@dimen/dp8"
         android:layout_marginRight="@dimen/dp16"
-        android:lines="1"
+        android:singleLine="true"
+        android:ellipsize="middle"
         android:textColor="@color/colorPrimaryText"
         android:textSize="@dimen/sp16"
         app:layout_constraintLeft_toRightOf="@id/item_history_preview"
@@ -57,8 +60,8 @@
 
     <com.mob.lee.fastair.view.CircleProgress
         android:id="@+id/item_history_progress"
-        android:layout_width="@dimen/dp48"
-        android:layout_height="@dimen/dp48"
+        android:layout_width="@dimen/dp24"
+        android:layout_height="@dimen/dp24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/item_history_title"
         app:layout_constraintRight_toRightOf="parent"

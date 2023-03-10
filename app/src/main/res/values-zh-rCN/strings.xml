@@ -27,6 +27,8 @@
     <string name="copy_success">内容已成功复制到剪切板</string>
     <string name="send_Illegal">空格或者空行不能发送</string>
     <string name="send_failed">消息发送失败</string>
+    <string name="transfer_failed">文件传送失败</string>
+    <string name="transfer_success">文件传送成功</string>
     <string name="remove_group_error">移除组发生了错误</string>
     <string name="connect_success">恭喜你，连接成功!</string>
     <string name="auto_connect_success">已自动连接上次连接的设备!</string>

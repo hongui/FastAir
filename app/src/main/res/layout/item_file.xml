@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="@dimen/dp16"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingLeft="@dimen/dp16"
+    android:paddingRight="@dimen/dp16"
+    android:paddingTop="@dimen/dp10"
+    android:paddingBottom="@dimen/dp10"
     android:clickable="true"
     android:focusable="true">
 
@@ -12,40 +14,48 @@
         android:id="@+id/item_file_icon"
         android:layout_width="@dimen/dp48"
         android:layout_height="@dimen/dp48"
-        android:layout_gravity="center_vertical"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/item_file_name"/>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="@dimen/dp16"
-        android:layout_marginRight="@dimen/dp16"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
         <TextView
             android:id="@+id/item_file_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/dp8"
-            android:lines="1"
             android:singleLine="true"
+            android:ellipsize="middle"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="@dimen/sp16" />
+            android:textSize="@dimen/sp16"
+            android:layout_marginLeft="@dimen/dp16"
+            android:layout_marginRight="@dimen/dp16"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/item_file_icon"
+            app:layout_constraintRight_toLeftOf="@+id/item_file_selector"
+            app:layout_constraintBottom_toTopOf="@id/item_file_extra"/>
 
         <TextView
             android:id="@+id/item_file_extra"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="@dimen/sp14" />
-    </LinearLayout>
+            android:textSize="@dimen/sp14"
+            android:layout_marginTop="@dimen/dp8"
+            app:layout_constraintLeft_toLeftOf="@id/item_file_name"
+            app:layout_constraintRight_toRightOf="@id/item_file_name"
+            app:layout_constraintTop_toBottomOf="@id/item_file_name"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     <CheckBox
         android:id="@+id/item_file_selector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:button="@drawable/selector_item_checkbox"
-        android:clickable="false"/>
-</LinearLayout>
+        android:clickable="false"
+        app:layout_constraintLeft_toRightOf="@id/item_file_name"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 <resources>
     <dimen name="dp2">2dp</dimen>
     <dimen name="dp4">4dp</dimen>
+    <dimen name="dp6">6dp</dimen>
     <dimen name="dp8">8dp</dimen>
     <dimen name="dp10">10dp</dimen>
     <dimen name="dp16">16dp</dimen>

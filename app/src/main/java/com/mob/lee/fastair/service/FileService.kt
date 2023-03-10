@@ -25,14 +25,15 @@ import java.nio.channels.SocketChannel
 class FileService : TransferService(), ProgressListener {
     override var port = 9527
 
+
     var mListener: ProgressListener? = null
     private var lastId = 0L
+    private var mLastDate=0L
     private val mFileReader by lazy { FileReader(this, this) }
 
     private val database by lazy {
         DataBaseDataSource()
     }
-
     override fun onReadFinished(channel: SocketChannel, data: ProtocolByte) {
         mFileReader.invoke(data)
     }
@@ -53,32 +54,38 @@ class FileService : TransferService(), ProgressListener {
 
     }
 
-    fun notification(progress: Int, title: String) {
+    fun onNewFile(state: StartRecordState) {
         easyNotify(FILE_TRANSFER, FILE_TRANSFER_CODE) {
             setContentTitle(getString(R.string.file_transfer))
-            setContentText(title)
-            setProgress(100, progress, false)
-            setAutoCancel(true)
+            setContentText(state.record.name)
         }
-    }
-
-    fun onNewFile(state: StartRecordState) {
-        launch(Dispatchers.Main) {
-            mListener?.invoke(state)
-        }
+        mLastDate=System.currentTimeMillis()
         Log.i(TAG, "New File start state = ${state.record}")
-        //notification(0, state.record.name)
-    }
 
-    fun onProgressFile(state: ProcessState) {
         launch(Dispatchers.Main) {
             mListener?.invoke(state)
         }
-        //notification((state.percentage() * 100).toInt(), state.record.name)
+    }
+
+    fun onProgressFile(state: TransmitState) {
+        if(System.currentTimeMillis()-mLastDate>1500) {
+            easyNotify(FILE_TRANSFER, FILE_TRANSFER_CODE) {
+                setProgress(100, (state.percentage() * 100).toInt(), false)
+                setContentTitle(getString(R.string.file_transfer))
+                setContentText(state.record.name)
+            }
+            mLastDate=System.currentTimeMillis()
+        }
+        launch(Dispatchers.Main) {
+            mListener?.invoke(state)
+        }
     }
 
     fun onFinishedFile(state: SuccessState) {
-        //notification(100, state.record.name)
+        easyNotify(FILE_TRANSFER, FILE_TRANSFER_CODE) {
+            setContentTitle(getString(R.string.transfer_success))
+            setContentText(state.record.name)
+        }
         if (state.fromRemote) {
             Log.i(TAG, "Success receive file state = ${state.record}")
             updateStorage(state.record.path)
@@ -89,12 +96,16 @@ class FileService : TransferService(), ProgressListener {
             mListener?.invoke(state)
         }
         onUpdateRecord(state.fromRemote, state.record)
+        launch { onNewTask(null) }
     }
 
     fun onFailedFile(state: FailedState) {
-        Log.e(TAG, "Failed ${if (state.record.valid()) "send" else "receive file state = ${state.record},exception = ${state.exception}"}")
         val record = state.record
-        //notification(100, record.name)
+        easyNotify(FILE_TRANSFER, FILE_TRANSFER_CODE) {
+            setContentTitle(getString(R.string.transfer_failed))
+            setContentText(state.record.name)
+        }
+        Log.e(TAG, "Failed ${if (state.record.valid()) "send" else "receive file state = ${state.record},exception = ${state.exception}"}")
         if (0L != record.date && 0L != record.size) {
             onUpdateRecord(false, record)
         }
@@ -119,7 +130,7 @@ class FileService : TransferService(), ProgressListener {
     override fun invoke(state: State) {
         when (state) {
             is StartRecordState -> onNewFile(state)
-            is ProcessState -> onProgressFile(state)
+            is TransmitState -> onProgressFile(state)
             is SuccessState -> onFinishedFile(state)
             else -> onFailedFile(state as FailedState)
         }

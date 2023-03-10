@@ -152,7 +152,7 @@ class DeviceViewModel : AppViewModel() {
         }
     }
 
-    fun isConnected() = connectState.value == true
+    fun isConnected() = device.value?.status==WifiP2pDevice.CONNECTED
 
     fun bundle(): Bundle {
         val info = p2pInfo.value

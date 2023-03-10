@@ -27,6 +27,8 @@
     <string name="copy_success">Content successfully copied to the clipboard</string>
     <string name="send_Illegal">Can\'t send spaces or blank lines</string>
     <string name="send_failed">Message delivery failed</string>
+    <string name="transfer_failed">File transfer failed</string>
+    <string name="transfer_success">File transfer success</string>
     <string name="remove_group_error">An error occurred in the group removal</string>
     <string name="connect_success">Congrats, the connection was established!</string>
     <string name="auto_connect_success">Recently connected device was automatically connected!</string>

@@ -10,7 +10,8 @@ class FileWriter(val record: Record, val listener: ProgressListener? = null) : W
     var tempLength = 0
     var startTime: Long = 0
 
-    val size = 1024 * 8
+    //TODO Need a policy to determine what size it should be
+    val size = 1024 * 9
 
     val bytes: ByteArray by lazy {
         ByteArray(size)
@@ -51,11 +52,11 @@ class FileWriter(val record: Record, val listener: ProgressListener? = null) : W
 
                     if (-1 == tempLength || 0L == record.size) {
                         record.state = Record.STATE_SUCCESS
-                        finished(SuccessState(record, speed = record.size.toFloat()/(System.currentTimeMillis()-startTime)/1000F))
+                        finished(SuccessState(record, speed = speed(record.size,System.currentTimeMillis()-startTime)))
                     } else {
                         alreadyFinished += tempLength
                         record.duration = System.currentTimeMillis() - startTime
-                        listener?.invoke(ProcessState(alreadyFinished, startTime,record))
+                        listener?.invoke(TransmitState(alreadyFinished, record.duration,record))
                         ProtocolByte.bytes(bytes.sliceArray(0 until tempLength))
                     }
                 } catch (e: Exception) {

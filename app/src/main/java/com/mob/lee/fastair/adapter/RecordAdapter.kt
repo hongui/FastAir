@@ -6,10 +6,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.imageloader.DisplayManager
-import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.StartRecordState
-import com.mob.lee.fastair.io.state.State
-import com.mob.lee.fastair.io.state.SuccessState
+import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.model.formatDate
 import com.mob.lee.fastair.utils.dialog
@@ -30,14 +27,16 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
         holder.text(R.id.item_history_title, record.name)
         holder.text(R.id.item_history_date, record.date.formatDate("MM/dd/yy HH:mm"))
         when (state) {
-            is ProcessState -> {
+            is TransmitState -> {
                 progress.progress(state.percentage()*100)
-                holder.text(R.id.item_history_speed, "${state.speed()}MB/S")
+                holder.text(R.id.item_history_speed, "${speed(state.alreadyTransmited,state.duration)}MB/S")
             }
 
             is SuccessState -> {
                 progress.updateState(CircleProgress.SUCCESS)
-                holder.text(R.id.item_history_speed, "${state.speed}MB/S")
+                if(state.needShowSpeed()) {
+                    holder.text(R.id.item_history_speed, "${state.speed}MB/S")
+                }
             }
 
             else -> {

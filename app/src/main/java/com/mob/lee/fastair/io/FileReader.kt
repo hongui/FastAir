@@ -1,10 +1,7 @@
 package com.mob.lee.fastair.io
 
 import android.content.Context
-import com.mob.lee.fastair.io.state.FailedState
-import com.mob.lee.fastair.io.state.ProcessState
-import com.mob.lee.fastair.io.state.StartRecordState
-import com.mob.lee.fastair.io.state.SuccessState
+import com.mob.lee.fastair.io.state.*
 import com.mob.lee.fastair.model.Record
 import com.mob.lee.fastair.utils.createFile
 import java.io.FileOutputStream
@@ -52,7 +49,7 @@ class FileReader(val context: Context, var listener: ProgressListener? = null) :
                 record?.apply {
                     duration = System.currentTimeMillis() - startTime
                 }
-                listener?.invoke(ProcessState(alreadyFinished, startTime,record!!))
+                listener?.invoke(TransmitState(alreadyFinished, System.currentTimeMillis()-startTime,record!!))
             }
         }
     }
@@ -63,7 +60,8 @@ class FileReader(val context: Context, var listener: ProgressListener? = null) :
                 stream?.close()
 
                 r.duration = System.currentTimeMillis() - startTime
-                listener?.invoke(SuccessState(r, true,r.size/1024F/r.duration/1000))
+                r.state=Record.STATE_SUCCESS
+                listener?.invoke(SuccessState(r, true, speed(r.size,r.duration)))
             }
         } catch (e: Exception) {
             e.printStackTrace()
