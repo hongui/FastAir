@@ -49,6 +49,7 @@
 
     <style name="AppButton" parent="Widget.AppCompat.Button">
         <item name="colorButtonNormal">@color/colorPrimary</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="AppDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">

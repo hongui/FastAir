@@ -2,7 +2,6 @@ package com.mob.lee.fastair.adapter
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -27,7 +26,6 @@ class PageAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
             viewPager?:return
             tabs?:return
             val adapter = PageAdapter(fragment)
-            viewPager.offscreenPageLimit = 1
             viewPager.adapter = adapter
 
             val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->

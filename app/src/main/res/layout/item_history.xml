@@ -1,47 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:padding="@dimen/dp16">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/dp16"
+    android:paddingRight="@dimen/dp16"
+    android:paddingTop="@dimen/dp6"
+    android:paddingBottom="@dimen/dp6"
+    app:layout_constraintVertical_chainStyle="spread">
 
     <ImageView
         android:id="@+id/item_history_preview"
         android:layout_width="@dimen/dp48"
         android:layout_height="@dimen/dp48"
-        android:layout_gravity="center_vertical"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/item_history_title"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/item_history_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/dp16"
-        android:paddingRight="@dimen/dp16">
+        android:layout_marginLeft="@dimen/dp16"
+        android:layout_marginTop="@dimen/dp8"
+        android:layout_marginRight="@dimen/dp16"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="@dimen/sp16"
+        app:layout_constraintLeft_toRightOf="@id/item_history_preview"
+        app:layout_constraintRight_toLeftOf="@id/item_history_progress"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_history_date"/>
 
-        <TextView
-            android:id="@+id/item_history_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="1"
-            android:textColor="@color/colorPrimaryText"
-            android:textSize="16sp"/>
+    <TextView
+        android:id="@+id/item_history_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp8"
+        android:lines="1"
+        android:layout_marginTop="@dimen/dp8"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/item_history_title"
+        app:layout_constraintRight_toLeftOf="@+id/item_history_speed"
+        app:layout_constraintTop_toBottomOf="@id/item_history_title" />
 
-        <TextView
-            android:id="@+id/item_history_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp8"
-            android:lines="1"
-            android:textColor="@color/colorSecondaryText"
-            android:textSize="14sp"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/item_history_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintBaseline_toBaselineOf="@id/item_history_date"
+        app:layout_constraintLeft_toRightOf="@id/item_history_date"
+        app:layout_constraintRight_toRightOf="@id/item_history_title" />
 
     <com.mob.lee.fastair.view.CircleProgress
         android:id="@+id/item_history_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"/>
-</LinearLayout>
+        android:layout_width="@dimen/dp24"
+        android:layout_height="@dimen/dp24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/item_history_title"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@
     <string name="app_description">Experimente as transferências de alta velocidade</string>
 
     <string name="wait_for_transport_file">Lista de transferências pendentes</string>
+    <string name="transfer_service">serviço de transfer</string>
     <string name="file_transfer">Transferência de arquivos</string>
     <string name="discover_device">Conexão do dispositivo</string>
     <string name="disconnect_device">Desconectar</string>
@@ -26,6 +27,8 @@
     <string name="copy_success">Conteúdo copiado ao Clipboard com sucesso</string>
     <string name="send_Illegal">Não é possível enviar espaços ou frases em branco</string>
     <string name="send_failed">A entrega da mensagem falhou</string>
+    <string name="transfer_failed">Falha na transferência de arquivo</string>
+    <string name="transfer_success">Transferência de arquivo bem-sucedida</string>
     <string name="remove_group_error">Ocorreu um erro ao remover do grupo</string>
     <string name="connect_success">Parabéns, a conexão foi estabelecida!</string>
     <string name="auto_connect_success">Dispositivo recentemente conectado foi automaticamente reconectado!</string>
@@ -51,6 +54,7 @@
     <string name="server_runing">O host local está em execução</string>
     <string name="server_stoped">O host local parou</string>
     <string name="current_device_info">Nome do dispositivo atual = %1$s,status = %2$s</string>
+    <string name="notification_was_denied">As notificações são rejeitadas e o status da transferência não é exibido na caixa de notificação.</string>
 
     <string name="copy_content">Copiar ao Clipboard</string>
     <string name="turn_on">Ligar</string>

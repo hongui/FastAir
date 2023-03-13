@@ -3,6 +3,7 @@
     <string name="app_description">体验飞起来的速度</string>
 
     <string name="wait_for_transport_file">待传输列表</string>
+    <string name="transfer_service">传输服务</string>
     <string name="file_transfer">文件传输</string>
     <string name="discover_device">设备连接</string>
     <string name="disconnect_device">断开连接</string>
@@ -26,6 +27,8 @@
     <string name="copy_success">内容已成功复制到剪切板</string>
     <string name="send_Illegal">空格或者空行不能发送</string>
     <string name="send_failed">消息发送失败</string>
+    <string name="transfer_failed">文件传送失败</string>
+    <string name="transfer_success">文件传送成功</string>
     <string name="remove_group_error">移除组发生了错误</string>
     <string name="connect_success">恭喜你，连接成功!</string>
     <string name="auto_connect_success">已自动连接上次连接的设备!</string>
@@ -51,6 +54,7 @@
     <string name="server_runing">本地主机正在运行</string>
     <string name="server_stoped">本地主机已停止</string>
     <string name="current_device_info">当前你的设备 名字 = %1$s,状态 = %2$s</string>
+    <string name="notification_was_denied">Notifications are rejected and no transfer status is visible on the notification drawer</string>
 
     <string name="copy_content">复制内容</string>
     <string name="turn_on">去开启</string>

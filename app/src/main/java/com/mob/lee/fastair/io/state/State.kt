@@ -1,53 +1,41 @@
 package com.mob.lee.fastair.io.state
 
-import android.os.Handler
-import android.os.Message
 import com.mob.lee.fastair.model.Record
-import java.io.File
+import kotlin.math.roundToInt
 
-sealed class State(val what: Int, val obj: Any? = null) {
-    /*发送消息*/
-    fun sendMessage(h: Handler?) {
-        val msg = Message.obtain(h, what)
-        msg.obj = this
-        h?.sendMessage(msg)
-    }
-}
+sealed class State
 
-class StartState(obj: Any? = null) : State(START, obj){
+class MessageState(val msg: String, val date: Long) : State()
+sealed class RecordState(val record: Record) : State()
+
+class StartRecordState(record: Record) : RecordState(record) {
     override fun toString(): String {
-        return "StartState(obj=${obj.toString()})"
+        return "StartState(record=$record)"
     }
 }
 
-class ProcessState(val process: Long, val total: Long, obj: Any? = null) : State(PROCESS, obj) {
-    fun percentage(): Float = (process.toFloat() / total * 100)
+class TransmitState(val alreadyTransmited: Long, val duration: Long, record: Record) : RecordState(record) {
+    fun percentage(): Float = alreadyTransmited.toFloat() / record.size
+
     override fun toString(): String {
-        return "ProcessState(process=$process, total=$total,obj=${obj.toString()})"
+        return "TransmitState(alreadyTransmited=$alreadyTransmited, total=${record.size},record=$record)"
     }
-
 
 }
 
-class SuccessState(val duration:Long=0L,obj: Any? = null) : State(SUCCESS, obj){
+class SuccessState(record: Record, val fromRemote: Boolean = false,val speed:Float=0F) : RecordState(record) {
     override fun toString(): String {
-        return "SuccessState(duration=$duration,obj=${obj.toString()})"
+        val record = record as Record?
+        return "SuccessState(speed=${record?.duration},record=$record)"
     }
+
+    fun needShowSpeed()=fromRemote||speed>0F
 }
 
-class FaildState(obj: Any? = null) : State(FAILD, obj){
+class FailedState(record: Record?, val exception: Exception? = null) : RecordState(record ?: Record(0, 0, 0, "")) {
     override fun toString(): String {
-        return "FaildState(obj=${obj.toString()})"
+        return "FailedState(record=$record,exception=$exception)"
     }
 }
 
-fun parseFile(state: State): Record? {
-    val file = state.obj as? File
-    file ?: return null
-    return Record(file.lastModified(), file.length(), file.lastModified(), file.absolutePath, state.what, 0)
-}
-
-const val START=0
-const val PROCESS=1
-const val SUCCESS=2
-const val FAILD=4
+fun speed(bytes:Long,duration:Long):Float=(if(0L==duration) 0F else (bytes.toFloat()/1024F/1024F/(duration.toFloat()/1000F))*100F).roundToInt()/100F

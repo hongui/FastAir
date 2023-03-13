@@ -2,7 +2,9 @@ package com.mob.lee.fastair.viewmodel
 
 import android.content.Context
 import com.mob.lee.fastair.adapter.History
-import com.mob.lee.fastair.io.state.FaildState
+import com.mob.lee.fastair.io.state.FailedState
+import com.mob.lee.fastair.io.state.RecordState
+import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.io.state.SuccessState
 import com.mob.lee.fastair.model.DataWrap
 import com.mob.lee.fastair.model.Record
@@ -20,10 +22,12 @@ class TransferViewModel : AppViewModel() {
     fun histories(context: Context?) = asyncWithWrap {
         dataSource.recordDao(context) {
             DataWrap.success(records().map {
-                History(it, when (it.state) {
-                    Record.STATE_SUCCESS -> SuccessState()
-                    else -> FaildState()
-                })
+                History(
+                    it, when (it.state) {
+                        Record.STATE_SUCCESS -> SuccessState(it)
+                        else -> FailedState(it)
+                    }
+                )
             })
         }
     }
@@ -50,5 +54,16 @@ class TransferViewModel : AppViewModel() {
             update(record)
             DataWrap.success(0)
         }
+    }
+
+    fun parseState(state: State): Record? {
+        if (state !is RecordState) {
+            return null
+        }
+        return if (state.record.valid()) state.record else null
+    }
+
+    companion object{
+        @JvmStatic val TAG="TransferViewModel"
     }
 }

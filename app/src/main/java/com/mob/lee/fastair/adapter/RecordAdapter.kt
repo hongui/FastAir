@@ -27,12 +27,16 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
         holder.text(R.id.item_history_title, record.name)
         holder.text(R.id.item_history_date, record.date.formatDate("MM/dd/yy HH:mm"))
         when (state) {
-            is ProcessState -> {
-                progress.progress(state.percentage())
+            is TransmitState -> {
+                progress.progress(state.percentage()*100)
+                holder.text(R.id.item_history_speed, "${speed(state.alreadyTransmited,state.duration)}MB/S")
             }
 
             is SuccessState -> {
                 progress.updateState(CircleProgress.SUCCESS)
+                if(state.needShowSpeed()) {
+                    holder.text(R.id.item_history_speed, "${state.speed}MB/S")
+                }
             }
 
             else -> {
@@ -89,20 +93,19 @@ class RecordAdapter(val action: (Record) -> Unit) : AppListAdapter<History>(R.la
                         val target = File("${origin.parent}${File.separator}${input}.${origin.extension}")
                         if (File(path).renameTo(target)) {
                             val rec = record.copy(path = target.absolutePath)
-                            update(pos, rec to SuccessState())
+                            update(pos, rec to SuccessState(rec))
                             action(rec)
                         }
                     }
         }
     }
 
-    fun update(state: State, record: Record?) {
-        record ?: return
+    fun update(record: Record,state:State) {
         val index = itemCount - 1
-        if (state is StartState) {
+        if(state is StartRecordState) {
             add(record to state)
-        } else {
-            update(index, record to state)
+        }else{
+            update(index,record to state)
         }
     }
 }

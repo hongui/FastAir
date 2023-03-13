@@ -91,12 +91,10 @@ open class AppViewModel : ViewModel() {
                 //TODO
             }
             val live = mPermissionData.distinctUntilChanged()
-            live.observe(fragment, object : Observer<Boolean> {
-                override fun onChanged(t: Boolean?) {
-                    live.removeObserver(this)
-                    action(t ?: false)
-                }
-            })
+            live.observe(fragment) {
+                live.removeObservers(fragment)
+                action(it ?: false)
+            }
             mPermission?.launch(permission)
 
         }
@@ -125,7 +123,6 @@ open class AppViewModel : ViewModel() {
                 }
             })
             mActivityResult?.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-
         }
     }
 
