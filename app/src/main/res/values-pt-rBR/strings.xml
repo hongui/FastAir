@@ -54,6 +54,7 @@
     <string name="server_runing">O host local está em execução</string>
     <string name="server_stoped">O host local parou</string>
     <string name="current_device_info">Nome do dispositivo atual = %1$s,status = %2$s</string>
+    <string name="notification_was_denied">As notificações são rejeitadas e o status da transferência não é exibido na caixa de notificação.</string>
 
     <string name="copy_content">Copiar ao Clipboard</string>
     <string name="turn_on">Ligar</string>

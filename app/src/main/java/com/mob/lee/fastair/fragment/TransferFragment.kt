@@ -1,9 +1,12 @@
 package com.mob.lee.fastair.fragment
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +17,7 @@ import com.mob.lee.fastair.io.ProgressListener
 import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
+import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import com.mob.lee.fastair.viewmodel.TransferViewModel
 
@@ -21,19 +25,32 @@ class TransferFragment : ConnectFragment(), ProgressListener {
     override val layout: Int = R.layout.fragment_recyclerview
     private var mConntect: ServiceConnection? = null
     private lateinit var mAdapter: RecordAdapter
-    val viewModel by lazy {
+    val mViewModel by lazy {
         viewModel<TransferViewModel>()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mViewModel.registerPermission(this)
     }
 
     override fun setting() {
         title(R.string.file_transfer)
 
         mAdapter = RecordAdapter {
-            viewModel.rename(requireContext(), it)
+            mViewModel.rename(requireContext(), it)
         }
         view<RecyclerView>(R.id.rv_recyclerview)?.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = mAdapter
+        }
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            mViewModel.withPermission(this, Manifest.permission.POST_NOTIFICATIONS) {
+                if (!it) {
+                    requireContext().errorToast(R.string.notification_was_denied)
+                }
+            }
         }
 
         Intent(requireContext(), FileService::class.java).apply {
@@ -53,8 +70,6 @@ class TransferFragment : ConnectFragment(), ProgressListener {
             requireActivity().startService(this)
             requireActivity().bindService(this, mConntect!!, Context.BIND_IMPORTANT)
         }
-
-
     }
 
     override fun onStop() {
@@ -70,7 +85,7 @@ class TransferFragment : ConnectFragment(), ProgressListener {
     }
 
     override fun invoke(state: State) {
-        val record = viewModel.parseState(state)
+        val record = mViewModel.parseState(state)
         if (null == record) {
             //mParent?.errorToast(R.string.disconnected)
             return

@@ -54,6 +54,7 @@
     <string name="server_runing">The local host is running</string>
     <string name="server_stoped">The local host has stopped</string>
     <string name="current_device_info">Current device name = %1$s,status = %2$s</string>
+    <string name="notification_was_denied">Notifications are rejected and no transfer status is visible on the notification drawer</string>
 
     <string name="copy_content">Copy to clipboard</string>
     <string name="turn_on">Turn on</string>

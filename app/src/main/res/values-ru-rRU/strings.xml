@@ -56,6 +56,7 @@
     <string name="server_runing">Сервер запущен</string>
     <string name="server_stoped">Сервер остановлен</string>
     <string name="current_device_info">Текущее имя устройства = %1$s, статус = %2$s</string>
+    <string name="notification_was_denied">Уведомления отклоняются, и статус передачи не отображается в ящике уведомлений.</string>
 
     <string name="copy_content">Копирование содержимого</string>
     <string name="turn_on">Включить</string>

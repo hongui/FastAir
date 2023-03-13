@@ -35,6 +35,7 @@ class Notification {
             code: Int,
             builder: Notification.Builder.() -> Unit
         ): Notification {
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             val intent = PendingIntent.getActivity(
                 this, code,
                 Intent(this, ContainerActivity::class.java),
@@ -49,10 +50,13 @@ class Notification {
             b.setColor(ContextCompat.getColor(this, R.color.colorAccent))
             b.setContentIntent(intent)
             b.setAutoCancel(true)
+            if(Build.VERSION.SDK_INT>=26) {
+                b.setTimeoutAfter(5 * 1000L)
+            }
+
             builder(b)
             val notification = b.build()
 
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.notify(code, notification)
             return notification
         }
