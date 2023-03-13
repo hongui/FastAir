@@ -1,4 +1,6 @@
-plugins{
+import java.text.SimpleDateFormat
+
+plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id("com.google.devtools.ksp") version "1.8.0-1.0.8"
@@ -22,6 +24,13 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    output ->
+                        def name = "${variant.applicationId}_${variant.getVersionName()}_${new SimpleDateFormat('yyyy_MM_dd_HH_mm').format(System.currentTimeMillis())}.apk"
+                        outputFileName = name
+                }
+            }
         }
     }
 
@@ -29,32 +38,24 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    packagingOptions {
-        jniLibs {
-            excludes += ['META-INF/*']
-        }
-        resources {
-            excludes += ['META-INF/*']
-        }
-    }
 
     namespace 'com.mob.lee.fastair'
 }
 
-task clearAssets(type: Delete){
-    def path="${projectDir}/src/main/assets"
-    def target=fileTree(dir: path,exclude:['about.html','help.html'])
-    delete(target,"$path/app")
+task clearAssets(type: Delete) {
+    def path = "${projectDir}/src/main/assets"
+    def target = fileTree(dir: path, exclude: ['about.html', 'help.html'])
+    delete(target, "$path/app")
 }
 
-task frontEnd(type:Exec){
+task frontEnd(type: Exec) {
     dependsOn(clearAssets)
     workingDir("${rootDir}/FastSvelte")
-    commandLine('npm.cmd','run','build')
+    commandLine('npm.cmd', 'run', 'build')
 }
 
-task toAssets(type: Copy){
-    def path="${projectDir}/src/main/assets"
+task toAssets(type: Copy) {
+    def path = "${projectDir}/src/main/assets"
     dependsOn(frontEnd)
     from("${rootDir}/FastSvelte/build")
     into(path)

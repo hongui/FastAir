@@ -49,7 +49,9 @@ class HomeViewModel : AppViewModel() {
                             fragment,
                             Manifest.permission.MANAGE_EXTERNAL_STORAGE
                         ) {
-                            fragment.requireContext().errorToast(R.string.no_permission_to_scan)
+                            if(!it) {
+                                fragment.requireContext().errorToast(R.string.no_permission_to_scan)
+                            }
                         }
                     }.setNegativeButton(R.string.exit) { _, _ ->
                         fragment.mParent?.finish()
