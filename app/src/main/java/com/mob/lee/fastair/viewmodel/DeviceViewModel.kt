@@ -165,6 +165,12 @@ class DeviceViewModel : AppViewModel() {
         return bundle
     }
 
+    fun <T> startService(context: Context,service:Class<T>){
+        Intent(context,service).apply {
+            putExtras(bundle())
+            context.startService(this)
+        }
+    }
     @TargetApi(Build.VERSION_CODES.Q)
     private fun requestInfo(channel: WifiP2pManager.Channel) {
         manager?.apply {

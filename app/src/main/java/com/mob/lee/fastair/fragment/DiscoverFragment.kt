@@ -13,6 +13,8 @@ import android.widget.TextView
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.failedReason
+import com.mob.lee.fastair.service.FileService
+import com.mob.lee.fastair.service.MessageService
 import com.mob.lee.fastair.utils.dialog
 import com.mob.lee.fastair.utils.errorToast
 import com.mob.lee.fastair.utils.successToast
@@ -139,5 +141,7 @@ class DiscoverFragment : AppFragment() {
         } else {
             mParent?.onBackPressed()
         }
+        viewModel.startService(requireContext(), MessageService::class.java)
+        viewModel.startService(requireContext(), FileService::class.java)
     }
 }

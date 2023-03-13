@@ -70,7 +70,6 @@ class ChatFragment : ConnectFragment() {
         }
         mConnect = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
-                context?.errorToast("连接断开")
             }
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -87,7 +86,7 @@ class ChatFragment : ConnectFragment() {
                 }
             }
         }
-        context?.startService(intent)
+
         context?.bindService(intent, mConnect!!, Context.BIND_AUTO_CREATE)
     }
 

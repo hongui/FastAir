@@ -8,7 +8,6 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mob.lee.fastair.R
@@ -18,7 +17,6 @@ import com.mob.lee.fastair.io.state.State
 import com.mob.lee.fastair.service.BinderImpl
 import com.mob.lee.fastair.service.FileService
 import com.mob.lee.fastair.utils.errorToast
-import com.mob.lee.fastair.viewmodel.DeviceViewModel
 import com.mob.lee.fastair.viewmodel.TransferViewModel
 
 class TransferFragment : ConnectFragment(), ProgressListener {
@@ -54,8 +52,6 @@ class TransferFragment : ConnectFragment(), ProgressListener {
         }
 
         Intent(requireContext(), FileService::class.java).apply {
-            val device: DeviceViewModel by requireActivity().viewModels()
-            putExtras(device.bundle())
             mConntect = object : ServiceConnection {
                 override fun onServiceDisconnected(name: ComponentName?) {
 
@@ -67,7 +63,6 @@ class TransferFragment : ConnectFragment(), ProgressListener {
                     fileService?.mListener = this@TransferFragment
                 }
             }
-            requireActivity().startService(this)
             requireActivity().bindService(this, mConntect!!, Context.BIND_IMPORTANT)
         }
     }
