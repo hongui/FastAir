@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.core.view.MenuProvider
 import com.mob.lee.fastair.R
 import com.mob.lee.fastair.base.AppFragment
 import com.mob.lee.fastair.p2p.failedReason
@@ -37,7 +38,6 @@ class DiscoverFragment : AppFragment() {
     }
 
     override fun setting() {
-        setHasOptionsMenu(true)
         title(R.string.discover_device, true)
 
         val discoverView = view<DiscoverView>(R.id.discoverView)
@@ -113,22 +113,23 @@ class DiscoverFragment : AppFragment() {
                     }
                 }
             })
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_discover, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (R.id.menu_discover_help == item.itemId) {
-            mParent?.dialog {
-                setMessage(R.string.discover_help)
-                    .setPositiveButton(R.string.knowIt, null)
+        requireActivity().addMenuProvider(object :MenuProvider{
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_discover, menu)
             }
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (R.id.menu_discover_help == menuItem.itemId) {
+                    mParent?.dialog {
+                        setMessage(R.string.discover_help)
+                            .setPositiveButton(R.string.knowIt, null)
+                    }
+                    return true
+                }
+                return false
+            }
+        },this)
     }
 
     fun jump() {

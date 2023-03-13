@@ -4,6 +4,7 @@ import android.os.Environment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import androidx.core.view.MenuProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
@@ -29,7 +30,6 @@ class PathPickFragment : AppFragment() {
     }
 
     override fun setting() {
-        setHasOptionsMenu(true)
         title(R.string.choose_save_path)
 
         val adapter = PathAdapter()
@@ -81,17 +81,20 @@ class PathPickFragment : AppFragment() {
             adapter.clear()
             adapter.add(it)
         }
-    }
+        requireActivity().addMenuProvider(object :MenuProvider{
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_ok, menu)
+            }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_ok, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.getItemId() == R.id.menu_ok) {
-            viewModel.submit(this)
-        }
-        return super.onOptionsItemSelected(item)
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return if (menuItem.getItemId() == R.id.menu_ok) {
+                    viewModel.submit(this@PathPickFragment)
+                    true
+                }else{
+                    false
+                }
+            }
+        },this)
     }
 
     inner class PathAdapter : AppListAdapter<File>(R.layout.item_path) {
