@@ -74,9 +74,9 @@
         всё</string>
     <string name="sort">Сортировка</string>
     <string name="delete">Удалить</string>
-    <string name="sort_by_name">Сортировать по имени</string>
-    <string name="sort_by_size">Сортировать по размеру</string>
-    <string name="sort_by_time">Сортировать по времени</string>
+    <string name="sort_by_name">По имени</string>
+    <string name="sort_by_size">По размеру</string>
+    <string name="sort_by_time">По времени</string>
     <string name="warm">Предупреждение</string>
     <string name="give_up">Отказаться</string>
     <string name="send">Отправить</string>
@@ -98,7 +98,7 @@
     <string name="category_other">Другие</string>
     <string name="category_application">APK</string>
     <string name="category_zip">Архивы</string>
-    <string name="category_txt">Текст</string>
+    <string name="category_txt">TXT</string>
     <string name="category_pdf">PDF</string>
     <string name="category_powerpoint">PowerPoint</string>
     <string name="category_excel">Excel</string>
