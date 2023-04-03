@@ -18,8 +18,13 @@ A Android APP design to transferring files and IM between two Android device.Usi
 8. Http implement
 9. Svelte
 
-# APK
-[Just want a APK.](https://github.com/hongui/FastAir/releases)
+# Download
+
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+     alt="Get it on IzzyOnDroid"
+     height="70">](https://apt.izzysoft.de/fdroid/index/apk/com.mob.lee.fastair)
+
+Or get the latest APK from the [Releases Section](https://github.com/hongui/FastAir/releases/latest).
 
 # Preview
 ## PC
