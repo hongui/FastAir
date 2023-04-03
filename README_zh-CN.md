@@ -18,6 +18,12 @@
 
 # APK
 [只需要个APK的安装包.](https://github.com/hongui/FastAir/releases)
+# 下载
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+     alt="Get it on IzzyOnDroid"
+     height="70">](https://apt.izzysoft.de/fdroid/index/apk/com.mob.lee.fastair)
+
+或者到[发布页面](https://github.com/hongui/FastAir/releases/latest)下载最新的安装包.
 
 # 页面预览
 ## PC端
